@@ -2,6 +2,7 @@
 #include <stack>
 #include <map>
 #include <iostream>
+#include <sstream>
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
@@ -15,10 +16,11 @@ using namespace sf;
 class Entity
 {
 public:
+	//Variables
 	RectangleShape shape;
 	float movementSpeed;
 
-
+	//Constructor / Destructor
 	Entity()
 	{
 		this->shape.setSize(Vector2f(50.f, 50.f));
@@ -92,17 +94,14 @@ public:
 	}
 
 	//Functions
-	virtual void chechForQuit()
+	virtual void endStateUpdate()
 	{
-		if (Keyboard::isKeyPressed(Keyboard::Key(this->keybinds.at("CLOSE"))))
-		{
-			this->quit = true;
-		}
+
 	}
 
-	virtual void endState()
+	void endState()
 	{
-
+		this->quit = true;
 	}
 
 	virtual void updateMousePositions()
@@ -131,9 +130,10 @@ public:
 class GameState : public State
 {
 public:
+	//Variables
 	Entity player;
 
-	//Functions
+	//Initilizer functions
 	void initKeybinds()
 	{
 		this->keybinds["CLOSE"] = this->supportedKeys->at("Escape");
@@ -162,8 +162,6 @@ public:
 
 	void updateInput(const float& dt)
 	{
-		this->chechForQuit();
-
 		//Update player input
 		if (Keyboard::isKeyPressed(Keyboard::Key(this->keybinds.at("MOVE_UP"))))
 			this->player.move(dt, 0.f, -1.f);
@@ -173,6 +171,8 @@ public:
 			this->player.move(dt, 0.f, 1.f);
 		if (Keyboard::isKeyPressed(Keyboard::Key(this->keybinds.at("MOVE_RIGHT"))))
 			this->player.move(dt, 1.f, 0.f);
+		if (Keyboard::isKeyPressed(Keyboard::Key(this->keybinds.at("CLOSE"))))
+			this->endState();
 	}
 
 	void update(const float& dt)
@@ -334,9 +334,11 @@ public:
 
 	void initButtons()
 	{
-		this->buttons["GAME_STATE"] = new Button(100, 100, 150, 50, &this->font, "เข้าสู่เกม", Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
+		this->buttons["GAME_STATE"] = new Button(100, 100, 250, 50, &this->font, "เข้าสู่เกม", Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->buttons["EXIT_STATE"] = new Button(100, 300, 150, 50, &this->font, "ออกจากเกม", Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
+		this->buttons["SETTINGS"] = new Button(100, 200, 250, 50, &this->font, "ตั้งค่า", Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
+
+		this->buttons["EXIT_STATE"] = new Button(100, 300, 250, 50, &this->font, "ออกจากเกม", Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 	}
 
 	//Constructor / Destructor
@@ -359,16 +361,6 @@ public:
 	}
 
 	//Functions
-	void endState()
-	{
-		cout << "Ending MainMenuState!" << "\n";
-	}
-
-	void updateInput(const float& dt)
-	{
-		this->chechForQuit();
-	}
-
 	void updateButtons()
 	{
 		/*Updates all the buttons in the state and handles their functionlaity.*/
@@ -386,7 +378,7 @@ public:
 		//Quit the game
 		if (this->buttons["EXIT_STATE"]->isPressed())
 		{
-			this->quit = true;
+			this->endState();
 		}
 	}
 
@@ -414,6 +406,15 @@ public:
 		target->draw(this->background);
 
 		this->renderButtons(target);
+		Text mouseText;
+		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
+		mouseText.setFont(this->font);
+		mouseText.setCharacterSize(20);
+		std::stringstream ss;
+		ss << this->mousePosView.x << " " << this->mousePosView.y;
+		mouseText.setString(ss.str());
+
+		target->draw(mouseText);
 	}
 };
 
