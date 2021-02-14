@@ -294,12 +294,31 @@ class MainMenuState : public State
 {
 public:
 	//Variables
+	Texture backgroundTexture;
 	RectangleShape background;
 	Font font;
 
 	map<string, Button*> buttons;
 
-	//Functions
+	//Initializer functions
+	void initVariables()
+	{
+
+	}
+
+	void initBackground()
+	{
+
+		if (!this->backgroundTexture.loadFromFile("Images/mainmanu.jpg"))
+		{
+			throw "ERROR::MAIN_MENU_STATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
+		}
+
+		this->background.setSize(Vector2f(window->getSize().x, window->getSize().y));
+		this->background.setTexture(&this->backgroundTexture);
+
+	}
+
 	void initFonts()
 	{
 		if (!this->font.loadFromFile("Fonts/2005_iannnnnJPG.ttf"))
@@ -324,12 +343,11 @@ public:
 	MainMenuState(RenderWindow* window, map<string, int>* supportedKeys, stack<State*>* states)
 		: State(window, supportedKeys, states)
 	{
+		this->initVariables();
+		this->initBackground();
 		this->initFonts();
 		this->initKeybinds();
 		this->initButtons();
-
-		this->background.setSize(Vector2f(window->getSize().x, window->getSize().y));
-		this->background.setFillColor(Color::Magenta);
 	}
 
 	virtual ~MainMenuState()
@@ -401,10 +419,11 @@ public:
 
 int main()
 {
-	bool fullscreen;
+	bool fullscreen = true;
 	unsigned antialiasing_level = 0;
 	float speed = 10;
-	float dt;
+	float dt = 0;
+
 	Event event;
 	Clock dtClock;
 
@@ -412,7 +431,10 @@ int main()
 	windowSettings.antialiasingLevel = antialiasing_level;
 
 	RenderWindow* window;
-	window = new RenderWindow(VideoMode(1920, 1080), "The Curse", Style::Default, windowSettings);
+	if (fullscreen)
+		window = new RenderWindow(VideoMode(1920, 1080), "The Curse", Style::Fullscreen, windowSettings);
+	else
+		window = new RenderWindow(VideoMode(1920, 1080), "The Curse", Style::Default, windowSettings);
 	window->setFramerateLimit(60);
 	window->setVerticalSyncEnabled(true);
 
