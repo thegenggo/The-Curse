@@ -1,0 +1,99 @@
+class AnimationComponent
+{
+public:
+	class Animation
+	{
+	public:
+		//Variables
+		Sprite& sprite;
+		Texture& textureSheet;
+		float animationTimer;
+		float timer;
+		int width;
+		int height;
+		bool end;
+		vector<IntRect> rect;
+
+		Animation(Sprite& sprite, Texture& textureSheet, float animation_timer, int start_frame_x, int start_frame_y, int frames_x, int frames_y, int width, int height)
+			: sprite(sprite), textureSheet(textureSheet), animationTimer(animation_timer / (frames_x + 1 - start_frame_x)), width(width), height(height)
+		{
+			this->end = false;
+			this->timer = 0.f;
+			for (int i = 0; i < frames_x - start_frame_x + 1; i++)
+				rect.push_back(IntRect(start_frame_x * width + i * width, start_frame_y * height, width, height));
+			this->sprite.setTexture(this->textureSheet);
+			this->sprite.setTextureRect(IntRect(start_frame_x * width, start_frame_y * height, width, height));
+		}
+
+		//Functions
+		void play(const float& dt)
+		{
+			//Update timer
+			this->timer += dt / this->animationTimer;
+			size_t n = rect.size();
+			if (this->timer >= n) {
+				this->timer -= n; this->end = 1;
+			}
+			if (n > 0) sprite.setTextureRect(rect[int(this->timer)]);
+		}
+
+		//Accessors
+		bool isEnd()
+		{
+			return this->end;
+		}
+
+		void reset()
+		{
+			this->timer = 0.f;
+		}
+	};
+	//Variables
+	map<string, Animation* > animations;
+	Sprite& sprite;
+	Texture& textureSheet;
+
+	//Constructor / Destructor
+	AnimationComponent(Sprite& sprite, Texture& texture_sheet)
+		:sprite(sprite), textureSheet(texture_sheet)
+	{
+
+	}
+
+	virtual ~AnimationComponent()
+	{
+		for (auto& i : this->animations)
+		{
+			delete i.second;
+		}
+	}
+
+	//Functions
+	void addAnimation(string key, float animation_timer, int start_frame_x, int start_frame_y, int frames_x, int frames_y, int width, int height)
+	{
+		this->animations[key] = new Animation(this->sprite, this->textureSheet, animation_timer, start_frame_x, start_frame_y, frames_x, frames_y, width, height);
+	}
+
+	void deleteAnimation(const string key)
+	{
+		this->animations.erase(key);
+	}
+
+	void play(const string key, const float& dt)
+	{
+		this->animations[key]->play(dt);
+	}
+
+	bool isEnd(const string key)
+	{
+		return this->animations[key]->isEnd();
+	}
+
+	void reset()
+	{
+		for (auto& i : this->animations)
+		{
+			i.second->reset();
+		}
+	}
+};
