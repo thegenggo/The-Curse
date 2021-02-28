@@ -1,0 +1,94 @@
+class Entity
+{
+public:
+	//Variables
+	Sprite sprite;
+	Texture* texture;
+
+	HitboxComponent* hitboxComponent;
+	MovementComponent* movementComponent;
+	AnimationComponent* animationComponent;
+
+	//Initilizer functions
+	virtual void initVariables()
+	{
+		this->hitboxComponent = NULL;
+		this->texture = NULL;
+		this->movementComponent = NULL;
+	}
+
+	//Constructor / Destructor
+	Entity()
+	{
+		this->initVariables();
+	}
+
+	virtual ~Entity()
+	{
+		delete this->hitboxComponent;
+		delete this->movementComponent;
+		delete this->animationComponent;
+	}
+
+	//Accessors
+	const FloatRect& getGlobalBounds() const
+	{
+		return this->hitboxComponent->hitbox.getGlobalBounds();
+	}
+
+	const Vector2f& getPosition() const
+	{
+		return this->sprite.getPosition();
+	}
+
+	//Component functions
+	void setTexture(Texture& texture)
+	{
+		this->texture = &texture;
+		this->sprite.setTexture(texture);
+	}
+
+	void createHitboxComponent(Sprite& sprite, float offset_x, float offset_y, float width, float height)
+	{
+		this->hitboxComponent = new HitboxComponent(sprite, offset_x, offset_y, width, height);
+	}
+
+	void createMovementComponent(const float velocity)
+	{
+		this->movementComponent = new MovementComponent(this->sprite, velocity);
+	}
+
+	void createAnimationComponent(Texture& texture_sheet)
+	{
+		this->animationComponent = new AnimationComponent(this->sprite, texture_sheet);
+	}
+
+	//Functions
+	virtual void setOrigin(const float x, const float y)
+	{
+		this->sprite.setOrigin(x, y);
+	}
+
+	virtual void setPosition(const float x, const float y)
+	{
+		this->sprite.setPosition(x, y);
+	}
+
+	virtual void move(const float dir_x, const float dir_y, const float& dt)
+	{
+		if (this->movementComponent)
+		{
+			this->movementComponent->move(dir_x, dir_y, dt); //Sets velocity
+		}
+	}
+
+	virtual void update(const float& dt)
+	{
+
+	}
+
+	virtual void render(RenderTarget& target)
+	{
+		target.draw(this->sprite);
+	}
+};
