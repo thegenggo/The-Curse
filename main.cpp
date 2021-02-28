@@ -15,6 +15,10 @@
 using namespace std;
 using namespace sf;
 
+string currentState = "MainMenu";
+string openWorldState = "Game";
+string battleState = "Battle";
+
 class Status
 {
 public:
@@ -153,7 +157,7 @@ public:
 	}
 };
 
-enum class movementState { IDLE = 0, MOVING_UP, MOVING_LEFT, MOVING_DOWN, MOVING_RIGHT };
+enum class movementState { IDLE, MOVING_UP, MOVING_LEFT, MOVING_DOWN, MOVING_RIGHT };
 
 class MovementComponent
 {
@@ -674,8 +678,7 @@ class State
 public:
 	//Variables
 	RenderWindow* window;
-	vector<State*>* states;
-	map<string, int>* supportedKeys;
+	map<string, State*>* states;
 	map<string, int> keybinds;
 	Font font;
 	bool quit;
@@ -694,10 +697,9 @@ public:
 	}
 
 	//Constructor / Destructor
-	State(RenderWindow* window, vector<State*>* states)
+	State(RenderWindow* window, map<string, State*>* states)
 	{
 		this->window = window;
-		this->supportedKeys = supportedKeys;
 		this->states = states;
 		this->quit = false;
 	}
@@ -912,7 +914,6 @@ public:
 	Entity targetCursor, * targetentity;
 	Texture targetCursortex;
 
-
 	//button
 	map<string, Button*> Mainbuttons, Itembuttons, * currentbutton;
 
@@ -942,10 +943,7 @@ public:
 	Texture ItemwindowTex;
 	bool isItemwindowActive;
 
-
-
 	//iniilizer function
-
 	void initItemwindow()
 	{
 		if (!this->ItemwindowTex.loadFromFile("Images/Itemwindow.jpg"))
@@ -976,7 +974,7 @@ public:
 			throw "ERROR::MAIN_MENU_STATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
 		}
 
-		this->player = new Player(200.f, 200.f, this->playertexture);
+		this->player = new Player(400.f, 500.f, this->playertexture);
 	}
 
 	void initEnemy()
@@ -1044,7 +1042,7 @@ public:
 			throw "ERROR::MAIN_MENU_STATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
 		}
 
-		this->background.setSize(Vector2f(window->getSize()));
+		this->background.setSize(Vector2f(this->window->getView().getSize()));
 		this->background.setTexture(&this->bgtexture);
 
 	}
@@ -1058,24 +1056,24 @@ public:
 
 	void initButtons()
 	{
-		this->Mainbuttons["ATTACK"] = new Button(100, 600, 125, 50, &this->font, "Attack", 20, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+		this->Mainbuttons["ATTACK"] = new Button(35, 827, 228, 234, &this->font, "Attack", 100, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
-		this->Mainbuttons["ITEM"] = new Button(300, 600, 125, 50, &this->font, "ITEM", 20, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+		this->Mainbuttons["ITEM"] = new Button(279, 827, 228, 234, &this->font, "ITEM", 100, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
-		this->Mainbuttons["SKILL"] = new Button(500, 600, 125, 50, &this->font, "SKILL", 20, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+		this->Mainbuttons["SKILL"] = new Button(521, 827, 228, 234, &this->font, "SKILL", 100, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
-		this->Mainbuttons["RUN"] = new Button(700, 600, 125, 50, &this->font, "RUN", 20, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+		this->Mainbuttons["RUN"] = new Button(767, 827, 228, 234, &this->font, "RUN", 100, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->Itembuttons["ITEM1"] = new Button(900, 50, 125, 50, &this->font, "item1", 20, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+		this->Itembuttons["ITEM1"] = new Button(900, 50, 125, 50, &this->font, "item1", 50, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
-		this->Itembuttons["ITEM2"] = new Button(900, 150, 125, 50, &this->font, "ITEM2", 20, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+		this->Itembuttons["ITEM2"] = new Button(900, 150, 125, 50, &this->font, "ITEM2", 50, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
-		this->Itembuttons["ITEM3"] = new Button(900, 250, 125, 50, &this->font, "item3", 20, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+		this->Itembuttons["ITEM3"] = new Button(900, 250, 125, 50, &this->font, "item3", 50, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
-		this->Itembuttons["ITEM4"] = new Button(900, 350, 125, 50, &this->font, "item4", 20, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+		this->Itembuttons["ITEM4"] = new Button(900, 350, 125, 50, &this->font, "item4", 50, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
-		this->Itembuttons["EXITITEM"] = new Button(900, 450, 125, 50, &this->font, "exit", 20, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+		this->Itembuttons["EXITITEM"] = new Button(900, 450, 125, 50, &this->font, "exit", 50, Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
 		//init curerent button
@@ -1094,7 +1092,7 @@ public:
 	}
 
 	//Constructor / Destructor
-	BattleState(RenderWindow* window, vector<State*>* states, int Maxround, int Stagelevel, bool Isbossstage)
+	BattleState(RenderWindow* window, map<string, State*>* states, int Maxround = 2, int Stagelevel = 1, bool Isbossstage = false)
 		: State(window, states)
 	{
 		this->initVariables(Maxround, Stagelevel, Isbossstage);
@@ -1169,7 +1167,7 @@ public:
 			this->isstageclear = false;
 			//backup player data
 			*temp::TempStatus = playerstatus;
-			this->endState(); //go back to game state
+			currentState = openWorldState; //go back to game state
 		}
 	}
 	void UpdateEnemyAttack()
@@ -1189,9 +1187,8 @@ public:
 					if (this->playerstatus.isdead)
 					{
 						cout << "You are dead" << endl;
-						this->endState();
+						currentState = openWorldState;
 						break;
-
 					}
 				}
 			}
@@ -1254,7 +1251,6 @@ public:
 				case 3:this->playerstatus.stamina += 0.5f * this->playerstatus.max_stamina;
 					cout << "effect +stamina" << endl;
 					break;
-
 				}
 				cout << "Use Item " << i << endl;
 				this->playerstatus.itemnum[i]--;
@@ -1330,7 +1326,7 @@ public:
 		//Quit the game
 		if (this->Mainbuttons["RUN"]->isPressed())
 		{
-			this->endState(); // back to game state
+			currentState = openWorldState; // back to game state
 		}
 	}
 
@@ -1437,11 +1433,11 @@ public:
 	}
 
 	//Constructor / Destructor
-	GameState(RenderWindow* window, vector<State*>* states)
+	GameState(RenderWindow* window, map<string, State*>* states)
 		: State(window, states)
 	{
 		this->background.setFillColor(Color::White);
-		this->background.setSize(Vector2f(window->getSize()));
+		this->background.setSize(Vector2f(this->window->getView().getSize()));
 		this->initTexture();
 		this->initPlayers();
 		this->initCollosionBox();
@@ -1471,12 +1467,13 @@ public:
 
 		if (Keyboard::isKeyPressed(Keyboard::B))
 		{
-			this->states->push_back(new BattleState(this->window, this->states, 2, 1, false));
+			this->states->insert_or_assign("Battle", new BattleState(this->window,this->states));
+			currentState = "Battle";
 		}
 
 		if (Keyboard::isKeyPressed(Keyboard::Escape))
 		{
-			this->endState();
+			currentState = "MainMenu";
 		}
 	}
 
@@ -1485,19 +1482,23 @@ public:
 		this->updateMousePositions();
 		this->updateInput(dt);
 
-		if (this->player->getGlobalBounds().left + this->player->getGlobalBounds().width > this->window->getSize().x)
+		if (this->player->getGlobalBounds().left + this->player->getGlobalBounds().width > this->window->getView().getSize().x + 5.f)
 		{
-			this->player->setPosition(this->window->getSize().x - this->player->getGlobalBounds().width, this->player->getPosition().y);
+			this->player->setPosition(this->window->getView().getSize().x - 40.f, this->player->getPosition().y);
+			openWorldState = "Game2";
+			currentState = "Game2";
 		}
 
-		if (this->player->getGlobalBounds().left < 0)
+		if (this->player->getGlobalBounds().left < -5.f)
 		{
 			this->player->setPosition(0, this->player->getPosition().y);
+			openWorldState = "Game";
+			currentState = "Game";
 		}
 
-		if (this->player->getGlobalBounds().top + this->player->getGlobalBounds().height > this->window->getSize().y)
+		if (this->player->getGlobalBounds().top + this->player->getGlobalBounds().height > this->window->getView().getSize().y)
 		{
-			this->player->setPosition(this->player->getPosition().x, this->window->getSize().y - this->player->getGlobalBounds().height);
+			this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getGlobalBounds().height);
 		}
 
 		if (this->player->getGlobalBounds().top < 0)
@@ -1538,20 +1539,19 @@ public:
 	RectangleShape background;
 
 	map<string, Button*> buttons;
-
+	
 	//Initializer functions
 	void initVariables()
 	{
-
+	
 	}
 
 	void initBackground()
 	{
-
 		if (!this->backgroundTexture.loadFromFile("Images/Backgrounds/mainmanu.jpg"))
 			throw "ERROR::MAIN_MENU_STATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
 
-		this->background.setSize(Vector2f(this->window->getSize()));
+		this->background.setSize(Vector2f(this->window->getView().getSize()));
 		this->background.setTexture(&this->backgroundTexture);
 	}
 
@@ -1571,7 +1571,7 @@ public:
 	}
 
 	//Constructor / Destructor
-	MainMenuState(RenderWindow* window, vector<State*>* states)
+	MainMenuState(RenderWindow* window, map<string, State*>* states)
 		: State(window, states)
 	{
 		this->initVariables();
@@ -1600,7 +1600,8 @@ public:
 		//New game
 		if (this->buttons["GAME_STATE"]->isPressed())
 		{
-			this->states->push_back(new GameState(window, states));
+			this->states->emplace("Game", new GameState(this->window, this->states));
+			currentState = openWorldState;
 		}
 
 		//Quit the game
@@ -1646,15 +1647,14 @@ public:
 	}
 };
 
-Event event;
-
 int main()
 {
-	bool fullscreen = true;
+	bool fullscreen = false;
 	unsigned antialiasing_level = 0;
 	float speed = 10;
 	float dt = 0;
 
+	Event event;
 	Clock dtClock;
 
 	ContextSettings windowSettings;
@@ -1662,15 +1662,18 @@ int main()
 
 	RenderWindow* window;
 	if (fullscreen)
-		window = new RenderWindow(VideoMode(1920, 1080), "The Curse", Style::Fullscreen, windowSettings);
+		window = new RenderWindow(VideoMode::getDesktopMode(), "The Curse", Style::Fullscreen, windowSettings);
 	else
-		window = new RenderWindow(VideoMode(1920, 1080), "The Curse", Style::Default, windowSettings);
-	window->setFramerateLimit(60);
+		window = new RenderWindow(VideoMode(1280, 720), "The Curse", Style::Default, windowSettings);
+
+	window->setView(View(FloatRect(0, 0, 1920, 1080)));
 	window->setVerticalSyncEnabled(true);
 
-	vector<State*> states;
-	states.push_back(new MainMenuState(window, &states));
-
+	map<string, State*> states;
+	states["MainMenu"] = new MainMenuState(window, &states);
+	states.insert(pair<string, State*>("Game2", new GameState(window, &states)));
+	states.insert(pair<string, State*>("Game", new GameState(window, &states)));
+	
 	while (window->isOpen())
 	{
 		//Update
@@ -1682,15 +1685,16 @@ int main()
 				window->close();
 		}
 
+
 		if (!states.empty())
 		{
-			states.back()->update(dt);
+			states[currentState]->update(dt);
 
-			if (states.back()->getQuit())
+			if (states[currentState]->getQuit())
 			{
-				states.back()->endState();
-				delete states.back();
-				states.pop_back();
+				states[currentState]->endState();
+				delete states[currentState];
+				states.erase(states.find(currentState));
 			}
 		}
 		else
@@ -1703,7 +1707,7 @@ int main()
 
 		if (!states.empty())
 		{
-			states.back()->render();
+			states[currentState]->render();
 		}
 
 		window->display();
@@ -1713,8 +1717,7 @@ int main()
 
 	while (!states.empty())
 	{
-		delete states.back();
-		states.pop_back();
+		states.clear();
 	}
 
 	return 0;
