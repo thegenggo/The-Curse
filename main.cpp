@@ -1016,8 +1016,6 @@ public:
 			this->enemystatus[i].Damageshow.setString("");
 			this->enemystatus[i].Damageshow.setFillColor(Color::Red);
 			this->enemystatus[i].Damageshow.setCharacterSize(40);
-
-
 		}
 
 		//set default target
