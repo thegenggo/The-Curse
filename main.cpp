@@ -19,12 +19,12 @@ using namespace sf;
 string currentState = "MainMenu";
 string openWorldState = "Game";
 string battleState = "Battle";
+Font font;
 
 class ChatDialog
 {
 	RectangleShape shape;
 	Text text;
-	Font font;
 
 public:
 	ChatDialog(wstring text)
@@ -32,8 +32,8 @@ public:
 		this->shape.setSize(Vector2f(1900, 200));
 		this->text.setCharacterSize(30);
 		this->shape.setOrigin(1900 / 2.f, 200 / 2.f);
-		this->font.loadFromFile("Fonts/2005_iannnnnJPG.ttf");
-		this->text.setFont(this->font);
+		
+		this->text.setFont(font);
 		this->text.setString(text);
 		this->shape.setFillColor(Color(70, 70, 70, 200));
 		this->text.setFillColor(Color::White);
@@ -61,7 +61,6 @@ public:
 class ShowDamage
 {
 	Text text;
-	Font font;
 	float time;
 
 public:
@@ -74,8 +73,7 @@ public:
 
 	ShowDamage(Vector2f position, int damage)
 	{
-		this->font.loadFromFile("Fonts/2005_iannnnnJPG.ttf");
-		this->text.setFont(this->font);
+		this->text.setFont(font);
 		this->text.setFillColor(Color::Red);
 		this->text.setCharacterSize(40);
 		this->text.setString(to_string(damage));
@@ -85,8 +83,7 @@ public:
 
 	ShowDamage(Vector2f position, string text)
 	{
-		this->font.loadFromFile("Fonts/2005_iannnnnJPG.ttf");
-		this->text.setFont(this->font);
+		this->text.setFont(font);
 		this->text.setFillColor(Color::Red);
 		this->text.setCharacterSize(40);
 		this->text.setString(text);
@@ -374,7 +371,6 @@ protected:
 	Texture texture;
 	string name;
 	Text textDamage;
-	Font font;
 	int lvl;
 	int hp;
 	int max_hp;
@@ -390,7 +386,6 @@ public:
 	//Initilizer functions
 	virtual void initVariables()
 	{
-		this->font.loadFromFile("Fonts/2005_iannnnnJPG.ttf");
 		this->textDamage.setCharacterSize(40);
 		this->textDamage.setFillColor(Color::Red);
 		this->textDamage.setFont(font);
@@ -800,11 +795,11 @@ public:
 
 		this->textDamage.setPosition(this->battleSprite.getPosition().x + 125, this->battleSprite.getPosition().y - 50);
 
-		this->hpText.setFont(this->font);
-		this->spText.setFont(this->font);
-		this->attText.setFont(this->font);
-		this->defText.setFont(this->font);
-		this->lvlText.setFont(this->font);
+		this->hpText.setFont(font);
+		this->spText.setFont(font);
+		this->attText.setFont(font);
+		this->defText.setFont(font);
+		this->lvlText.setFont(font);
 		this->hpText.setCharacterSize(40);
 		this->spText.setCharacterSize(40);
 		this->attText.setCharacterSize(40);
@@ -1096,7 +1091,6 @@ protected:
 	RenderWindow* window;
 	map<string, State*>* states;
 	map<string, int> keybinds;
-	Font font;
 	bool quit;
 
 	Vector2i mousePosScreen;
@@ -1105,12 +1099,6 @@ protected:
 
 	//Resources
 	map<string, Texture> textures;
-
-	void initFonts()
-	{
-		if (!this->font.loadFromFile("Fonts/2005_iannnnnJPG.ttf"))
-			throw("ERROR::MAINMENUSTATE::COULD NOT LOAD FONT");
-	}
 
 public:
 
@@ -1169,7 +1157,6 @@ class Button
 	button_states buttonState;
 
 	RectangleShape shape;
-	Font* font;
 	Text text;
 
 	Color textIdleColor;
@@ -1184,7 +1171,7 @@ class Button
 
 public:
 
-	Button(float x, float y, float width, float height, Font* font, string text, unsigned character_size, Color text_idle_color, Color text_hover_color, Color text_active_color,
+	Button(float x, float y, float width, float height, string text, unsigned character_size, Color text_idle_color, Color text_hover_color, Color text_active_color,
 		Color idle_color, Color hover_color, Color active_color)
 	{
 		this->buttonState = button_states::BTN_IDLE;
@@ -1193,8 +1180,7 @@ public:
 		this->shape.setSize(Vector2f(width, height));
 		this->shape.setFillColor(idle_color);
 
-		this->font = font;
-		this->text.setFont(*this->font);
+		this->text.setFont(font);
 		this->text.setString(text);
 		this->text.setFillColor(text_idle_color);
 		this->text.setCharacterSize(character_size);
@@ -1395,18 +1381,18 @@ public:
 		this->Mainbuttons["Items"] = new ImageButton(531, 837, "Images/Buttons/ButtonItems.png");
 		this->Mainbuttons["Flee"] = new ImageButton(777, 837, "Images/Buttons/ButtonFlee.png");
 
-		this->Itembuttons["ITEM1"] = new Button(560, 400, 150, 100, &this->font, "Item 1", 50, Color::White, Color::White, Color::White,
+		this->Itembuttons["ITEM1"] = new Button(560, 400, 150, 100, "Item 1", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Itembuttons["ITEM2"] = new Button(560, 500, 150, 100, &this->font, "Item 2", 50, Color::White, Color::White, Color::White,
+		this->Itembuttons["ITEM2"] = new Button(560, 500, 150, 100, "Item 2", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Itembuttons["ITEM3"] = new Button(560, 600, 150, 100, &this->font, "Item 3", 50, Color::White, Color::White, Color::White,
+		this->Itembuttons["ITEM3"] = new Button(560, 600, 150, 100, "Item 3", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Itembuttons["ITEM4"] = new Button(560, 700, 150, 100, &this->font, "Item 4", 50, Color::White, Color::White, Color::White,
+		this->Itembuttons["ITEM4"] = new Button(560, 700, 150, 100, "Item 4", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->Skillbuttons["SKILL1"] = new Button(320, 600, 150, 100, &this->font, "Skill 1", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL1"] = new Button(320, 600, 150, 100, "Skill 1", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Skillbuttons["SKILL2"] = new Button(320, 700, 150, 100, &this->font, "Skill 2", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL2"] = new Button(320, 700, 150, 100, "Skill 2", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 	}
 
@@ -1439,7 +1425,6 @@ public:
 	{
 		/*this->initVariables(Maxround, Stagelevel, Isbossstage);*/
 		this->initBackground();
-		this->initFonts();
 		this->initButtons();
 		this->isItemWindowActive = false;
 		this->isSkillWindowActive = false;
@@ -1513,13 +1498,13 @@ public:
 			it.second->update();
 		}
 
-		if (isItemWindowActive)
+		if (this->isItemWindowActive)
 			for (auto& it : Itembuttons)
 			{
 				it.second->update(this->mousePosView);
 			}
 
-		if (isSkillWindowActive)
+		if (this->isSkillWindowActive)
 			for (auto& it : Skillbuttons)
 			{
 				it.second->update(this->mousePosView);
@@ -1533,13 +1518,13 @@ public:
 			i.second->updateEvent(event, this->mousePosView);
 		}
 
-		if (isItemWindowActive)
+		if (this->isItemWindowActive)
 			for (auto& it : Itembuttons)
 			{
 				it.second->updateEvent(event, this->mousePosView);
 			}
 
-		if (isSkillWindowActive)
+		if (this->isSkillWindowActive)
 			for (auto& it : Skillbuttons)
 			{
 				it.second->updateEvent(event, this->mousePosView);
@@ -1628,7 +1613,7 @@ public:
 			this->targetCursor->setPosition(this->target);
 
 		this->isPlayerturn = true;
-		time = 0;
+		this->time = 0;
 
 		//update texture
 	}
@@ -1680,7 +1665,7 @@ public:
 		//show mouse position zone
 		Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
-		mouseText.setFont(this->font);
+		mouseText.setFont(font);
 		mouseText.setCharacterSize(20);
 		std::stringstream ss;
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
@@ -1745,7 +1730,6 @@ public:
 		this->environment.setTexture(environmentTexture);
 		this->objects.push_back(new Object(this->player, 656.f, 110.f));
 		this->objects.push_back(new Object(this->player, 958.f, 187.f));
-		this->initFonts();
 	}
 
 	virtual ~GameState()
@@ -1835,7 +1819,7 @@ public:
 
 		Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
-		mouseText.setFont(this->font);
+		mouseText.setFont(font);
 		mouseText.setCharacterSize(20);
 		stringstream ss;
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
@@ -1866,15 +1850,15 @@ public:
 
 	void initButtons()
 	{
-		this->buttons["GAME_STATE"] = new Button(835, 500, 250, 50, &this->font, "เข้าสู่เกม", 50,
+		this->buttons["GAME_STATE"] = new Button(835, 500, 250, 50, "เข้าสู่เกม", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["BATTLE_STATE"] = new Button(835, 600, 250, 50, &this->font, "ฝึกต่อสู้", 50,
+		this->buttons["BATTLE_STATE"] = new Button(835, 600, 250, 50, "ฝึกต่อสู้", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, &this->font, "ออกจากเกม", 50,
+		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, "ออกจากเกม", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(100, 100, 100, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 	}
@@ -1884,7 +1868,6 @@ public:
 		: State(window, states), player(player)
 	{
 		this->initBackground();
-		this->initFonts();
 		this->initButtons();
 	}
 
@@ -1952,7 +1935,7 @@ public:
 
 		Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
-		mouseText.setFont(this->font);
+		mouseText.setFont(font);
 		mouseText.setCharacterSize(20);
 		stringstream ss;
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
@@ -1965,6 +1948,8 @@ public:
 
 int main()
 {
+	font.loadFromFile("Fonts/2005_iannnnnJPG.ttf");
+
 	bool fullscreen = true;
 	unsigned antialiasing_level = 0;
 	float speed = 10;
