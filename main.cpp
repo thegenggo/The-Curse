@@ -20,6 +20,7 @@ string currentState = "MainMenu";
 string openWorldState = "Game";
 string battleState = "Battle";
 Font font;
+map<string, Texture> enemyTexture;
 
 class ChatDialog
 {
@@ -32,7 +33,7 @@ public:
 		this->shape.setSize(Vector2f(1900, 200));
 		this->text.setCharacterSize(30);
 		this->shape.setOrigin(1900 / 2.f, 200 / 2.f);
-		
+
 		this->text.setFont(font);
 		this->text.setString(text);
 		this->shape.setFillColor(Color(70, 70, 70, 200));
@@ -75,24 +76,31 @@ public:
 	{
 		this->text.setFont(font);
 		this->text.setFillColor(Color::Red);
+		this->text.setOutlineColor(Color::Black);
+		this->text.setOutlineThickness(3.f);
 		this->text.setCharacterSize(40);
 		this->text.setString(to_string(damage));
+		this->text.setOrigin(this->text.getGlobalBounds().width / 2, this->text.getGlobalBounds().height / 2);
 		this->text.setPosition(position);
 		this->time = 0;
 	}
 
-	ShowDamage(Vector2f position, string text)
+	ShowDamage(Vector2f position, string text, int size = 40, Color color = Color::Red)
 	{
 		this->text.setFont(font);
-		this->text.setFillColor(Color::Red);
-		this->text.setCharacterSize(40);
+		this->text.setFillColor(color);
+		this->text.setOutlineColor(Color::Black);
+		this->text.setOutlineThickness(3.f);
+		this->text.setCharacterSize(size);
 		this->text.setString(text);
+		this->text.setOrigin(this->text.getGlobalBounds().width / 2, this->text.getCharacterSize() * 0.75f);
 		this->text.setPosition(position);
 		this->time = 0;
 	}
 
 	void update(const float& dt)
 	{
+		cout << this->text.getGlobalBounds().height << "\n";
 		this->time += dt;
 		this->text.move(0.f, -1.f);
 	}
@@ -510,10 +518,10 @@ public:
 		if (this->name == "Karakasa")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
-			this->hp = 400;
-			this->max_hp = 400;
-			this->att = 150;
-			this->def = 10;
+			this->hp = 600;
+			this->max_hp = 600;
+			this->att = 80;
+			this->def = 5;
 			this->lvl = 1;
 			this->exp = 500;
 
@@ -523,9 +531,9 @@ public:
 		else if (this->name == "Hitotsume")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap1_hitotsume.png");
-			this->hp = 400;
-			this->max_hp = 400;
-			this->att = 150;
+			this->hp = 600;
+			this->max_hp = 600;
+			this->att = 80;
 			this->def = 10;
 			this->lvl = 1;
 			this->exp = 500;
@@ -535,11 +543,11 @@ public:
 		}
 		else if (this->name == "Boss Oni")
 		{
-			this->texture.loadFromFile("Images/on_battle_stage/monmap1_hitotsume.png");
-			this->hp = 400;
-			this->max_hp = 400;
+			this->texture.loadFromFile("Images/on_battle_stage/monmap1_boss_oni.png");
+			this->hp = 1000;
+			this->max_hp = 1000;
 			this->att = 150;
-			this->def = 10;
+			this->def = 20;
 			this->lvl = 1;
 			this->exp = 500;
 
@@ -549,10 +557,10 @@ public:
 		else if (this->name == "Amikiri")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap2_amikiri.png");
-			this->hp = 400;
-			this->max_hp = 400;
-			this->att = 150;
-			this->def = 10;
+			this->hp = 750;
+			this->max_hp = 750;
+			this->att = 100;
+			this->def = 15;
 			this->lvl = 1;
 			this->exp = 500;
 
@@ -562,8 +570,8 @@ public:
 		else if (this->name == "Kappa")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap2_kappa.png");
-			this->hp = 400;
-			this->max_hp = 400;
+			this->hp = 700;
+			this->max_hp = 700;
 			this->att = 150;
 			this->def = 10;
 			this->lvl = 1;
@@ -575,10 +583,10 @@ public:
 		else if (this->name == "Boss Umibozu")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap2_boss_umibozu.png");
-			this->hp = 400;
-			this->max_hp = 400;
-			this->att = 150;
-			this->def = 10;
+			this->hp = 2000;
+			this->max_hp = 2000;
+			this->att = 200;
+			this->def = 30;
 			this->lvl = 1;
 			this->exp = 500;
 
@@ -590,8 +598,8 @@ public:
 			this->texture.loadFromFile("Images/on_battle_stage/monmap3_skeleton.png");
 			this->hp = 400;
 			this->max_hp = 400;
-			this->att = 150;
-			this->def = 10;
+			this->att = 300;
+			this->def = 5;
 			this->lvl = 1;
 			this->exp = 500;
 
@@ -715,6 +723,8 @@ class Player : public Entity
 	MovementComponent* movementComponent;
 	AnimationComponent* battleAnimationComponent;
 	AnimationComponent* openWorldanimationComponent;
+
+	vector<ShowDamage*> showEvent;
 
 public:
 	//Accessors
@@ -877,7 +887,9 @@ public:
 	void levelUp()
 	{
 		this->current_exp -= max_exp;
+		this->max_exp += lvl * 300;
 		this->lvl++;
+		this->showEvent.push_back(new ShowDamage(Vector2f(this->getPosition()), "Level Up!!!!"));
 		this->max_hp += 30;
 		this->att += 10;
 		this->def += 5;
@@ -888,7 +900,7 @@ public:
 
 	void expUp(int exp)
 	{
-		current_exp += exp;
+		this->current_exp += exp;
 	}
 
 	bool useSkill1(vector<Enemy*>& enemies, vector<ShowDamage*>& showDamages)
@@ -898,13 +910,13 @@ public:
 			stamina -= 30;
 			for (auto i : enemies)
 			{
-				showDamages.push_back(new ShowDamage(Vector2f(i->getPosition().x + 30, i->getPosition().y - 40), i->beAttacked(att / 2)));
+				showDamages.push_back(new ShowDamage(Vector2f(i->getPosition().x + 50, i->getPosition().y - 40), i->beAttacked(att / 2)));
 			}
 			return true;
 		}
 		else
 		{
-			showDamages.push_back(new ShowDamage(Vector2f(this->getPosition().x + 30, this->getPosition().y - 40), "Mp is not enough"));
+			showDamages.push_back(new ShowDamage(Vector2f(this->getPosition().x + 50, this->getPosition().y - 40), "Mp is not enough"));
 			return false;
 		}
 		return false;
@@ -915,12 +927,12 @@ public:
 		if (stamina >= 30)
 		{
 			stamina -= 30;
-			showDamages.push_back(new ShowDamage(Vector2f(enemy->getPosition().x + 30, enemy->getPosition().y - 40), enemy->beAttacked(att * 3 / 2)));
+			showDamages.push_back(new ShowDamage(Vector2f(enemy->getPosition().x + 50, enemy->getPosition().y - 40), enemy->beAttacked(att * 3 / 2)));
 			return true;
 		}
 		else
 		{
-			showDamages.push_back(new ShowDamage(Vector2f(this->getPosition().x + 30, this->getPosition().y - 40), "Mp is not enough"));
+			showDamages.push_back(new ShowDamage(Vector2f(this->getPosition().x + 50, this->getPosition().y - 40), "Mp is not enough"));
 			return false;
 		}
 	}
@@ -988,6 +1000,11 @@ public:
 		else this->battleUpdate(dt);
 		if (this->current_exp >= this->max_exp)
 			this->levelUp();
+		for (auto i = this->showEvent.begin(); i < this->showEvent.end(); i++)
+		{
+			(*i)->update(dt);
+			if ((*i)->isEnd()) { this->showEvent.erase(i); i--; }
+		}
 	}
 
 	void openWorldRender(RenderTarget& target)
@@ -1014,6 +1031,10 @@ public:
 	{
 		if (!mode) this->openWorldRender(target);
 		else this->battleRender(target);
+		for (auto& i : showEvent)
+		{
+			i->render(target);
+		}
 	}
 };
 
@@ -1117,7 +1138,7 @@ public:
 	}
 
 	//Functions
-	void endState()
+	virtual void endState()
 	{
 		this->quit = true;
 	}
@@ -1233,7 +1254,7 @@ public:
 			}
 		}
 
-		pressed = false;
+		this->pressed = false;
 
 		switch (this->buttonState)
 		{
@@ -1323,6 +1344,7 @@ class BattleState : public State
 	Enemy* target;
 	TargetCursor* targetCursor;
 	vector<ShowDamage*> showDamages;
+	ShowDamage* clear;
 
 	//item window
 	bool isItemWindowActive;
@@ -1331,7 +1353,6 @@ class BattleState : public State
 
 	float time;
 
-	int maxRound;
 	int stage;
 
 public:
@@ -1396,11 +1417,30 @@ public:
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 	}
 
-	virtual void initEnemy()
+	virtual bool initEnemy()
 	{
-		this->enemy.push_back(new Enemy("Karakasa", 400, 200));
-		this->enemy.push_back(new Enemy("Karakasa", 600, 400));
-		this->enemy.push_back(new Enemy("Karakasa", 300, 500));
+		if (this->stage == 1)
+		{
+			this->enemy.push_back(new Enemy("Karakasa", 400, 200));
+			this->enemy.push_back(new Enemy("Karakasa", 600, 400));
+			this->enemy.push_back(new Enemy("Karakasa", 300, 500));
+			return true;
+		}
+		else if (this->stage == 2)
+		{
+			this->enemy.push_back(new Enemy("Hitotsume", 400, 200));
+			this->enemy.push_back(new Enemy("Hitotsume", 150, 350));
+			return true;
+		}
+		else if (this->stage == 3)
+		{
+			this->enemy.push_back(new Enemy("Boss Oni", 300, 200));
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	void deleteButtons()
@@ -1420,19 +1460,20 @@ public:
 	}
 
 	//Constructor / Destructor
-	BattleState(RenderWindow* window, map<string, State*>* states, Player* player, int Maxround = 3, int Stagelevel = 1, bool Isbossstage = false)
-		: State(window, states), player(player), maxRound(Maxround)
+	BattleState(RenderWindow* window, map<string, State*>* states, Player* player)
+		: State(window, states), player(player)
 	{
 		/*this->initVariables(Maxround, Stagelevel, Isbossstage);*/
+		this->time = 0;
+		this->stage = 1;
 		this->initBackground();
 		this->initButtons();
+		this->initEnemy();
+		this->target = enemy[0];
 		this->isItemWindowActive = false;
 		this->isSkillWindowActive = false;
 		this->isPlayerturn = true;
-		this->initEnemy();
-		this->target = enemy[0];
 		this->targetCursor = new TargetCursor();
-		this->time = 0;
 	}
 
 	virtual ~BattleState()
@@ -1443,17 +1484,27 @@ public:
 			delete it;
 		}
 		delete targetCursor;
+		delete clear;
 	}
 
 	//Functions
+	void endState(int x = 0)
+	{
+		if (!this->clear && x == 1)
+			this->clear = new ShowDamage(Vector2f(960.f, 540.f), "Stage Clear", 300, Color::White);
+		else if(!this->clear && x == 0)
+			this->clear = new ShowDamage(Vector2f(960.f, 540.f), "Run!!!", 250, Color::White);
+	}
+
 	void updateButtons()
 	{
-		if (isPlayerturn)
+		if (this->isPlayerturn && this->target)
 		{
 			//Attack
 			if (this->Mainbuttons["Attack"]->isPressed())
 			{
-				this->showDamages.push_back(new ShowDamage(Vector2f(this->target->getPosition().x + 30, this->target->getPosition().y - 40), this->player->attack(*this->target)));
+				this->showDamages.push_back(new ShowDamage(Vector2f(this->target->getPosition().x + this->target->getGlobalBounds().width / 2
+					, this->target->getPosition().y - 50.f), this->player->attack(*this->target)));
 				this->isPlayerturn = false;
 			}
 
@@ -1488,8 +1539,7 @@ public:
 			//Quit the game
 			if (this->Mainbuttons["Flee"]->isPressed())
 			{
-				currentState = openWorldState; // back to game state
-				this->player->setMode(false);
+				this->endState();
 			}
 		}
 		/*Updates all the buttons in the state and handles their functionlaity.*/
@@ -1544,14 +1594,14 @@ public:
 			dmg += i->attack(*this->player);
 		}
 		if (!enemy.empty())
-			this->showDamages.push_back(new ShowDamage(Vector2f(this->player->getPosition().x + 150, this->player->getPosition().y - 20), dmg));
+			this->showDamages.push_back(new ShowDamage(Vector2f(this->player->getPosition().x + 170.f, this->player->getPosition().y - 20), dmg));
 	}
 
 	void updateTarget()
 	{
 		for (auto& i : enemy)
 		{
-			if (i->isPressed() && !isSkillWindowActive && !isItemWindowActive)
+			if (i->isPressed() && !this->isSkillWindowActive && !this->isItemWindowActive)
 			{
 				this->target = i;
 			}
@@ -1581,6 +1631,7 @@ public:
 			{
 				this->player->expUp((*it)->getExp());
 				this->enemy.erase(it);
+				this->target = NULL;
 				it--;
 			}
 		}
@@ -1599,23 +1650,34 @@ public:
 			i->update(dt);
 		}
 
-		if (!isPlayerturn)
+		if (!this->isPlayerturn)
 			this->enemyTurn();
 
-		if (enemy.empty())
+		if (this->enemy.empty())
 		{
-			this->enemy.push_back(new Enemy("Hitotsume", 350, 100));
-			this->enemy.push_back(new Enemy("Hitotsume", 200, 350));
+			this->target = NULL;
+			this->stage++;
+			if (!this->initEnemy()) this->endState(1);
 		}
 
-		if (this->target->isdead()) this->target = *this->enemy.begin();
+		if (!this->target && !this->enemy.empty())
+			this->target = *this->enemy.begin();
+
 		if (this->target)
 			this->targetCursor->setPosition(this->target);
 
 		this->isPlayerturn = true;
-		this->time = 0;
 
-		//update texture
+		if (this->clear)
+		{
+			this->clear->update(dt);
+			if (this->clear->isEnd())
+			{
+				currentState = openWorldState; // back to game state
+				this->player->setMode(false);
+				this->quit = true;
+			}
+		}
 	}
 
 	void renderButtons(RenderTarget* target = NULL)
@@ -1631,7 +1693,7 @@ public:
 				it.second->render(*target);
 			}
 
-		if (isSkillWindowActive)
+		if (this->isSkillWindowActive)
 			for (auto& it : Skillbuttons)
 			{
 				it.second->render(*target);
@@ -1653,7 +1715,8 @@ public:
 			i->render(*target);
 
 		//enemy target cursor
-		this->targetCursor->render(*target);
+		if (this->target)
+			this->targetCursor->render(*target);
 
 		//render damage to enemy
 		for (auto& i : showDamages)
@@ -1661,6 +1724,9 @@ public:
 
 		//render button
 		this->renderButtons(target);
+
+		if (this->clear)
+			this->clear->render(*target);
 
 		//show mouse position zone
 		Text mouseText;
@@ -1949,6 +2015,15 @@ public:
 int main()
 {
 	font.loadFromFile("Fonts/2005_iannnnnJPG.ttf");
+	enemyTexture["battleKarakasa"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
+	enemyTexture["battleHitosume"].loadFromFile("Images/on_battle_stage/monmap1_boss_oni.png");
+	enemyTexture["battleBossOni"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
+	enemyTexture["battleKappa"].loadFromFile("Images/on_battle_stage/monmap2_kappa.png");
+	enemyTexture["battleAmikiri"].loadFromFile("Images/on_battle_stage/monmap2_amikiri.png");
+	enemyTexture["battleBossUmibozu"].loadFromFile("Images/on_battle_stage/monmap2_boss_umibozu.png");
+	enemyTexture["battleSkeleton"].loadFromFile("Images/on_battle_stage/monmap3_skeleton.png");
+	enemyTexture["battleWanyudo"].loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");
+
 
 	bool fullscreen = true;
 	unsigned antialiasing_level = 0;
