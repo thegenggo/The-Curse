@@ -20,16 +20,56 @@ string currentState = "MainMenu";
 string openWorldState = "Game";
 string battleState = "Battle";
 
+class ChatDialog
+{
+	RectangleShape shape;
+	Text text;
+	Font font;
+
+public:
+	ChatDialog(wstring text)
+	{
+		this->shape.setSize(Vector2f(1900, 200));
+		this->text.setCharacterSize(30);
+		this->shape.setOrigin(1900 / 2.f, 200 / 2.f);
+		this->font.loadFromFile("Fonts/2005_iannnnnJPG.ttf");
+		this->text.setFont(this->font);
+		this->text.setString(text);
+		this->shape.setFillColor(Color(70, 70, 70, 200));
+		this->text.setFillColor(Color::White);
+		this->shape.setPosition(960, 980);
+		this->text.setPosition(30, 900);
+	}
+
+	~ChatDialog()
+	{
+
+	}
+
+	void update()
+	{
+
+	}
+
+	void render(RenderTarget* target)
+	{
+		target->draw(this->shape);
+		target->draw(this->text);
+	}
+};
+
 class ShowDamage
 {
 	Text text;
 	Font font;
-	bool Bool;
 	float time;
+
 public:
-	bool isEnd()
+	const bool isEnd() const
 	{
-		return Bool;
+		if (time > 2.f)
+			return true;
+		return false;
 	}
 
 	ShowDamage(Vector2f position, int damage)
@@ -41,7 +81,6 @@ public:
 		this->text.setString(to_string(damage));
 		this->text.setPosition(position);
 		this->time = 0;
-		this->Bool = false;
 	}
 
 	ShowDamage(Vector2f position, string text)
@@ -53,14 +92,12 @@ public:
 		this->text.setString(text);
 		this->text.setPosition(position);
 		this->time = 0;
-		this->Bool = false;
 	}
 
 	void update(const float& dt)
 	{
-		time += dt;
+		this->time += dt;
 		this->text.move(0.f, -1.f);
-		if (time > 2.f) Bool = true;
 	}
 
 	void render(RenderTarget& target)
@@ -73,40 +110,41 @@ class Bar
 {
 	RectangleShape maxBar;
 	RectangleShape currentBar;
+
 public:
 	Bar(float x, float y, float width, float height, Color color = Color::Green)
 	{
-		maxBar.setSize(Vector2f(width, height));
-		maxBar.setFillColor(Color::Red);
-		maxBar.setOutlineThickness(5.f);
-		maxBar.setOutlineColor(Color::Black);
-		maxBar.setPosition(x, y);
-		currentBar.setSize(Vector2f(width, height));
-		currentBar.setFillColor(color);
-		currentBar.setPosition(x, y);
+		this->maxBar.setSize(Vector2f(width, height));
+		this->maxBar.setFillColor(Color::Red);
+		this->maxBar.setOutlineThickness(5.f);
+		this->maxBar.setOutlineColor(Color::Black);
+		this->maxBar.setPosition(x, y);
+		this->currentBar.setSize(Vector2f(width, height));
+		this->currentBar.setFillColor(color);
+		this->currentBar.setPosition(x, y);
 	}
 
 	void update(int current, int max)
 	{
-		currentBar.setSize(Vector2f(((float)current / max) * maxBar.getSize().x, 10));
+		this->currentBar.setSize(Vector2f(((float)current / max) * maxBar.getSize().x, 10));
 	}
 
 	void render(RenderTarget& target)
 	{
-		target.draw(maxBar);
-		target.draw(currentBar);
+		target.draw(this->maxBar);
+		target.draw(this->currentBar);
 	}
 };
 
 class HitboxComponent
 {
-public:
 	//Variables
 	Sprite& sprite;
 	RectangleShape hitbox;
 	float offsetX;
 	float offsetY;
 
+public:
 	//Constructor / Destructor
 	HitboxComponent(Sprite& sprite, float offset_x, float offset_y, float width, float height)
 		:sprite(sprite), offsetX(offset_x), offsetY(offset_y)
@@ -118,19 +156,19 @@ public:
 		this->hitbox.setOutlineColor(Color::Black);
 	}
 
-	virtual ~HitboxComponent()
-	{
-
-	}
-
 	//Accessors
 	const FloatRect& getGlobalBounds() const
 	{
 		return this->hitbox.getGlobalBounds();
 	}
 
+	const RectangleShape& getHitbox() const
+	{
+		return this->hitbox;
+	}
+
 	//Functions
-	bool checkIntersect(const FloatRect& frect)
+	const bool& checkIntersect(const FloatRect& frect) const
 	{
 		return this->hitbox.getGlobalBounds().intersects(frect);
 	}
@@ -142,7 +180,7 @@ public:
 
 	void render(RenderTarget& target)
 	{
-		//target.draw(this->hitbox);
+		target.draw(this->hitbox);
 	}
 };
 
@@ -150,7 +188,6 @@ enum class movementState { IDLE, MOVING_UP, MOVING_LEFT, MOVING_DOWN, MOVING_RIG
 
 class MovementComponent
 {
-public:
 	//Variables
 	Sprite& sprite;
 	Vector2f velocity;
@@ -158,8 +195,7 @@ public:
 	float maxVelocity;
 	movementState state;
 
-	//Initilizer functions
-
+public:
 	//Constructor / Destructor
 	MovementComponent(Sprite& sprite, float maxVelocity)
 		: sprite(sprite), velocity(Vector2f(0, 0)), maxVelocity(maxVelocity), state(movementState::IDLE)
@@ -167,12 +203,12 @@ public:
 
 	}
 
-	virtual ~MovementComponent()
+	//Accessors
+	const movementState getMovementState() const
 	{
-
+		return this->state;
 	}
 
-	//Accessors
 	const Vector2f& getVelocity() const
 	{
 		return this->velocity;
@@ -235,7 +271,6 @@ class AnimationComponent
 public:
 	class Animation
 	{
-	public:
 		//Variables
 		Sprite& sprite;
 		Texture& textureSheet;
@@ -245,6 +280,8 @@ public:
 		int height;
 		bool end;
 		vector<IntRect> rect;
+
+	public:
 
 		Animation(Sprite& sprite, Texture& textureSheet, float animation_timer, int start_frame_x, int start_frame_y, int frames_x, int frames_y, int width, int height)
 			: sprite(sprite), textureSheet(textureSheet), animationTimer(animation_timer / (frames_x + 1 - start_frame_x)), width(width), height(height)
@@ -442,7 +479,8 @@ class Enemy : public Entity
 	int dropnum;
 	int exp;
 
-	bool Bool;
+	bool pressed;
+
 public:
 	const FloatRect& getGlobalBounds() const
 	{
@@ -459,49 +497,143 @@ public:
 		return this->exp;
 	}
 
-	bool isPressed()
+	const bool& isPressed() const
 	{
-		return Bool;
+		return pressed;
 	}
 
-	bool isdead()
+	const bool& isdead() const
 	{
 		if (hp <= 0) return true;
 		return false;
 	}
 
-	void setStat(int hp, int max_hp, int att, int def)
+	Enemy(string name, float x, float y)
 	{
-		this->hp = hp;
-		this->max_hp = max_hp;
-		this->att = att;
-		this->def = def;
-	}
-
-	void setExp(int exp)
-	{
-		this->exp = exp;
-	}
-
-	Enemy(string name, string textureLocation, float x, float y)
-	{
-		this->Bool = false;
-		this->texture.loadFromFile(textureLocation);
-		this->textDamage.setPosition(x + 50, y - 50);
-		this->sprite.setTexture(this->texture);
-		this->sprite.setPosition(x, y);
+		this->pressed = false;
 		this->name = name;
-		this->hp = 400;
-		this->max_hp = 400;
-		this->att = 150;
-		this->def = 10;
-		this->lvl = 1;
-		this->exp = 500;
+		if (this->name == "Karakasa")
+		{
+			this->texture.loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
+			this->hp = 400;
+			this->max_hp = 400;
+			this->att = 150;
+			this->def = 10;
+			this->lvl = 1;
+			this->exp = 500;
 
-		this->droprate = 30;
-		this->dropnum = 1;
+			this->droprate = 30;
+			this->dropnum = 1;
+		}
+		else if (this->name == "Hitotsume")
+		{
+			this->texture.loadFromFile("Images/on_battle_stage/monmap1_hitotsume.png");
+			this->hp = 400;
+			this->max_hp = 400;
+			this->att = 150;
+			this->def = 10;
+			this->lvl = 1;
+			this->exp = 500;
 
-		this->hpBar = new Bar(sprite.getPosition().x, sprite.getPosition().y, 100, 10);
+			this->droprate = 30;
+			this->dropnum = 1;
+		}
+		else if (this->name == "Boss Oni")
+		{
+			this->texture.loadFromFile("Images/on_battle_stage/monmap1_hitotsume.png");
+			this->hp = 400;
+			this->max_hp = 400;
+			this->att = 150;
+			this->def = 10;
+			this->lvl = 1;
+			this->exp = 500;
+
+			this->droprate = 30;
+			this->dropnum = 1;
+		}
+		else if (this->name == "Amikiri")
+		{
+			this->texture.loadFromFile("Images/on_battle_stage/monmap2_amikiri.png");
+			this->hp = 400;
+			this->max_hp = 400;
+			this->att = 150;
+			this->def = 10;
+			this->lvl = 1;
+			this->exp = 500;
+
+			this->droprate = 30;
+			this->dropnum = 1;
+		}
+		else if (this->name == "Kappa")
+		{
+			this->texture.loadFromFile("Images/on_battle_stage/monmap2_kappa.png");
+			this->hp = 400;
+			this->max_hp = 400;
+			this->att = 150;
+			this->def = 10;
+			this->lvl = 1;
+			this->exp = 500;
+
+			this->droprate = 30;
+			this->dropnum = 1;
+		}
+		else if (this->name == "Boss Umibozu")
+		{
+			this->texture.loadFromFile("Images/on_battle_stage/monmap2_boss_umibozu.png");
+			this->hp = 400;
+			this->max_hp = 400;
+			this->att = 150;
+			this->def = 10;
+			this->lvl = 1;
+			this->exp = 500;
+
+			this->droprate = 30;
+			this->dropnum = 1;
+		}
+		else if (this->name == "Skeleton")
+		{
+			this->texture.loadFromFile("Images/on_battle_stage/monmap3_skeleton.png");
+			this->hp = 400;
+			this->max_hp = 400;
+			this->att = 150;
+			this->def = 10;
+			this->lvl = 1;
+			this->exp = 500;
+
+			this->droprate = 30;
+			this->dropnum = 1;
+		}
+		else if (this->name == "Wanyudo")
+		{
+			this->texture.loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");
+			this->hp = 400;
+			this->max_hp = 400;
+			this->att = 150;
+			this->def = 10;
+			this->lvl = 1;
+			this->exp = 500;
+
+			this->droprate = 30;
+			this->dropnum = 1;
+		}
+		else
+		{
+			this->texture.loadFromFile("Images/on_battle_stage/monmap3_skeleton.png");
+			this->hp = 400;
+			this->max_hp = 400;
+			this->att = 150;
+			this->def = 10;
+			this->lvl = 1;
+			this->exp = 500;
+
+			this->droprate = 30;
+			this->dropnum = 1;
+		}
+		this->sprite.setTexture(this->texture);
+		this->textDamage.setPosition(x + this->sprite.getGlobalBounds().width / 2, y - 50);
+		this->sprite.setPosition(x, y);
+		this->hpBar = new Bar(sprite.getPosition().x, sprite.getPosition().y - 10.f, sprite.getGlobalBounds().width, 10);
+
 	}
 
 	~Enemy()
@@ -513,7 +645,7 @@ public:
 	{
 		if (event.type == Event::MouseButtonPressed)
 		{
-			if (event.mouseButton.button == Mouse::Left && this->sprite.getGlobalBounds().contains(mousePos)) Bool = true;
+			if (event.mouseButton.button == Mouse::Left && this->sprite.getGlobalBounds().contains(mousePos)) pressed = true;
 		}
 	}
 
@@ -521,7 +653,7 @@ public:
 	{
 		this->hpBar->update(this->hp, this->max_hp);
 		this->showDamage(dt);
-		this->Bool = false;
+		this->pressed = false;
 	}
 
 	void render(RenderTarget& target)
@@ -536,17 +668,18 @@ class TargetCursor
 {
 	Sprite sprite;
 	Texture texture;
+
 public:
 	void setPosition(Enemy* enemy)
 	{
-		this->sprite.setPosition(enemy->getPosition().x - 50, enemy->getPosition().y - 140);
+		this->sprite.setPosition(enemy->getPosition().x + enemy->getGlobalBounds().width / 2 - this->sprite.getGlobalBounds().width / 2, enemy->getPosition().y - 150.f);
 	}
 
 	TargetCursor()
 	{
 		this->texture.loadFromFile("Images/targetcursor.png");
 		this->sprite.setTexture(this->texture);
-		this->sprite.setPosition(500.f, 500.f);
+		this->sprite.setPosition(0.f, 0.f);
 	}
 
 	void render(RenderTarget& target)
@@ -568,6 +701,7 @@ class Player : public Entity
 	Bar* hpBar;
 	Bar* staminaBar;
 	bool mode; // 0 = OpenWorld, 1 = Battle
+	bool rendered;
 
 	//Stat
 	int stamina;
@@ -581,11 +715,39 @@ class Player : public Entity
 	Text attText;
 	Text defText;
 	Text lvlText;
-public:
+
 	HitboxComponent* hitboxComponent;
 	MovementComponent* movementComponent;
 	AnimationComponent* battleAnimationComponent;
 	AnimationComponent* openWorldanimationComponent;
+
+public:
+	//Accessors
+	const movementState getMovementState() const
+	{
+		return this->movementComponent->getMovementState();
+	}
+
+	const RectangleShape& getHitbox() const
+	{
+		return this->hitboxComponent->getHitbox();
+	}
+
+	const FloatRect& getSpriteGlobalBounds() const
+	{
+		return this->openWorldSprite.getGlobalBounds();
+	}
+
+	const Sprite& getSprite() const
+	{
+		return this->openWorldSprite;
+	}
+
+	const bool& isRendered() const
+	{
+		return this->rendered;
+	}
+
 	//Constructor / Destructor
 	Player()
 	{
@@ -598,9 +760,9 @@ public:
 
 		this->battleSprite.setPosition(1400.f, 280.f);
 		this->setOrigin(40.f, 10.f);
-		this->setPosition(0, 0);
+		this->setPosition(20.f, 145.f);
 
-		this->hitboxComponent = new HitboxComponent(this->openWorldSprite, 0.f, 0.f, 45.f, 105.f);
+		this->hitboxComponent = new HitboxComponent(this->openWorldSprite, 0.f, 75.f, 45.f, 30.f);
 		this->openWorldanimationComponent = new AnimationComponent(this->openWorldSprite, this->openWorldTexture);
 		this->battleAnimationComponent = new AnimationComponent(this->battleSprite, this->battleTexture);
 		this->movementComponent = new MovementComponent(this->openWorldSprite, 300.f);
@@ -621,8 +783,8 @@ public:
 		this->openWorldanimationComponent->addAnimation("RIGHT", 0.5f, 0, 4, 3, 4, 125, 125);
 		this->battleAnimationComponent->addAnimation("IDLE", 0.5f, 0, 0, 0, 0, 240, 320);
 
-		this->hp = 1500;
-		this->max_hp = 1500;
+		this->hp = 1000;
+		this->max_hp = 1000;
 		this->att = 150;
 		this->def = 10;
 		this->stamina = 100;
@@ -658,6 +820,8 @@ public:
 		this->attText.setFillColor(Color::Black);
 		this->defText.setFillColor(Color::Black);
 		this->lvlText.setFillColor(Color::Black);
+
+		this->rendered = false;
 	}
 
 	virtual ~Player()
@@ -717,14 +881,14 @@ public:
 
 	void levelUp()
 	{
-		current_exp -= max_exp;
-		lvl++;
-		max_hp += 30;
-		att += 10;
-		def += 5;
-		max_stamina += 10;
-		hp = max_hp;
-		stamina = max_stamina;
+		this->current_exp -= max_exp;
+		this->lvl++;
+		this->max_hp += 30;
+		this->att += 10;
+		this->def += 5;
+		this->max_stamina += 10;
+		this->hp = max_hp;
+		this->stamina = max_stamina;
 	}
 
 	void expUp(int exp)
@@ -761,7 +925,7 @@ public:
 		}
 		else
 		{
-
+			showDamages.push_back(new ShowDamage(Vector2f(this->getPosition().x + 30, this->getPosition().y - 40), "Mp is not enough"));
 			return false;
 		}
 	}
@@ -807,6 +971,8 @@ public:
 
 		this->hitboxComponent->update();
 		this->light.setPosition(this->openWorldSprite.getPosition().x + this->getGlobalBounds().width / 2, this->openWorldSprite.getPosition().y + this->getGlobalBounds().height / 2);
+
+		this->rendered = false;
 	}
 
 	void battleUpdate(const float& dt)
@@ -833,6 +999,7 @@ public:
 	{
 		target.draw(this->openWorldSprite);
 		target.draw(this->light);
+		this->rendered = true;
 	}
 
 	void battleRender(RenderTarget& target)
@@ -855,21 +1022,26 @@ public:
 	}
 };
 
-class CollosionBox
+class CollisionBox
 {
-public:
 	//Variables
 	RectangleShape shape;
-	RectangleShape& playerShape;
 	Player& player;
 	RectangleShape up;
 	RectangleShape left;
 	RectangleShape down;
 	RectangleShape right;
 
+public:
+	//Accessors
+	const RectangleShape& getShape() const
+	{
+		return this->shape;
+	}
+
 	//Constructor / Destructor
-	CollosionBox(Player& player, float x, float y, float width, float height)
-		:player(player), playerShape(player.hitboxComponent->hitbox)
+	CollisionBox(Player& player, float x, float y, float width, float height)
+		:player(player)
 	{
 		this->shape.setPosition(x, y);
 		this->shape.setSize(Vector2f(width, height));
@@ -890,27 +1062,22 @@ public:
 		this->right.setSize(Vector2f(1.f, height));
 	}
 
-	virtual ~CollosionBox()
-	{
-
-	}
-
 	//Functions
 	void update()
 	{
-		if (this->playerShape.getGlobalBounds().intersects(this->up.getGlobalBounds()) && this->player.movementComponent->state == movementState::MOVING_DOWN)
+		if (this->player.getHitbox().getGlobalBounds().intersects(this->up.getGlobalBounds()) && this->player.getMovementState() == movementState::MOVING_DOWN)
 		{
-			this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top - this->playerShape.getGlobalBounds().height);
+			this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top - this->player.getHitbox().getGlobalBounds().height - 75.f);
 		}
-		else if (this->playerShape.getGlobalBounds().intersects(this->left.getGlobalBounds()) && this->player.movementComponent->state == movementState::MOVING_RIGHT)
+		else if (this->player.getHitbox().getGlobalBounds().intersects(this->left.getGlobalBounds()) && this->player.getMovementState() == movementState::MOVING_RIGHT)
 		{
-			this->player.setPosition(this->shape.getGlobalBounds().left - this->playerShape.getGlobalBounds().width, this->player.getPosition().y);
+			this->player.setPosition(this->shape.getGlobalBounds().left - this->player.getHitbox().getGlobalBounds().width, this->player.getPosition().y);
 		}
-		else if (this->playerShape.getGlobalBounds().intersects(this->down.getGlobalBounds()) && this->player.movementComponent->state == movementState::MOVING_UP)
+		else if (this->player.getHitbox().getGlobalBounds().intersects(this->down.getGlobalBounds()) && this->player.getMovementState() == movementState::MOVING_UP)
 		{
-			this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height);
+			this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height - 75.f);
 		}
-		else if (this->playerShape.getGlobalBounds().intersects(this->right.getGlobalBounds()) && this->player.movementComponent->state == movementState::MOVING_LEFT)
+		else if (this->player.getHitbox().getGlobalBounds().intersects(this->right.getGlobalBounds()) && this->player.getMovementState() == movementState::MOVING_LEFT)
 		{
 			this->player.setPosition(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width, this->player.getPosition().y);
 		}
@@ -924,7 +1091,7 @@ public:
 
 class State
 {
-public:
+protected:
 	//Variables
 	RenderWindow* window;
 	map<string, State*>* states;
@@ -945,17 +1112,14 @@ public:
 			throw("ERROR::MAINMENUSTATE::COULD NOT LOAD FONT");
 	}
 
+public:
+
 	//Constructor / Destructor
 	State(RenderWindow* window, map<string, State*>* states)
 	{
 		this->window = window;
 		this->states = states;
 		this->quit = false;
-	}
-
-	virtual ~State()
-	{
-
 	}
 
 	//Accessors
@@ -965,11 +1129,6 @@ public:
 	}
 
 	//Functions
-	virtual void endStateUpdate()
-	{
-
-	}
-
 	void endState()
 	{
 		this->quit = true;
@@ -1007,7 +1166,6 @@ enum class button_states { BTN_IDLE, BTN_HOVER, BTN_ACTIVE };
 
 class Button
 {
-public:
 	button_states buttonState;
 
 	RectangleShape shape;
@@ -1023,6 +1181,8 @@ public:
 	Color activeColor;
 
 	bool pressed;
+
+public:
 
 	Button(float x, float y, float width, float height, Font* font, string text, unsigned character_size, Color text_idle_color, Color text_hover_color, Color text_active_color,
 		Color idle_color, Color hover_color, Color active_color)
@@ -1051,11 +1211,6 @@ public:
 		this->activeColor = active_color;
 
 		this->pressed = false;
-	}
-
-	virtual ~Button()
-	{
-
 	}
 
 	//Accessors
@@ -1129,11 +1284,12 @@ class ImageButton
 {
 	Texture texture;
 	Sprite sprite;
-	bool Bool;
+	bool pressed;
+
 public:
 	ImageButton(float x, float y, string textureLocation)
 	{
-		this->Bool = false;
+		this->pressed = false;
 		this->texture.loadFromFile(textureLocation);
 		this->sprite.setTexture(this->texture);
 		this->sprite.setPosition(x, y);
@@ -1141,20 +1297,20 @@ public:
 
 	bool isPressed()
 	{
-		return Bool;
+		return pressed;
 	}
 
 	void updateEvent(const Event& event, const Vector2f mousePos)
 	{
 		if (event.type == Event::MouseButtonPressed)
 		{
-			if (event.mouseButton.button == Mouse::Left && this->sprite.getGlobalBounds().contains(mousePos)) this->Bool = true;
+			if (event.mouseButton.button == Mouse::Left && this->sprite.getGlobalBounds().contains(mousePos)) this->pressed = true;
 		}
 	}
 
 	void update()
 	{
-		this->Bool = false;
+		this->pressed = false;
 	}
 
 	void render(RenderTarget& target)
@@ -1163,8 +1319,8 @@ public:
 	}
 };
 
-class BattleState : public State {
-
+class BattleState : public State
+{
 	Texture bgtexture;
 	RectangleShape background;
 
@@ -1188,6 +1344,9 @@ class BattleState : public State {
 	bool isPlayerturn;
 
 	float time;
+
+	int maxRound;
+	int stage;
 
 public:
 	//variables
@@ -1253,9 +1412,9 @@ public:
 
 	virtual void initEnemy()
 	{
-		this->enemy.push_back(new Enemy("karakasa.png", "Images/monster_on_map/map1/karakasa.png", 400, 500));
-		this->enemy.push_back(new Enemy("karakasa.png", "Images/monster_on_map/map1/karakasa.png", 400, 650));
-		this->enemy.push_back(new Enemy("karakasa.png", "Images/monster_on_map/map1/karakasa.png", 400, 350));
+		this->enemy.push_back(new Enemy("Karakasa", 400, 200));
+		this->enemy.push_back(new Enemy("Karakasa", 600, 400));
+		this->enemy.push_back(new Enemy("Karakasa", 300, 500));
 	}
 
 	void deleteButtons()
@@ -1275,8 +1434,8 @@ public:
 	}
 
 	//Constructor / Destructor
-	BattleState(RenderWindow* window, map<string, State*>* states, Player* player, int Maxround = 2, int Stagelevel = 1, bool Isbossstage = false)
-		: State(window, states), player(player)
+	BattleState(RenderWindow* window, map<string, State*>* states, Player* player, int Maxround = 3, int Stagelevel = 1, bool Isbossstage = false)
+		: State(window, states), player(player), maxRound(Maxround)
 	{
 		/*this->initVariables(Maxround, Stagelevel, Isbossstage);*/
 		this->initBackground();
@@ -1294,7 +1453,7 @@ public:
 	virtual ~BattleState()
 	{
 		this->deleteButtons();
-		for (auto it : enemy)
+		for (auto& it : enemy)
 		{
 			delete it;
 		}
@@ -1349,19 +1508,19 @@ public:
 			}
 		}
 		/*Updates all the buttons in the state and handles their functionlaity.*/
-		for (auto it : Mainbuttons)
+		for (auto& it : Mainbuttons)
 		{
 			it.second->update();
 		}
 
 		if (isItemWindowActive)
-			for (auto it : Itembuttons)
+			for (auto& it : Itembuttons)
 			{
 				it.second->update(this->mousePosView);
 			}
 
 		if (isSkillWindowActive)
-			for (auto it : Skillbuttons)
+			for (auto& it : Skillbuttons)
 			{
 				it.second->update(this->mousePosView);
 			}
@@ -1369,24 +1528,24 @@ public:
 
 	void updateEvent(const Event& event)
 	{
-		for (auto i : Mainbuttons)
+		for (auto& i : Mainbuttons)
 		{
 			i.second->updateEvent(event, this->mousePosView);
 		}
 
 		if (isItemWindowActive)
-			for (auto it : Itembuttons)
+			for (auto& it : Itembuttons)
 			{
 				it.second->updateEvent(event, this->mousePosView);
 			}
 
 		if (isSkillWindowActive)
-			for (auto it : Skillbuttons)
+			for (auto& it : Skillbuttons)
 			{
 				it.second->updateEvent(event, this->mousePosView);
 			}
 
-		for (auto i : enemy)
+		for (auto& i : enemy)
 		{
 			i->updateEvent(event, this->mousePosView);
 		}
@@ -1395,7 +1554,7 @@ public:
 	void enemyTurn()
 	{
 		int dmg = 0;
-		for (auto i : enemy)
+		for (auto& i : enemy)
 		{
 			dmg += i->attack(*this->player);
 		}
@@ -1405,7 +1564,7 @@ public:
 
 	void updateTarget()
 	{
-		for (auto i : enemy)
+		for (auto& i : enemy)
 		{
 			if (i->isPressed() && !isSkillWindowActive && !isItemWindowActive)
 			{
@@ -1416,7 +1575,6 @@ public:
 
 	void update(const float& dt)
 	{
-		cout << enemy.size() << "\n";
 		//enviornment update zone
 		this->updateButtons();
 		this->updateMousePositions();
@@ -1427,31 +1585,31 @@ public:
 		this->player->update(dt);
 
 		//enemy update zome
-		for (auto i : enemy)
+		for (auto& i : enemy)
 		{
 			i->update(dt);
 		}
 
-		for (int i = 0; i < enemy.size(); i++)
+		for (auto it = this->enemy.begin(); it != this->enemy.end(); it++)
 		{
-			if (enemy[i]->isdead())
+			if ((*it)->isdead())
 			{
-				delete this->enemy[i];
-				this->player->expUp(enemy[i]->getExp());
-				this->enemy.erase(enemy.begin() + i);
+				this->player->expUp((*it)->getExp());
+				this->enemy.erase(it);
+				it--;
 			}
 		}
 
-		for (int i = 0; i < showDamages.size(); i++)
+		for (auto it = this->showDamages.begin(); it != this->showDamages.end(); it++)
 		{
-			if (showDamages[i]->isEnd())
+			if ((*it)->isEnd())
 			{
-				showDamages[i];
-				this->showDamages.erase(showDamages.begin() + i);
+				this->showDamages.erase(it);
+				it--;
 			}
 		}
 
-		for (auto i : showDamages)
+		for (auto& i : showDamages)
 		{
 			i->update(dt);
 		}
@@ -1461,13 +1619,13 @@ public:
 
 		if (enemy.empty())
 		{
-			this->enemy.push_back(new Enemy("karakasa.png", "Images/monster_on_map/map1/karakasa.png", 400, 500));
-			this->enemy.push_back(new Enemy("karakasa.png", "Images/monster_on_map/map1/karakasa.png", 400, 650));
-			this->enemy.push_back(new Enemy("karakasa.png", "Images/monster_on_map/map1/karakasa.png", 400, 350));
+			this->enemy.push_back(new Enemy("Hitotsume", 350, 100));
+			this->enemy.push_back(new Enemy("Hitotsume", 200, 350));
 		}
 
-		if(this->target->isdead()) this->target = *this->enemy.begin();
-		this->targetCursor->setPosition(this->target);
+		if (this->target->isdead()) this->target = *this->enemy.begin();
+		if (this->target)
+			this->targetCursor->setPosition(this->target);
 
 		this->isPlayerturn = true;
 		time = 0;
@@ -1477,19 +1635,19 @@ public:
 
 	void renderButtons(RenderTarget* target = NULL)
 	{
-		for (auto it : Mainbuttons)
+		for (auto& it : Mainbuttons)
 		{
 			it.second->render(*target);
 		}
 
 		if (this->isItemWindowActive)
-			for (auto it : Itembuttons)
+			for (auto& it : Itembuttons)
 			{
 				it.second->render(*target);
 			}
 
 		if (isSkillWindowActive)
-			for (auto it : Skillbuttons)
+			for (auto& it : Skillbuttons)
 			{
 				it.second->render(*target);
 			}
@@ -1506,14 +1664,14 @@ public:
 		//render player zone
 		this->player->render(*target);
 		//render enemy zone
-		for (auto i : enemy)
+		for (auto& i : enemy)
 			i->render(*target);
 
 		//enemy target cursor
 		this->targetCursor->render(*target);
 
 		//render damage to enemy
-		for (auto i : showDamages)
+		for (auto& i : showDamages)
 			i->render(*target);
 
 		//render button
@@ -1532,35 +1690,68 @@ public:
 	}
 };
 
+class Object
+{
+	Texture texture;
+	CollisionBox* collisionBox;
+	Player* player;
+	Sprite sprite;
+
+public:
+	Object(Player* player, float positionX, float positionY)
+		:player(player)
+	{
+		this->texture.loadFromFile("Images/map/map1/Tree.png");
+		this->sprite.setTexture(this->texture);
+		this->sprite.setPosition(positionX, positionY);
+		this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 220.f, 45.f, 40.f);
+	}
+
+	virtual void update()
+	{
+		this->collisionBox->update();
+	}
+
+	virtual void render(RenderTarget& target)
+	{
+		if (this->player->getGlobalBounds().top < this->collisionBox->getShape().getGlobalBounds().top + this->collisionBox->getShape().getGlobalBounds().height / 2
+			&& !this->player->isRendered())
+			this->player->render(target);
+		target.draw(this->sprite);
+	}
+};
+
 class GameState : public State
 {
-public:
 	//Variables
 	Player* player;
+	Texture backgroundTexture;
+	Texture environmentTexture;
 	RectangleShape background;
-	CollosionBox* box;
+	Sprite environment;
+	vector<Object*> objects;
 
+public:
 	//Initilizer functions
-
-	void initCollosionBox()
-	{
-		this->box = new CollosionBox(*this->player, 500.f, 500.f, 0.01f, 0.01f);
-	}
 
 	//Constructor / Destructor
 	GameState(RenderWindow* window, map<string, State*>* states, Player* player)
 		: State(window, states), player(player)
 	{
-		this->background.setFillColor(Color::White);
+		this->backgroundTexture.loadFromFile("Images/map/map1/map1_1.png");
+		this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");
+		this->background.setTexture(&this->backgroundTexture);
 		this->background.setSize(Vector2f(this->window->getView().getSize()));
-		this->initCollosionBox();
+		this->environment.setTexture(environmentTexture);
+		this->objects.push_back(new Object(this->player, 656.f, 110.f));
+		this->objects.push_back(new Object(this->player, 958.f, 187.f));
 		this->initFonts();
 	}
 
 	virtual ~GameState()
 	{
-		delete this->box;
 		delete this->player;
+		this->objects.clear();
 	}
 
 	//Functions
@@ -1589,11 +1780,6 @@ public:
 		{
 			currentState = "MainMenu";
 		}
-	}
-
-	virtual void updateEvent(const Event& event)
-	{
-
 	}
 
 	void update(const float& dt)
@@ -1626,7 +1812,11 @@ public:
 		}
 
 		this->player->update(dt);
-		this->box->update();
+
+		for (auto& i : objects)
+		{
+			i->update();
+		}
 	}
 
 	void render(RenderTarget* target = NULL)
@@ -1635,8 +1825,13 @@ public:
 			target = this->window;
 
 		target->draw(background);
-		this->player->render(*target);
-		this->box->render(*target);
+		target->draw(environment);
+		for (auto& i : objects)
+		{
+			i->render(*target);
+		}
+
+		if (!this->player->isRendered()) this->player->render(*target);
 
 		Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
@@ -1646,13 +1841,11 @@ public:
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
 		mouseText.setString(ss.str());
 		target->draw(mouseText);
-
 	}
 };
 
 class MainMenuState : public State
 {
-public:
 	//Variables
 	Player* player;
 	Texture backgroundTexture;
@@ -1660,6 +1853,7 @@ public:
 
 	map<string, Button*> buttons;
 
+public:
 	//Initializer functions
 	void initBackground()
 	{
