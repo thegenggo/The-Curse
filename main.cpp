@@ -942,13 +942,17 @@ public:
 	Texture ItemwindowTex;
 	bool isItemwindowActive;
 
+	//skill window
+	RectangleShape Skillwindow;
+	Texture SkillwindowTex;
+	bool isSkillwindowActive;
 
-
+	
 	//iniilizer function
 
 	void initItemwindow()
 	{
-		if (!this->ItemwindowTex.loadFromFile("Images/Itemwindow.jpg"))
+		if (!this->ItemwindowTex.loadFromFile("Images/itemwindowV2.png"))
 		{
 			throw "ERROR::MAIN_MENU_STATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
 		}
@@ -1559,15 +1563,15 @@ public:
 
 	void initButtons()
 	{
-		this->buttons["GAME_STATE"] = new Button(835, 500, 250, 50, &this->font, "à¢éÒÊÙèà¡Á", 50,
+		this->buttons["GAME_STATE"] = new Button(835, 500, 250, 50, &this->font, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["BATTLE_STATE"] = new Button(835, 600, 250, 50, &this->font, "½Ö¡µèÍÊÙé", 50,
+		this->buttons["BATTLE_STATE"] = new Button(835, 600, 250, 50, &this->font, "ï¿½Ö¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, &this->font, "ÍÍ¡¨Ò¡à¡Á", 50,
+		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, &this->font, "ï¿½Í¡ï¿½Ò¡ï¿½ï¿½", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(100, 100, 100, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 	}
