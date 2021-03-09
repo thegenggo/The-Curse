@@ -963,6 +963,17 @@ public:
 
 		this->isItemwindowActive = false;
 	}
+	void initSkillwindow()
+	{
+		if(!this->SkillwindowTex.loadFromFile("Images/skill window.png"))
+		{
+			throw "ERROR::MAIN_MENU_STATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
+		}
+		this->Skillwindow.setSize(Vector2f(300.f,700.f));
+		this->Skillwindow.setTexture(&this->SkillwindowTex);
+		this->Skillwindow.setTexture(Vector2f(700.f,100.f));
+		this->isSkillwindowActive = false;
+	}
 	void initPlayer()
 	{
 		//turn
