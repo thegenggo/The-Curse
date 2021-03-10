@@ -3,9 +3,6 @@
 #include <map>
 #include <iostream>
 #include <sstream>
-#include <functional>
-#include<iterator>
-
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
@@ -1743,19 +1740,53 @@ public:
 
 class Object
 {
+protected:
+	string name;
 	Texture texture;
 	CollisionBox* collisionBox;
 	Player* player;
 	Sprite sprite;
 
 public:
-	Object(Player* player, float positionX, float positionY)
-		:player(player)
+	const float& getObjectPosition() const
 	{
-		this->texture.loadFromFile("Images/map/map1/Tree.png");
-		this->sprite.setTexture(this->texture);
+		return this->collisionBox->getShape().getGlobalBounds().top;
+	}
+
+	Object(string name, Player* player, float positionX, float positionY)
+		:player(player), name(name)
+	{
+		if (this->name == "Rock")
+		{
+			this->texture.loadFromFile("Images/map/rock_type_1.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 220.f, 45.f, 40.f);
+		}
+		else if (this->name == "Tree1")
+		{
+			this->texture.loadFromFile("Images/map/tree_type_1.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX + 70.f, positionY + 255.f, 55.f, 40.f);
+		}
+		else if (this->name == "Tree2")
+		{
+			this->texture.loadFromFile("Images/map/tree_type_2.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 220.f, 45.f, 40.f);
+		}
+		else if (this->name == "Tree3")
+		{
+			this->texture.loadFromFile("Images/map/tree_type_3.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX , positionY, 40.f, 30.f);
+		}
+		else
+		{
+			this->texture.loadFromFile("Images/map/tree_type_1.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 220.f, 45.f, 40.f);
+		}
 		this->sprite.setPosition(positionX, positionY);
-		this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 220.f, 45.f, 40.f);
 	}
 
 	virtual void update()
@@ -1765,12 +1796,32 @@ public:
 
 	virtual void render(RenderTarget& target)
 	{
-		if (this->player->getGlobalBounds().top < this->collisionBox->getShape().getGlobalBounds().top + this->collisionBox->getShape().getGlobalBounds().height / 2
-			&& !this->player->isRendered())
+		this->collisionBox->render(target);
+		if (this->player->getHitbox().getGlobalBounds().top < this->collisionBox->getShape().getGlobalBounds().top && !this->player->isRendered())
 			this->player->render(target);
 		target.draw(this->sprite);
 	}
 };
+
+void sortObject(vector<Object*>& objects)
+{
+	for (auto& i : objects)
+	{
+		for (auto& j : objects)
+		{
+			if (j->getObjectPosition() > i->getObjectPosition())
+			{
+				Object *temp = j;
+				j = i;
+				i = temp;
+			}
+		}
+	}
+	for (auto& i : objects) 
+	{
+		cout << i->getObjectPosition() << "\n";
+	}
+}
 
 class GameState : public State
 {
@@ -1794,8 +1845,31 @@ public:
 		this->background.setTexture(&this->backgroundTexture);
 		this->background.setSize(Vector2f(this->window->getView().getSize()));
 		this->environment.setTexture(environmentTexture);
-		this->objects.push_back(new Object(this->player, 656.f, 110.f));
-		this->objects.push_back(new Object(this->player, 958.f, 187.f));
+		this->objects.push_back(new Object("Tree1", this->player, 934.f, 15.f));
+		this->objects.push_back(new Object("Tree1", this->player, 1567.f, 19.f));
+		this->objects.push_back(new Object("Tree1", this->player, 185.f, 83.f));
+		this->objects.push_back(new Object("Tree1", this->player, 375.f, 95.f));
+		this->objects.push_back(new Object("Tree1", this->player, 1222.f, 109.f));
+		this->objects.push_back(new Object("Tree2", this->player, 657.f, 111.f));
+		this->objects.push_back(new Object("Tree2", this->player, 47.f, 149.f));
+		this->objects.push_back(new Object("Tree2", this->player, 958.f, 189.f));
+		this->objects.push_back(new Object("Tree2", this->player, 1765.f, 219.f));
+		this->objects.push_back(new Object("Tree1", this->player, 17.f, 342.f));
+		this->objects.push_back(new Object("Tree2", this->player, 963.f, 484.f));
+		this->objects.push_back(new Object("Tree1", this->player, 1719.f, 608.f));
+		this->objects.push_back(new Object("Tree2", this->player, 22.f, 631.f));
+		this->objects.push_back(new Object("Tree2", this->player, 970.f, 637.f));
+		this->objects.push_back(new Object("Tree1", this->player, 1521.f, 694.f));
+		this->objects.push_back(new Object("Tree1", this->player, 173.f, 699.f));
+		this->objects.push_back(new Object("Tree2", this->player, 476.f, 700.f));
+		this->objects.push_back(new Object("Tree1", this->player, 633.f, 760.f));
+		this->objects.push_back(new Object("Tree2", this->player, 1154.f, 785.f));
+		this->objects.push_back(new Object("Tree2", this->player, 970.f, 791.f));
+		this->objects.push_back(new Object("Tree2", this->player, 1364.f, 799.f));
+		this->objects.push_back(new Object("Tree3", this->player, 1607.f, 416.f));
+		this->objects.push_back(new Object("Tree3", this->player, 1057.f, 17.f));
+
+		sortObject(objects);
 	}
 
 	virtual ~GameState()
@@ -1875,7 +1949,7 @@ public:
 			target = this->window;
 
 		target->draw(background);
-		target->draw(environment);
+		/*target->draw(environment);*/
 		for (auto& i : objects)
 		{
 			i->render(*target);
