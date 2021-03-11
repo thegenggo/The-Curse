@@ -1,11 +1,6 @@
 #include <vector>
-#include <stack>
 #include <map>
-#include <list>
-#include <set>
-#include <iostream>
 #include <sstream>
-#include <fstream>
 #include <cmath>
 
 #include "SFML/Graphics.hpp"
@@ -60,7 +55,7 @@ public:
 	}
 };
 
-class ShowDamage
+class ShowText
 {
 	Text text;
 	float time;
@@ -73,10 +68,10 @@ public:
 		return false;
 	}
 
-	ShowDamage(Vector2f position, int damage)
+	ShowText(Vector2f position, int damage, Color color = Color::Red)
 	{
 		this->text.setFont(font);
-		this->text.setFillColor(Color::Red);
+		this->text.setFillColor(color);
 		this->text.setOutlineColor(Color::Black);
 		this->text.setOutlineThickness(3.f);
 		this->text.setCharacterSize(40);
@@ -86,7 +81,7 @@ public:
 		this->time = 0;
 	}
 
-	ShowDamage(Vector2f position, string text, int size = 40, Color color = Color::Red)
+	ShowText(Vector2f position, string text, int size = 40, Color color = Color::Red)
 	{
 		this->text.setFont(font);
 		this->text.setFillColor(color);
@@ -101,7 +96,6 @@ public:
 
 	void update(const float& dt)
 	{
-		cout << this->text.getGlobalBounds().height << "\n";
 		this->time += dt;
 		this->text.move(0.f, -1.f);
 	}
@@ -157,9 +151,7 @@ public:
 	{
 		this->hitbox.setPosition(this->sprite.getPosition().x + offset_x, this->sprite.getPosition().y + offset_y);
 		this->hitbox.setSize(Vector2f(width, height));
-		this->hitbox.setFillColor(Color::Transparent);
-		this->hitbox.setOutlineThickness(1.f);
-		this->hitbox.setOutlineColor(Color::Black);
+		this->hitbox.setFillColor(Color::White);
 	}
 
 	//Accessors
@@ -378,7 +370,7 @@ class Entity
 protected:
 	Texture texture;
 	string name;
-	Text textDamage;
+	vector<ShowText*> showText;
 	int lvl;
 	int hp;
 	int max_hp;
@@ -394,9 +386,6 @@ public:
 	//Initilizer functions
 	virtual void initVariables()
 	{
-		this->textDamage.setCharacterSize(40);
-		this->textDamage.setFillColor(Color::Red);
-		this->textDamage.setFont(font);
 		this->time = 0.f;
 	}
 
@@ -415,9 +404,14 @@ public:
 	//Accessors
 	virtual const Vector2f& getPosition() const
 	{
-		return Vector2f(0.f,0.f);
+		return Vector2f();
 	}
-	
+
+	virtual const FloatRect& getGlobalBounds() const
+	{
+		return FloatRect();
+	}
+
 	//Component functions
 
 	void setTexture(Texture& texture)
@@ -427,34 +421,35 @@ public:
 
 	virtual void createAnimationComponent(Texture& texture_sheet)
 	{
-		
+
 	}
 
 	//Functions
-	int attack(Entity& opp) {
-		return opp.beAttacked(att + rand() % 10);
+	virtual void showTextPushBack(int dmg)
+	{
+		showText.push_back(new ShowText(Vector2f(this->getPosition().x + this->getGlobalBounds().width / 2, this->getPosition().y), dmg));
 	}
 
-	int beAttacked(int oppatk) {
+	void attack(Entity& opp) {
+		opp.beAttacked(att + rand() % 10);
+	}
+
+	void beAttacked(int oppatk) {
 		int dmg = 0;
 		if (oppatk > this->def) {
 			dmg = oppatk - this->def;
 		}
 		this->hp -= dmg;
 		if (this->hp <= 0) this->hp = 0;
-		return dmg;
+		this->showTextPushBack(dmg);
 	}
 
-	void showDamage(const float& dt)
+	virtual void showTextUpdate(const float& dt)
 	{
-		if (textDamage.getString() != "\0")
+		for (auto i = this->showText.begin(); i < this->showText.end(); i++)
 		{
-			time += dt;
-			if (time >= 1.f)
-			{
-				textDamage.setString("\0");
-				time = 0;
-			}
+			(*i)->update(dt);
+			if ((*i)->isEnd()) { this->showText.erase(i); i--; }
 		}
 	}
 
@@ -463,9 +458,17 @@ public:
 
 	}
 
+	virtual void showTextRender(RenderTarget& target)
+	{
+		for (auto& i : showText)
+		{
+			i->render(target);
+		}
+	}
+
 	virtual void render(RenderTarget& target)
 	{
-	
+
 	}
 };
 
@@ -503,7 +506,7 @@ public:
 
 	const bool& isdead() const
 	{
-		if (hp <= 0) return true;
+		if (this->hp <= 0) return true;
 		return false;
 	}
 
@@ -629,15 +632,19 @@ public:
 			this->dropnum = 1;
 		}
 		this->sprite.setTexture(this->texture);
-		this->textDamage.setPosition(x + this->sprite.getGlobalBounds().width / 2, y - 50);
 		this->sprite.setPosition(x, y);
-		this->hpBar = new Bar(sprite.getPosition().x, sprite.getPosition().y - 10.f, sprite.getGlobalBounds().width, 10);
+		this->hpBar = new Bar(this->sprite.getPosition().x, this->sprite.getPosition().y - 10.f, this->sprite.getGlobalBounds().width, 10);
 
 	}
 
 	~Enemy()
 	{
 		delete hpBar;
+	}
+
+	void showTextPushBack(int dmg)
+	{
+		showText.push_back(new ShowText(Vector2f(this->getPosition().x + this->getGlobalBounds().width / 2, this->getPosition().y - 50.f), dmg));
 	}
 
 	void updateEvent(const Event& event, const Vector2f mousePos)
@@ -651,15 +658,15 @@ public:
 	void update(const float& dt)
 	{
 		this->hpBar->update(this->hp, this->max_hp);
-		this->showDamage(dt);
+		this->showTextUpdate(dt);
 		this->pressed = false;
 	}
 
 	void render(RenderTarget& target)
 	{
 		this->hpBar->render(target);
+		this->showTextRender(target);
 		target.draw(this->sprite);
-		target.draw(this->textDamage);
 	}
 };
 
@@ -708,6 +715,10 @@ class Player : public Entity
 	int current_exp;
 	int max_exp;
 
+	//Item
+	int elixirs;
+	int sacredWater;
+
 	//Text
 	Text hpText;
 	Text spText;
@@ -720,8 +731,6 @@ class Player : public Entity
 	AnimationComponent* battleAnimationComponent;
 	AnimationComponent* openWorldanimationComponent;
 
-	vector<ShowDamage*> showEvent;
-
 public:
 	//Accessors
 	const movementState getMovementState() const
@@ -729,19 +738,11 @@ public:
 		return this->movementComponent->getMovementState();
 	}
 
-	const RectangleShape& getHitbox() const
-	{
-		return this->hitboxComponent->getHitbox();
-	}
-
 	const FloatRect& getSpriteGlobalBounds() const
 	{
-		return this->openWorldSprite.getGlobalBounds();
-	}
-
-	const Sprite& getSprite() const
-	{
-		return this->openWorldSprite;
+		if (this->mode) return this->battleSprite.getGlobalBounds();
+		else
+			return this->openWorldSprite.getGlobalBounds();
 	}
 
 	const bool& isRendered() const
@@ -749,9 +750,22 @@ public:
 		return this->rendered;
 	}
 
-	const Vector2f& getVelocity() const
+	const Vector2f& getPosition() const
 	{
-		return this->movementComponent->getVelocity();
+		if (this->mode) return this->battleSprite.getPosition();
+		else
+			return this->openWorldSprite.getPosition();
+	}
+
+	const FloatRect& getHitboxGlobalBounds() const
+	{
+		return this->hitboxComponent->getGlobalBounds();
+	}
+
+	const bool& isdead() const
+	{
+		if (this->hp <= 0) return true;
+		return false;
 	}
 
 	//Constructor / Destructor
@@ -765,10 +779,10 @@ public:
 		this->battleTexture.loadFromFile("Images/Sprites/Player/on_battle.png");
 
 		this->battleSprite.setPosition(1400.f, 280.f);
-		this->setOrigin(40.f, 10.f);
+		this->setOrigin(40.f, 85.f);
 		this->setPosition(20.f, 145.f);
 
-		this->hitboxComponent = new HitboxComponent(this->openWorldSprite, 0.f, 75.f, 45.f, 30.f);
+		this->hitboxComponent = new HitboxComponent(this->openWorldSprite, 0.f, 0.f, 45.f, 30.f);
 		this->openWorldanimationComponent = new AnimationComponent(this->openWorldSprite, this->openWorldTexture);
 		this->battleAnimationComponent = new AnimationComponent(this->battleSprite, this->battleTexture);
 		this->movementComponent = new MovementComponent(this->openWorldSprite, 300.f);
@@ -804,8 +818,6 @@ public:
 		this->hpBar = new Bar(1070, 880, 400, 10);
 		this->staminaBar = new Bar(1070, 930, 200, 10, Color::Yellow);
 
-		this->textDamage.setPosition(this->battleSprite.getPosition().x + 125, this->battleSprite.getPosition().y - 50);
-
 		this->hpText.setFont(font);
 		this->spText.setFont(font);
 		this->attText.setFont(font);
@@ -828,6 +840,9 @@ public:
 		this->lvlText.setFillColor(Color::Black);
 
 		this->rendered = false;
+
+		this->elixirs = 3;
+		this->sacredWater = 3;
 	}
 
 	virtual ~Player()
@@ -837,22 +852,6 @@ public:
 	}
 
 	//Component functions
-	const FloatRect& getGlobalBounds() const
-	{
-		return this->hitboxComponent->getGlobalBounds();
-	}
-
-	const Vector2f& getPosition() const
-	{
-		if (this->mode) this->battleSprite.getPosition();
-		else
-			return this->openWorldSprite.getPosition();
-	}
-
-	void collisionFixed()
-	{
-		this->openWorldSprite.move(-this->getVelocity().x, -this->getVelocity().y);
-	}
 
 	virtual void setScale(const float x, const float y)
 	{
@@ -882,6 +881,12 @@ public:
 			this->light.setColor(Color::Transparent);
 	}
 
+	//Functions
+	void showTextPushBack(int dmg, Color color = Color::Red)
+	{
+		showText.push_back(new ShowText(Vector2f(this->getPosition().x + this->getSpriteGlobalBounds().width / 2.f, this->getPosition().y), dmg, color));
+	}
+
 	virtual void move(const float dir_x, const float dir_y, const float& dt)
 	{
 		if (this->movementComponent)
@@ -895,7 +900,7 @@ public:
 		this->current_exp -= max_exp;
 		this->max_exp += lvl * 300;
 		this->lvl++;
-		this->showEvent.push_back(new ShowDamage(Vector2f(this->battleSprite.getPosition()), "Level Up!!!!"));
+		this->showText.push_back(new ShowText(this->getPosition(), "Level Up!!!!"));
 		this->max_hp += 30;
 		this->att += 10;
 		this->def += 5;
@@ -909,41 +914,67 @@ public:
 		this->current_exp += exp;
 	}
 
-	bool useSkill1(vector<Enemy*>& enemies, vector<ShowDamage*>& showDamages)
+	bool useSkill1(vector<Enemy*>& enemies, vector<ShowText*>& showDamages)
 	{
 		if (stamina >= 30)
 		{
 			stamina -= 30;
-			for (auto i : enemies)
+			for (auto& i : enemies)
 			{
-				showDamages.push_back(new ShowDamage(Vector2f(i->getPosition().x + 50, i->getPosition().y - 40), i->beAttacked(att / 2)));
+				i->beAttacked(att / 2);
 			}
 			return true;
 		}
 		else
 		{
-			showDamages.push_back(new ShowDamage(Vector2f(this->getPosition().x + 50, this->getPosition().y - 40), "Mp is not enough"));
+			showText.push_back(new ShowText(this->getPosition(), "Mp is not enough"));
 			return false;
 		}
 		return false;
 	}
 
-	bool useSkill2(Enemy*& enemy, vector<ShowDamage*>& showDamages)
+	bool useSkill2(Enemy*& enemy, vector<ShowText*>& showDamages)
 	{
 		if (stamina >= 30)
 		{
 			stamina -= 30;
-			showDamages.push_back(new ShowDamage(Vector2f(enemy->getPosition().x + 50, enemy->getPosition().y - 40), enemy->beAttacked(att * 3 / 2)));
+			enemy->beAttacked(att * 2);
 			return true;
 		}
 		else
 		{
-			showDamages.push_back(new ShowDamage(Vector2f(this->getPosition().x + 50, this->getPosition().y - 40), "Mp is not enough"));
+			showText.push_back(new ShowText(this->getPosition(), "Mp is not enough"));
 			return false;
 		}
 	}
 
-	void openUpdate(const float& dt)
+	void useItem(string name)
+	{
+		if (name == "Elixirs")
+		{
+			if (this->elixirs > 0)
+			{
+				this->elixirs--;
+				int heal = this->max_hp * 3 / 4;
+				if (heal + this->hp > this->max_hp) heal = this->max_hp - this->hp;
+				this->hp += heal;
+				this->showTextPushBack(heal, Color::Green);
+			}
+		}
+		else if (name == "Sacred water")
+		{
+			if (this->sacredWater > 0)
+			{
+				this->sacredWater--;
+				int heal = this->max_stamina * 3 / 4;
+				if (heal + this->stamina > this->max_stamina) heal = this->max_stamina - this->stamina;
+				this->stamina += heal;
+				this->showTextPushBack(heal, Color::Blue);
+			}
+		}
+	}
+
+	void openWorldUpdate(const float& dt)
 	{
 		this->movementComponent->update();
 
@@ -992,7 +1023,7 @@ public:
 	{
 		this->battleAnimationComponent->play("IDLE", dt);
 		this->hpBar->update(this->hp, this->max_hp);
-		this->showDamage(dt);
+		this->staminaBar->update(this->stamina, this->max_stamina);
 		this->hpText.setString("HP: " + to_string(this->hp));
 		this->spText.setString("MP: " + to_string(this->stamina));
 		this->attText.setString("ATK: " + to_string(this->att));
@@ -1002,22 +1033,18 @@ public:
 
 	void update(const float& dt)
 	{
-		if (!mode) this->openUpdate(dt);
+		if (!mode) this->openWorldUpdate(dt);
 		else this->battleUpdate(dt);
 		if (this->current_exp >= this->max_exp)
 			this->levelUp();
-		for (auto i = this->showEvent.begin(); i < this->showEvent.end(); i++)
-		{
-			(*i)->update(dt);
-			if ((*i)->isEnd()) { this->showEvent.erase(i); i--; }
-		}
+		this->showTextUpdate(dt);
 	}
 
 	void openWorldRender(RenderTarget& target)
 	{
+		this->hitboxComponent->render(target);
 		target.draw(this->openWorldSprite);
 		target.draw(this->light);
-		this->hitboxComponent->render(target);
 		this->rendered = true;
 	}
 
@@ -1026,7 +1053,6 @@ public:
 		target.draw(this->battleSprite);
 		this->hpBar->render(target);
 		this->staminaBar->render(target);
-		target.draw(this->textDamage);
 		target.draw(this->hpText);
 		target.draw(this->spText);
 		target.draw(this->attText);
@@ -1038,10 +1064,7 @@ public:
 	{
 		if (!mode) this->openWorldRender(target);
 		else this->battleRender(target);
-		for (auto& i : showEvent)
-		{
-			i->render(target);
-		}
+		this->showTextRender(target);
 	}
 };
 
@@ -1062,22 +1085,37 @@ public:
 	CollisionBox(Player& player, float x, float y, float width = 1.f, float height = 1.f)
 		:player(player)
 	{
-		
+
 		this->shape.setSize(Vector2f(width, height));
 		this->shape.setPosition(x, y);
 	}
 
 	~CollisionBox()
 	{
-		
+
 	}
 
 	//Functions
 	void update(const float& dt)
 	{
-		if (this->shape.getGlobalBounds().intersects(this->player.getGlobalBounds()))
+		if (this->shape.getGlobalBounds().intersects(this->player.getHitboxGlobalBounds()))
 		{
-			this->player.collisionFixed();
+			if (this->player.getMovementState() == movementState::MOVING_UP)
+			{
+				this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height + 1.f);
+			}
+			if (this->player.getMovementState() == movementState::MOVING_LEFT)
+			{
+				this->player.setPosition(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width + 1.f, this->player.getPosition().y);
+			}
+			if (this->player.getMovementState() == movementState::MOVING_DOWN)
+			{
+				this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top - this->player.getHitboxGlobalBounds().height - 1.f);
+			}
+			if (this->player.getMovementState() == movementState::MOVING_RIGHT)
+			{
+				this->player.setPosition(this->shape.getGlobalBounds().left - this->player.getHitboxGlobalBounds().width - 1.f, this->player.getPosition().y);
+			}
 		}
 	}
 
@@ -1213,6 +1251,12 @@ public:
 		return pressed;
 	}
 
+	const bool isHovered() const
+	{
+		if (this->buttonState == button_states::BTN_HOVER) return true;
+		return false;
+	}
+
 	//check click
 	void updateEvent(const Event& event, const Vector2f mousePos)
 	{
@@ -1315,8 +1359,10 @@ public:
 
 class BattleState : public State
 {
-	Texture bgtexture;
 	RectangleShape background;
+	Texture bgtexture;
+	Texture skillDetailTexture;
+	Texture itemDetailTexture;
 
 	//target cursor
 	Entity* targetentity;
@@ -1324,14 +1370,17 @@ class BattleState : public State
 	//button
 	map<string, ImageButton*> Mainbuttons;
 	map<string, Button*> Itembuttons, Skillbuttons;
+	map<string, Button*> detailButtons;
 
 	//entity player&ene
 	Player* player;
-	vector<Enemy*> enemy;
+	Sprite skillDetail;
+	Sprite itemDetail;
 	Enemy* target;
 	TargetCursor* targetCursor;
-	vector<ShowDamage*> showDamages;
-	ShowDamage* clear;
+	ShowText* clear;
+	vector<Enemy*> enemy;
+	vector<ShowText*> showDamages;
 
 	//item window
 	bool isItemWindowActive;
@@ -1341,42 +1390,15 @@ class BattleState : public State
 	float time;
 
 	int stage;
+	int battleStage;
 
 public:
-	//variables
-
-	//round
-	/*int round = 0;
-	int roundlimit;
-	bool isroundclear = false;*/
-
-	//stage 
-	/*bool  isstageclear = false;
-	int stagelevel;
-	bool isbossstage;*/
-
-	//turn 
-	/*bool isPlayerturn;
-	bool isEnemystop;*/
-
-
-	//iniilizer function
-
-	//set default target
-	/*void initVariables(int round, int lvl, bool isboss)
-	{
-		this->isPlayerturn = true;
-		this->roundlimit = round;
-		this->stagelevel = lvl;
-		this->isbossstage = isboss;
-	}*/
-
 	void initBackground()
 	{
-		if (!this->bgtexture.loadFromFile("Images/battle_scene/map1.png"))
-		{
-			throw "ERROR::MAIN_MENU_STATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
-		}
+		if(this->battleStage == 1)
+			this->bgtexture.loadFromFile("Images/battle_scene/map1.png");
+		else if(this->battleStage == 2)
+			this->bgtexture.loadFromFile("Images/battle_scene/map2.png");
 
 		this->background.setSize(Vector2f(this->window->getView().getSize()));
 		this->background.setTexture(&this->bgtexture);
@@ -1389,45 +1411,70 @@ public:
 		this->Mainbuttons["Items"] = new ImageButton(531, 837, "Images/Buttons/ButtonItems.png");
 		this->Mainbuttons["Flee"] = new ImageButton(777, 837, "Images/Buttons/ButtonFlee.png");
 
-		this->Itembuttons["ITEM1"] = new Button(560, 400, 150, 100, "Item 1", 50, Color::White, Color::White, Color::White,
+		this->Itembuttons["ITEM1"] = new Button(530, 600, 220, 100, "Elixirs", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Itembuttons["ITEM2"] = new Button(560, 500, 150, 100, "Item 2", 50, Color::White, Color::White, Color::White,
-			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Itembuttons["ITEM3"] = new Button(560, 600, 150, 100, "Item 3", 50, Color::White, Color::White, Color::White,
-			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Itembuttons["ITEM4"] = new Button(560, 700, 150, 100, "Item 4", 50, Color::White, Color::White, Color::White,
+		this->Itembuttons["ITEM2"] = new Button(530, 700, 220, 100, "Sacred water", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->Skillbuttons["SKILL1"] = new Button(320, 600, 150, 100, "Skill 1", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL1"] = new Button(200, 600, 420, 100, "à¢ÕéÂÇ¨Ñ¹·ÃÒ ·ÐÅÇ§ ÊÇÃÃ¤ì", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Skillbuttons["SKILL2"] = new Button(320, 700, 150, 100, "Skill 2", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL2"] = new Button(200, 700, 420, 100, "àºÕÂÇâ´ä¤¨Ô¹à«ç¹ä«", 50, Color::White, Color::White, Color::White,
+			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
+
+		this->detailButtons["SkillDetail"] = new Button(1650, 850, 200, 100, "ÃÒÂÅÐàÍÕÂ´Ê¡ÔÅ", 30, Color::White, Color::White, Color::White,
+			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
+		this->detailButtons["ItemDetail"] = new Button(1650, 950, 200, 100, "ÃÒÂÅÐàÍÕÂ´äÍà·Á", 30, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 	}
 
 	virtual bool initEnemy()
 	{
-		if (this->stage == 1)
-		{
-			this->enemy.push_back(new Enemy("Karakasa", 400, 200));
-			this->enemy.push_back(new Enemy("Karakasa", 600, 400));
-			this->enemy.push_back(new Enemy("Karakasa", 300, 500));
-			return true;
-		}
-		else if (this->stage == 2)
-		{
-			this->enemy.push_back(new Enemy("Hitotsume", 400, 200));
-			this->enemy.push_back(new Enemy("Hitotsume", 150, 350));
-			return true;
-		}
-		else if (this->stage == 3)
-		{
-			this->enemy.push_back(new Enemy("Boss Oni", 300, 200));
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		if (this->battleStage == 1)
+			if (this->stage == 1)
+			{
+				this->enemy.push_back(new Enemy("Karakasa", 400, 200));
+				this->enemy.push_back(new Enemy("Karakasa", 600, 400));
+				this->enemy.push_back(new Enemy("Karakasa", 300, 500));
+				return true;
+			}
+			else if (this->stage == 2)
+			{
+				this->enemy.push_back(new Enemy("Hitotsume", 400, 200));
+				this->enemy.push_back(new Enemy("Hitotsume", 150, 350));
+				return true;
+			}
+			else if (this->stage == 3)
+			{
+				this->enemy.push_back(new Enemy("Boss Oni", 300, 200));
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		else if (this->battleStage == 2)
+			if (this->stage == 1)
+			{
+				this->enemy.push_back(new Enemy("Kappa", 400, 200));
+				this->enemy.push_back(new Enemy("Kappa", 600, 400));
+				this->enemy.push_back(new Enemy("Kappa", 300, 500));
+				return true;
+			}
+			else if (this->stage == 2)
+			{
+				this->enemy.push_back(new Enemy("Amikiri", 400, 200));
+				this->enemy.push_back(new Enemy("Amikiri", 150, 350));
+				return true;
+			}
+			else if (this->stage == 3)
+			{
+				this->enemy.push_back(new Enemy("Boss Umibozu", 300, 200));
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 	}
 
 	void deleteButtons()
@@ -1444,13 +1491,16 @@ public:
 		{
 			delete it->second;
 		}
+		for (auto it = this->detailButtons.begin(); it != this->detailButtons.end(); ++it)
+		{
+			delete it->second;
+		}
 	}
 
 	//Constructor / Destructor
-	BattleState(RenderWindow* window, map<string, State*>* states, Player* player)
-		: State(window, states), player(player)
+	BattleState(RenderWindow* window, map<string, State*>* states, Player* player, int battleStage = 1)
+		: State(window, states), player(player), battleStage(battleStage)
 	{
-		/*this->initVariables(Maxround, Stagelevel, Isbossstage);*/
 		this->time = 0;
 		this->stage = 1;
 		this->initBackground();
@@ -1461,6 +1511,12 @@ public:
 		this->isSkillWindowActive = false;
 		this->isPlayerturn = true;
 		this->targetCursor = new TargetCursor();
+		this->skillDetailTexture.loadFromFile("Images/skill window.png");
+		this->itemDetailTexture.loadFromFile("Images/ItemwindowV2.png");
+		this->skillDetail.setColor(Color::Transparent);
+		this->itemDetail.setColor(Color::Transparent);
+		this->skillDetail.setTexture(this->skillDetailTexture);
+		this->itemDetail.setTexture(this->itemDetailTexture);
 	}
 
 	virtual ~BattleState()
@@ -1478,9 +1534,9 @@ public:
 	void endState(int x = 0)
 	{
 		if (!this->clear && x == 1)
-			this->clear = new ShowDamage(Vector2f(960.f, 540.f), "Stage Clear", 300, Color::White);
-		else if(!this->clear && x == 0)
-			this->clear = new ShowDamage(Vector2f(960.f, 540.f), "Run!!!", 250, Color::White);
+			this->clear = new ShowText(Vector2f(960.f, 540.f), "Stage Clear", 300, Color::White);
+		else if (!this->clear && x == 0)
+			this->clear = new ShowText(Vector2f(960.f, 540.f), "Run!!!", 250, Color::White);
 	}
 
 	void updateButtons()
@@ -1488,39 +1544,46 @@ public:
 		if (this->isPlayerturn && this->target)
 		{
 			//Attack
-			if (this->Mainbuttons["Attack"]->isPressed())
+			if (this->Mainbuttons["Attack"]->isPressed() && this->clear == nullptr)
 			{
-				this->showDamages.push_back(new ShowDamage(Vector2f(this->target->getPosition().x + this->target->getGlobalBounds().width / 2
-					, this->target->getPosition().y - 50.f), this->player->attack(*this->target)));
+				this->player->attack(*this->target);
 				this->isPlayerturn = false;
 			}
 
 			//Skill
-			if (this->Mainbuttons["Skill"]->isPressed())
+			if (this->Mainbuttons["Skill"]->isPressed() && !this->isItemWindowActive && this->clear == nullptr)
 			{
 				if (!this->isSkillWindowActive)
 					this->isSkillWindowActive = true;
 				else this->isSkillWindowActive = false;
 			}
 
-			if (this->Skillbuttons["SKILL1"]->isPressed())
+			if (this->Skillbuttons["SKILL1"]->isPressed() && this->clear == nullptr)
 			{
 				if (this->player->useSkill1(this->enemy, this->showDamages))
 					this->isPlayerturn = false;
 			}
 
-			if (this->Skillbuttons["SKILL2"]->isPressed())
+			if (this->Skillbuttons["SKILL2"]->isPressed() && this->clear == nullptr)
 			{
 				if (this->player->useSkill2(this->target, this->showDamages))
 					this->isPlayerturn = false;
 			}
 
 			//Item 
-			if (this->Mainbuttons["Items"]->isPressed())
+			if (this->Mainbuttons["Items"]->isPressed() && !this->isSkillWindowActive && this->clear == nullptr)
 			{
 				if (!this->isItemWindowActive)
 					this->isItemWindowActive = true;
 				else this->isItemWindowActive = false;
+			}
+			if (this->Itembuttons["ITEM1"]->isPressed() && this->clear == nullptr)
+			{
+				this->player->useItem("Elixirs");
+			}
+			if (this->Itembuttons["ITEM2"]->isPressed() && this->clear == nullptr)
+			{
+				this->player->useItem("Sacred water");
 			}
 
 			//Quit the game
@@ -1529,10 +1592,16 @@ public:
 				this->endState();
 			}
 		}
+
 		/*Updates all the buttons in the state and handles their functionlaity.*/
 		for (auto& it : Mainbuttons)
 		{
 			it.second->update();
+		}
+
+		for (auto& it : detailButtons)
+		{
+			it.second->update(this->mousePosView);
 		}
 
 		if (this->isItemWindowActive)
@@ -1571,17 +1640,16 @@ public:
 		{
 			i->updateEvent(event, this->mousePosView);
 		}
+
 	}
 
 	void enemyTurn()
 	{
-		int dmg = 0;
 		for (auto& i : enemy)
 		{
-			dmg += i->attack(*this->player);
+			i->attack(*this->player);
 		}
-		if (!enemy.empty())
-			this->showDamages.push_back(new ShowDamage(Vector2f(this->player->getPosition().x + 170.f, this->player->getPosition().y - 20), dmg));
+
 	}
 
 	void updateTarget()
@@ -1597,6 +1665,19 @@ public:
 
 	void update(const float& dt)
 	{
+		this->skillDetail.setPosition(this->mousePosView.x - this->skillDetail.getGlobalBounds().width,
+			this->mousePosView.y - this->skillDetail.getGlobalBounds().height);
+		this->itemDetail.setPosition(this->mousePosView.x - this->itemDetail.getGlobalBounds().width,
+			this->mousePosView.y - this->itemDetail.getGlobalBounds().height);
+
+		if (this->detailButtons["SkillDetail"]->isHovered())
+			this->skillDetail.setColor(Color::White);
+		else this->skillDetail.setColor(Color::Transparent);
+
+		if (this->detailButtons["ItemDetail"]->isHovered())
+			this->itemDetail.setColor(Color::White);
+		else this->itemDetail.setColor(Color::Transparent);
+
 		//enviornment update zone
 		this->updateButtons();
 		this->updateMousePositions();
@@ -1665,6 +1746,13 @@ public:
 				this->quit = true;
 			}
 		}
+
+		if (this->player->isdead())
+		{
+			currentState = "MainMenu";
+			this->states->erase(this->states->find("Map1_1"),this->states->end());
+		}
+
 	}
 
 	void renderButtons(RenderTarget* target = NULL)
@@ -1685,6 +1773,11 @@ public:
 			{
 				it.second->render(*target);
 			}
+
+		for (auto& it : detailButtons)
+		{
+			it.second->render(*target);
+		}
 	}
 
 	void render(RenderTarget* target = NULL)
@@ -1695,25 +1788,27 @@ public:
 		//update environment zone
 		target->draw(this->background);
 
-		//render player zone
-		this->player->render(*target);
-		//render enemy zone
-		for (auto& i : enemy)
-			i->render(*target);
-
 		//enemy target cursor
 		if (this->target)
 			this->targetCursor->render(*target);
 
-		//render damage to enemy
-		for (auto& i : showDamages)
+		//render player zone
+		this->player->render(*target);
+
+		//render enemy zone
+		for (auto& i : enemy)
 			i->render(*target);
+
+		//render damage to enemy
 
 		//render button
 		this->renderButtons(target);
 
 		if (this->clear)
 			this->clear->render(*target);
+
+		target->draw(this->skillDetail);
+		target->draw(this->itemDetail);
 
 		//show mouse position zone
 		Text mouseText;
@@ -1768,7 +1863,7 @@ public:
 		{
 			this->texture.loadFromFile("Images/map/tree_type_3.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX , positionY, 37.f, 30.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 37.f, 30.f);
 		}
 		else
 		{
@@ -1787,7 +1882,7 @@ public:
 	virtual void render(RenderTarget& target)
 	{
 		this->collisionBox->render(target);
-		if (this->player->getHitbox().getGlobalBounds().top < this->collisionBox->getShape().getGlobalBounds().top && !this->player->isRendered())
+		if (this->player->getHitboxGlobalBounds().top < this->collisionBox->getShape().getGlobalBounds().top && !this->player->isRendered())
 			this->player->render(target);
 		target.draw(this->sprite);
 	}
@@ -1801,7 +1896,7 @@ void sortObject(vector<Object*>& objects)
 		{
 			if (j->getObjectPosition() > i->getObjectPosition())
 			{
-				Object *temp = j;
+				Object* temp = j;
 				j = i;
 				i = temp;
 			}
@@ -1814,27 +1909,26 @@ class GameState : public State
 	//Variables
 	Player* player;
 	Texture backgroundTexture;
-	Texture environmentTexture;
+	/*Texture environmentTexture;*/
 	RectangleShape background;
 	Sprite environment;
 	vector<Object*> objects;
 	vector<CollisionBox*> collisions;
-	ifstream source;
 	string textline;
-	
-	int stage;
+
+	int gameStage;
 
 public:
 	//Initilizer functions
 
 	//Constructor / Destructor
-	GameState(RenderWindow* window, map<string, State*>* states, Player* player, int stage = 1)
-		: State(window, states), player(player), stage(stage)
+	GameState(RenderWindow* window, map<string, State*>* states, Player* player, int gameStage = 11)
+		: State(window, states), player(player), gameStage(gameStage)
 	{
-		if (this->stage == 1)
+		if (this->gameStage == 11)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map1/map1_1.png");
-			this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");
+			/*this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");*/
 			this->objects.push_back(new Object("Tree1", this->player, 704.f, -172.f));
 			this->objects.push_back(new Object("Tree1", this->player, 948.f, -5.f));
 			this->objects.push_back(new Object("Tree1", this->player, 927.f, -163.f));
@@ -1883,15 +1977,46 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
 		}
-		else if (this->stage == 2)
+		else if (this->gameStage == 12)
 		{
-
-			
 			this->backgroundTexture.loadFromFile("Images/map/map1/map1_2.png");
-			this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");
+			/*this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");*/
+			this->collisions.push_back(new CollisionBox(*this->player, 1434.f, 584.f, 1.f, 358.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 1634.f, 589.f, 1.f, 353.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 610.f, 0.f, 1.f, 295.f));
 		}
+		else if (this->gameStage == 13)
+		{
+			this->backgroundTexture.loadFromFile("Images/map/map1/map1_3.png");
+		}
+		else if (this->gameStage == 21)
+		{
+			this->backgroundTexture.loadFromFile("Images/map/map2/map2_1.png");
+		}
+		else if (this->gameStage == 22)
+		{
+			this->backgroundTexture.loadFromFile("Images/map/map2/map2_2.png");
+		}
+		else if (this->gameStage == 23)
+		{
+			this->backgroundTexture.loadFromFile("Images/map/map2/map2_3.png");
+		}
+		else if (this->gameStage == 31)
+		{
+			this->backgroundTexture.loadFromFile("Images/map/map3/map3_1.png");
+		}
+		else if (this->gameStage == 32)
+		{
+			this->backgroundTexture.loadFromFile("Images/map/map3/map3_2.png");
+		}
+		else if (this->gameStage == 33)
+		{
+			this->backgroundTexture.loadFromFile("Images/map/map3/map3_3.png");
+		}
+
+
 		this->background.setTexture(&this->backgroundTexture);
-		this->environment.setTexture(environmentTexture);
+		/*this->environment.setTexture(environmentTexture);*/
 		sortObject(objects);
 		this->background.setSize(Vector2f(this->window->getView().getSize()));
 	}
@@ -1922,7 +2047,7 @@ public:
 
 		if (Keyboard::isKeyPressed(Keyboard::B))
 		{
-			this->states->insert_or_assign("Battle", new BattleState(this->window, this->states, this->player));
+			this->states->insert_or_assign("Battle", new BattleState(this->window, this->states, this->player, 2));
 			currentState = "Battle";
 			this->player->setMode(true);
 		}
@@ -1937,52 +2062,290 @@ public:
 	{
 		this->updateMousePositions();
 		this->updateInput(dt);
-		if (this->stage == 1)
+		if (this->gameStage == 11)
 		{
-			if (this->player->getGlobalBounds().left > this->window->getView().getSize().x)
+			//RIGHT
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x &&
+				!(this->player->getHitboxGlobalBounds().top > 480.f && this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 656.f))
 			{
-				this->player->setPosition(0, this->player->getPosition().y);
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+			}
+			else if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y);
 				openWorldState = "Map1_2";
 				currentState = "Map1_2";
 			}
 
-			if (this->player->getGlobalBounds().left < 0.f)
+			//LEFT
+			if (this->player->getHitboxGlobalBounds().left < 0.f)
 			{
-				this->player->collisionFixed();
+				this->player->setPosition(0.f, this->player->getPosition().y);
 			}
 
-			if (this->player->getGlobalBounds().top > this->window->getView().getSize().y)
+			//DOWN
+			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height > this->window->getView().getSize().y &&
+				!(this->player->getHitboxGlobalBounds().left > 835.f && this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 982.f))
 			{
-				this->player->collisionFixed();
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
+			}
+			else if (this->player->getHitboxGlobalBounds().top > this->window->getView().getSize().y)
+			{
+				this->player->setPosition(this->player->getPosition().x, 0.f);
+				openWorldState = "Map1_3";
+				currentState = "Map1_3";
 			}
 
-			if (this->player->getGlobalBounds().top < 0)
+			//UP
+			if (this->player->getHitboxGlobalBounds().top < 0.f)
 			{
-				this->player->collisionFixed();
+				this->player->setPosition(this->player->getPosition().x, 0.f);
 			}
 		}
-		else if (this->stage == 2)
+		else if (this->gameStage == 12)
 		{
-			if (this->player->getGlobalBounds().left + this->player->getGlobalBounds().width > this->window->getView().getSize().x)
+			//RIGHT
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x)
 			{
-				
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
 			}
 
-			if (this->player->getGlobalBounds().left + this->player->getGlobalBounds().width < 0.f)
+			//LEFT
+			if (this->player->getHitboxGlobalBounds().left < 0.f &&
+				!(this->player->getHitboxGlobalBounds().top > 480.f && this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 656.f))
 			{
-				this->player->setPosition(this->window->getView().getSize().x - this->player->getGlobalBounds().width, this->player->getPosition().y);
-				openWorldState = "Game";
-				currentState = "Game";
+				this->player->setPosition(0.f, this->player->getPosition().y);
+			}
+			else if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 0.f)
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+				openWorldState = "Map1_1";
+				currentState = "Map1_1";
 			}
 
-			if (this->player->getGlobalBounds().top + this->player->getGlobalBounds().height > this->window->getView().getSize().y)
+			//DOWN
+			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height > this->window->getView().getSize().y)
 			{
-				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - 75.f);
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
 			}
 
-			if (this->player->getGlobalBounds().top < 0)
+			//UP
+			if (this->player->getHitboxGlobalBounds().top < 0.f)
 			{
-				this->player->setPosition(this->player->getPosition().x, -75.f);
+				this->player->setPosition(this->player->getPosition().x, 0.f);
+			}
+		}
+		else if (this->gameStage == 13)
+		{
+			//RIGHT
+			if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y);
+				openWorldState = "Map2_1";
+				currentState = "Map2_1";
+			}
+
+			//LEFT
+			if (this->player->getHitboxGlobalBounds().left < 0.f)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y);
+			}
+
+			//DOWN
+			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height > this->window->getView().getSize().y)
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
+			}
+
+			//UP
+			if (this->player->getHitboxGlobalBounds().top < 0.f &&
+				!(this->player->getHitboxGlobalBounds().left > 835.f && this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 982.f))
+			{
+				this->player->setPosition(this->player->getPosition().x, 0.f);
+			}
+			else if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 0.f)
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
+				openWorldState = "Map1_1";
+				currentState = "Map1_1";
+			}
+		}
+		else if (this->gameStage == 21)
+		{
+			//RIGHT
+			if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y);
+				openWorldState = "Map2_2";
+				currentState = "Map2_2";
+			}
+
+			//LEFT
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().left < 0.f)
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+				openWorldState = "Map1_3";
+				currentState = "Map1_3";
+			}
+
+			//DOWN
+			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height > this->window->getView().getSize().y)
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
+			}
+
+			//UP
+			if (this->player->getHitboxGlobalBounds().top < 0.f)
+			{
+				this->player->setPosition(this->player->getPosition().x, 0.f);
+			}
+		}
+		else if (this->gameStage == 22)
+		{
+			//RIGHT
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+			}
+
+			//LEFT
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 0.f)
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+				openWorldState = "Map2_1";
+				currentState = "Map2_1";
+			}
+
+			//DOWN
+			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height > this->window->getView().getSize().y)
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
+			}
+
+			//UP
+			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 0.f)
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
+				openWorldState = "Map2_3";
+				currentState = "Map2_3";
+			}
+		}
+		else if (this->gameStage == 23)
+		{
+			//RIGHT
+			if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y);
+				openWorldState = "Map3_1";
+				currentState = "Map3_1";
+			}
+
+			//LEFT
+			if (this->player->getHitboxGlobalBounds().left < 0.f)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y);
+			}
+
+			//DOWN
+			if (this->player->getHitboxGlobalBounds().top > this->window->getView().getSize().y)
+			{
+				this->player->setPosition(this->player->getPosition().x, 0.f);
+				openWorldState = "Map2_2";
+				currentState = "Map2_2";
+			}
+
+			//UP
+			if (this->player->getHitboxGlobalBounds().top < 0.f)
+			{
+				this->player->setPosition(this->player->getPosition().x, 0.f);
+			}
+		}
+		else if (this->gameStage == 31)
+		{
+			//RIGHT
+			if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y);
+				openWorldState = "Map3_2";
+				currentState = "Map3_2";
+			}
+
+			//LEFT
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 0.f)
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+				openWorldState = "Map2_3";
+				currentState = "Map2_3";
+			}
+
+			//DOWN
+			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height > this->window->getView().getSize().y)
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
+			}
+
+			//UP
+			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 0.f)
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
+				openWorldState = "Map3_3";
+				currentState = "Map3_3";
+			}
+		}
+		else if (this->gameStage == 32)
+		{
+			//RIGHT
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+			}
+
+			//LEFT
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 0.f)
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+				openWorldState = "Map3_1";
+				currentState = "Map3_1";
+			}
+
+			//DOWN
+			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height > this->window->getView().getSize().y)
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
+			}
+
+			//UP
+			if (this->player->getHitboxGlobalBounds().top < 0.f)
+			{
+				this->player->setPosition(this->player->getPosition().x, 0.f);
+			}
+		}
+		else if (this->gameStage == 33)
+		{
+			//RIGHT
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+			}
+
+			//LEFT
+			if (this->player->getHitboxGlobalBounds().left < 0.f)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y);
+			}
+
+			//DOWN
+			if (this->player->getHitboxGlobalBounds().top > this->window->getView().getSize().y)
+			{
+				this->player->setPosition(this->player->getPosition().x, 0.f);
+				openWorldState = "Map3_1";
+				currentState = "Map3_1";
+			}
+
+			//UP
+			if (this->player->getHitboxGlobalBounds().top < 0.f)
+			{
+				this->player->setPosition(this->player->getPosition().x, 0.f);
 			}
 		}
 
@@ -1992,6 +2355,7 @@ public:
 		{
 			i->update(dt);
 		}
+
 		for (auto& i : collisions)
 		{
 			i->update(dt);
@@ -2083,26 +2447,34 @@ public:
 	void updateButtons()
 	{
 		//New game
-		if(this->player != nullptr)
-		if (this->buttons["CONTINUE_STATE"]->isPressed())
-		{
-			currentState = openWorldState;
-		}
+		if (this->player != nullptr && !this->player->isdead())
+			if (this->buttons["CONTINUE_STATE"]->isPressed())
+			{
+				currentState = openWorldState;
+			}
 
 		if (this->buttons["START_STATE"]->isPressed())
 		{
 			if (this->player != nullptr)
 			{
 				delete this->player;
+				this->player = NULL;
 			}
 
 			this->player = new Player();
-			this->states->emplace("Map1_1", new GameState(this->window, this->states, this->player));
-			this->states->emplace("Map1_2", new GameState(this->window, this->states, this->player,2));
+			this->states->emplace("Map1_1", new GameState(this->window, this->states, this->player, 11));
+			this->states->emplace("Map1_2", new GameState(this->window, this->states, this->player, 12));
+			this->states->emplace("Map1_3", new GameState(this->window, this->states, this->player, 13));
+			this->states->emplace("Map2_1", new GameState(this->window, this->states, this->player, 21));
+			this->states->emplace("Map2_2", new GameState(this->window, this->states, this->player, 22));
+			this->states->emplace("Map2_3", new GameState(this->window, this->states, this->player, 23));
+			this->states->emplace("Map3_1", new GameState(this->window, this->states, this->player, 31));
+			this->states->emplace("Map3_2", new GameState(this->window, this->states, this->player, 32));
+			this->states->emplace("Map3_3", new GameState(this->window, this->states, this->player, 33));
 			openWorldState = "Map1_1";
 			currentState = openWorldState;
 		}
-		
+
 		//Quit the game
 		if (this->buttons["EXIT_STATE"]->isPressed())
 		{
@@ -2185,7 +2557,7 @@ int main()
 
 	RenderWindow* window;
 	if (fullscreen)
-		window = new RenderWindow(VideoMode::getDesktopMode(), "The Curse", Style::Default, windowSettings);
+		window = new RenderWindow(VideoMode::getDesktopMode(), "The Curse", Style::Fullscreen, windowSettings);
 	else
 		window = new RenderWindow(VideoMode(1280, 720), "The Curse", Style::Default, windowSettings);
 
