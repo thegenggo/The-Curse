@@ -1,14 +1,19 @@
 #include <vector>
 #include <stack>
 #include <map>
+#include <list>
+#include <set>
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <cmath>
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"
 #include "SFML/Audio.hpp"
 #include "SFML/Network.hpp"
+#include "Collision.h"
 
 using namespace std;
 using namespace sf;
@@ -16,6 +21,7 @@ using namespace sf;
 string currentState = "MainMenu";
 string openWorldState = "Game";
 string battleState = "Battle";
+string drawState = "Draw";
 Font font;
 map<string, Texture> enemyTexture;
 
@@ -740,7 +746,7 @@ public:
 		return this->openWorldSprite.getGlobalBounds();
 	}
 
-	const Sprite& getSprite() const
+	Sprite& getSprite()
 	{
 		return this->openWorldSprite;
 	}
@@ -748,6 +754,11 @@ public:
 	const bool& isRendered() const
 	{
 		return this->rendered;
+	}
+
+	const Vector2f& getVelocity() const
+	{
+		return this->movementComponent->getVelocity();
 	}
 
 	//Constructor / Destructor
@@ -1038,61 +1049,36 @@ public:
 class CollisionBox
 {
 	//Variables
-	RectangleShape shape;
+	Sprite shape;
 	Player& player;
-	RectangleShape up;
-	RectangleShape left;
-	RectangleShape down;
-	RectangleShape right;
 
 public:
 	//Accessors
-	const RectangleShape& getShape() const
+	const Sprite& getShape() const
 	{
 		return this->shape;
 	}
 
 	//Constructor / Destructor
-	CollisionBox(Player& player, float x, float y, float width, float height)
+	CollisionBox(Player& player, float x, float y, float width = 1.f, float height = 1.f)
 		:player(player)
 	{
+		
 		this->shape.setPosition(x, y);
-		this->shape.setSize(Vector2f(width, height));
-		this->shape.setFillColor(Color::Black);
-		this->shape.setOutlineThickness(1.f);
-		this->shape.setOutlineColor(Color::Black);
-		this->up.setFillColor(Color::Red);
-		this->up.setPosition(x, y);
-		this->up.setSize(Vector2f(width, 1.f));
-		this->left.setFillColor(Color::Blue);
-		this->left.setPosition(x, y);
-		this->left.setSize(Vector2f(1.f, height));
-		this->down.setFillColor(Color::Green);
-		this->down.setPosition(x, y + height);
-		this->down.setSize(Vector2f(width, 1.f));
-		this->right.setFillColor(Color::Magenta);
-		this->right.setPosition(x + width, y);
-		this->right.setSize(Vector2f(1.f, height));
+		
+	}
+
+	~CollisionBox()
+	{
+		
 	}
 
 	//Functions
-	void update()
+	void update(const float& dt)
 	{
-		if (this->player.getHitbox().getGlobalBounds().intersects(this->up.getGlobalBounds()) && this->player.getMovementState() == movementState::MOVING_DOWN)
+		if (Collision::PixelPerfectTest(this->player.getSprite(),this->shape))
 		{
-			this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top - this->player.getHitbox().getGlobalBounds().height - 75.f);
-		}
-		else if (this->player.getHitbox().getGlobalBounds().intersects(this->left.getGlobalBounds()) && this->player.getMovementState() == movementState::MOVING_RIGHT)
-		{
-			this->player.setPosition(this->shape.getGlobalBounds().left - this->player.getHitbox().getGlobalBounds().width, this->player.getPosition().y);
-		}
-		else if (this->player.getHitbox().getGlobalBounds().intersects(this->down.getGlobalBounds()) && this->player.getMovementState() == movementState::MOVING_UP)
-		{
-			this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height - 75.f);
-		}
-		else if (this->player.getHitbox().getGlobalBounds().intersects(this->right.getGlobalBounds()) && this->player.getMovementState() == movementState::MOVING_LEFT)
-		{
-			this->player.setPosition(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width, this->player.getPosition().y);
+			this->player.getSprite().move(-this->player.getVelocity().x, -this->player.getVelocity().y);
 		}
 	}
 
@@ -1126,6 +1112,11 @@ public:
 		this->window = window;
 		this->states = states;
 		this->quit = false;
+	}
+
+	virtual ~State()
+	{
+
 	}
 
 	//Accessors
@@ -1760,7 +1751,7 @@ public:
 		{
 			this->texture.loadFromFile("Images/map/rock_type_1.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 220.f, 45.f, 40.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX + 17.5f, positionY, 60.f, 40.f);
 		}
 		else if (this->name == "Tree1")
 		{
@@ -1778,7 +1769,7 @@ public:
 		{
 			this->texture.loadFromFile("Images/map/tree_type_3.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX , positionY, 40.f, 30.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX , positionY, 37.f, 30.f);
 		}
 		else
 		{
@@ -1789,9 +1780,9 @@ public:
 		this->sprite.setPosition(positionX, positionY);
 	}
 
-	virtual void update()
+	virtual void update(const float& dt)
 	{
-		this->collisionBox->update();
+		this->collisionBox->update(dt);
 	}
 
 	virtual void render(RenderTarget& target)
@@ -1817,10 +1808,6 @@ void sortObject(vector<Object*>& objects)
 			}
 		}
 	}
-	for (auto& i : objects) 
-	{
-		cout << i->getObjectPosition() << "\n";
-	}
 }
 
 class GameState : public State
@@ -1832,50 +1819,98 @@ class GameState : public State
 	RectangleShape background;
 	Sprite environment;
 	vector<Object*> objects;
+	vector<CollisionBox*> collisions;
+	ifstream source;
+	string textline;
+	
+	int stage;
 
 public:
 	//Initilizer functions
 
 	//Constructor / Destructor
-	GameState(RenderWindow* window, map<string, State*>* states, Player* player)
-		: State(window, states), player(player)
+	GameState(RenderWindow* window, map<string, State*>* states, Player* player, int stage = 1)
+		: State(window, states), player(player), stage(stage)
 	{
-		this->backgroundTexture.loadFromFile("Images/map/map1/map1_1.png");
-		this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");
-		this->background.setTexture(&this->backgroundTexture);
-		this->background.setSize(Vector2f(this->window->getView().getSize()));
-		this->environment.setTexture(environmentTexture);
-		this->objects.push_back(new Object("Tree1", this->player, 934.f, 15.f));
-		this->objects.push_back(new Object("Tree1", this->player, 1567.f, 19.f));
-		this->objects.push_back(new Object("Tree1", this->player, 185.f, 83.f));
-		this->objects.push_back(new Object("Tree1", this->player, 375.f, 95.f));
-		this->objects.push_back(new Object("Tree1", this->player, 1222.f, 109.f));
-		this->objects.push_back(new Object("Tree2", this->player, 657.f, 111.f));
-		this->objects.push_back(new Object("Tree2", this->player, 47.f, 149.f));
-		this->objects.push_back(new Object("Tree2", this->player, 958.f, 189.f));
-		this->objects.push_back(new Object("Tree2", this->player, 1765.f, 219.f));
-		this->objects.push_back(new Object("Tree1", this->player, 17.f, 342.f));
-		this->objects.push_back(new Object("Tree2", this->player, 963.f, 484.f));
-		this->objects.push_back(new Object("Tree1", this->player, 1719.f, 608.f));
-		this->objects.push_back(new Object("Tree2", this->player, 22.f, 631.f));
-		this->objects.push_back(new Object("Tree2", this->player, 970.f, 637.f));
-		this->objects.push_back(new Object("Tree1", this->player, 1521.f, 694.f));
-		this->objects.push_back(new Object("Tree1", this->player, 173.f, 699.f));
-		this->objects.push_back(new Object("Tree2", this->player, 476.f, 700.f));
-		this->objects.push_back(new Object("Tree1", this->player, 633.f, 760.f));
-		this->objects.push_back(new Object("Tree2", this->player, 1154.f, 785.f));
-		this->objects.push_back(new Object("Tree2", this->player, 970.f, 791.f));
-		this->objects.push_back(new Object("Tree2", this->player, 1364.f, 799.f));
-		this->objects.push_back(new Object("Tree3", this->player, 1607.f, 416.f));
-		this->objects.push_back(new Object("Tree3", this->player, 1057.f, 17.f));
+		if (this->stage == 1)
+		{
+			this->backgroundTexture.loadFromFile("Images/map/map1/map1_1.png");
+			this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");
+			this->objects.push_back(new Object("Tree1", this->player, 704.f, -172.f));
+			this->objects.push_back(new Object("Tree1", this->player, 948.f, -5.f));
+			this->objects.push_back(new Object("Tree1", this->player, 927.f, -163.f));
+			this->objects.push_back(new Object("Tree1", this->player, 487.f, -179.f));
+			this->objects.push_back(new Object("Tree1", this->player, 200.f, -164.f));
+			this->objects.push_back(new Object("Tree1", this->player, 633.f, 760.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1567.f, 19.f));
+			this->objects.push_back(new Object("Tree1", this->player, 185.f, 83.f));
+			this->objects.push_back(new Object("Tree1", this->player, 375.f, 95.f));
+			this->objects.push_back(new Object("Tree1", this->player, 17.f, 342.f));
+			this->objects.push_back(new Object("Tree1", this->player, 224.f, 699.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1221.f, 150.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1521.f, 694.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1719.f, 608.f));
+			this->objects.push_back(new Object("Tree2", this->player, 657.f, 111.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1252.f, -89.f));
+			this->objects.push_back(new Object("Tree2", this->player, 30.f, -124.f));
+			this->objects.push_back(new Object("Tree2", this->player, 47.f, 149.f));
+			this->objects.push_back(new Object("Tree2", this->player, 958.f, 189.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1765.f, 219.f));
+			this->objects.push_back(new Object("Tree2", this->player, 963.f, 484.f));
+			this->objects.push_back(new Object("Tree2", this->player, 22.f, 631.f));
+			this->objects.push_back(new Object("Tree2", this->player, 970.f, 637.f));
+			this->objects.push_back(new Object("Tree2", this->player, 476.f, 700.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1154.f, 785.f));
+			this->objects.push_back(new Object("Tree2", this->player, 970.f, 791.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1364.f, 799.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1151.f, 402.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1161.f, 109.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1061.f, 269.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1607.f, 416.f));
+			this->objects.push_back(new Object("Tree3", this->player, 349.f, 335.f));
+			this->objects.push_back(new Object("Tree3", this->player, 22.f, 326.f));
+			this->objects.push_back(new Object("Tree3", this->player, 77.f, 984.f));
+			this->objects.push_back(new Object("Tree3", this->player, 422.f, 1014.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1654.f, 1030.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1595.f, 871.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1830.f, 945.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1838.f, 96.f));
+			this->objects.push_back(new Object("Rock", this->player, 1802.f, 1011.f));
+			this->objects.push_back(new Object("Rock", this->player, 1536.f, 1031.f));
+			this->objects.push_back(new Object("Rock", this->player, 1687.f, 348.f));
+			this->objects.push_back(new Object("Rock", this->player, 1131.f, 235.f));
+			this->objects.push_back(new Object("Rock", this->player, 657.f, 90.f));
+			this->objects.push_back(new Object("Rock", this->player, 393.f, 91.f));
+			this->objects.push_back(new Object("Rock", this->player, 309.f, 379.f));
+			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
+			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
+		}
+		else if (this->stage == 2)
+		{
 
+			this->source.open("dest.txt");
+			while (getline(source, textline))
+			{
+				float a, b;
+				sscanf_s(textline.c_str(), "%f %f", &a, &b);
+				this->collisions.push_back(new CollisionBox(*this->player, a, b));
+			}
+			this->backgroundTexture.loadFromFile("Images/map/map1/map1_2.png");
+			this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");
+		}
+		this->background.setTexture(&this->backgroundTexture);
+		this->environment.setTexture(environmentTexture);
 		sortObject(objects);
+		this->background.setSize(Vector2f(this->window->getView().getSize()));
 	}
 
 	virtual ~GameState()
 	{
-		delete this->player;
-		this->objects.clear();
+		for (auto& i : this->objects)
+			delete i;
+
+		for (auto& i : this->collisions)
+			delete i;
 	}
 
 	//Functions
@@ -1910,36 +1945,64 @@ public:
 	{
 		this->updateMousePositions();
 		this->updateInput(dt);
-
-		if (this->player->getGlobalBounds().left + this->player->getGlobalBounds().width > this->window->getView().getSize().x + 5.f)
+		if (this->stage == 1)
 		{
-			this->player->setPosition(5, this->player->getPosition().y);
-			openWorldState = "Game2";
-			currentState = "Game2";
+			if (this->player->getGlobalBounds().left > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(0, this->player->getPosition().y);
+				openWorldState = "Game2";
+				currentState = "Game2";
+			}
+
+			if (this->player->getGlobalBounds().left < 0.f)
+			{
+				this->player->setPosition(0, this->player->getPosition().y);
+			}
+
+			if (this->player->getGlobalBounds().top > this->window->getView().getSize().y)
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - 75.f);
+			}
+
+			if (this->player->getGlobalBounds().top < 0)
+			{
+				this->player->setPosition(this->player->getPosition().x, -75.f);
+			}
 		}
-
-		if (this->player->getGlobalBounds().left < -5.f)
+		else if (this->stage == 2)
 		{
-			this->player->setPosition(0, this->player->getPosition().y);
-			openWorldState = "Game";
-			currentState = "Game";
-		}
+			if (this->player->getGlobalBounds().left + this->player->getGlobalBounds().width > this->window->getView().getSize().x)
+			{
+				
+			}
 
-		if (this->player->getGlobalBounds().top + this->player->getGlobalBounds().height > this->window->getView().getSize().y)
-		{
-			this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getGlobalBounds().height);
-		}
+			if (this->player->getGlobalBounds().left + this->player->getGlobalBounds().width < 0.f)
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getGlobalBounds().width, this->player->getPosition().y);
+				openWorldState = "Game";
+				currentState = "Game";
+			}
 
-		if (this->player->getGlobalBounds().top < 0)
-		{
-			this->player->setPosition(this->player->getPosition().x, 0);
+			if (this->player->getGlobalBounds().top + this->player->getGlobalBounds().height > this->window->getView().getSize().y)
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - 75.f);
+			}
+
+			if (this->player->getGlobalBounds().top < 0)
+			{
+				this->player->setPosition(this->player->getPosition().x, -75.f);
+			}
 		}
 
 		this->player->update(dt);
 
 		for (auto& i : objects)
 		{
-			i->update();
+			i->update(dt);
+		}
+		for (auto& i : collisions)
+		{
+			i->update(dt);
 		}
 	}
 
@@ -1949,8 +2012,12 @@ public:
 			target = this->window;
 
 		target->draw(background);
-		/*target->draw(environment);*/
+		//target->draw(environment);
 		for (auto& i : objects)
+		{
+			i->render(*target);
+		}
+		for (auto& i : collisions)
 		{
 			i->render(*target);
 		}
@@ -1965,6 +2032,76 @@ public:
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
 		mouseText.setString(ss.str());
 		target->draw(mouseText);
+	}
+};
+
+class DrawState : public State
+{
+	Player* player;
+	ofstream* draw;
+	Texture* backgroundTexture;
+	RectangleShape background;
+	vector<CollisionBox*> collisions;
+public:
+	DrawState(RenderWindow* window, map<string, State*>* states, Player* player)
+		: State(window, states), player(player)
+	{
+		this->draw = new ofstream("dest.txt");
+		this->backgroundTexture = new Texture();
+		this->backgroundTexture->loadFromFile("Images/map/map1/map1_2.png");
+		this->backgroundTexture->setSmooth(true);
+		this->background.setSize(window->getView().getSize());
+		this->background.setTexture(this->backgroundTexture);
+	}
+
+	~DrawState()
+	{
+		delete this->draw;
+		delete this->backgroundTexture;
+	}
+
+	void updateEvent(const Event& event)
+	{
+		if (event.type == Event::KeyPressed)
+		{
+			if (event.key.code == Keyboard::Escape)
+			{
+				currentState = "MainMenu";
+			}
+		}
+	}
+
+	void update(const float& dt)
+	{
+		this->updateMousePositions();
+
+		if (Mouse::isButtonPressed(Mouse::Left))
+		{
+			this->collisions.push_back(new CollisionBox(*this->player, this->mousePosView.x, this->mousePosView.y));
+		}
+
+		if (Mouse::isButtonPressed(Mouse::Right))
+		{
+			this->collisions.pop_back();
+		}
+
+		for (auto& i : collisions)
+		{
+			i->update(dt);
+		}
+	}
+
+	void render(RenderTarget* target = NULL)
+	{
+		if (!target)
+			target = this->window;
+
+		target->draw(this->background);
+
+		for (auto& i : collisions)
+		{
+			i->render(*target);
+		}
 	}
 };
 
@@ -2011,7 +2148,7 @@ public:
 		this->initButtons();
 	}
 
-	virtual ~MainMenuState()
+	~MainMenuState()
 	{
 		for (auto it = this->buttons.begin(); it != this->buttons.end(); ++it)
 		{
@@ -2025,8 +2162,12 @@ public:
 		//New game
 		if (this->buttons["GAME_STATE"]->isPressed())
 		{
-			this->states->emplace("Game", new GameState(this->window, this->states, this->player));
 			currentState = openWorldState;
+		}
+
+		if (this->buttons["BATTLE_STATE"]->isPressed())
+		{
+			currentState = drawState;
 		}
 
 		//Quit the game
@@ -2098,7 +2239,6 @@ int main()
 	enemyTexture["battleSkeleton"].loadFromFile("Images/on_battle_stage/monmap3_skeleton.png");
 	enemyTexture["battleWanyudo"].loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");
 
-
 	bool fullscreen = true;
 	unsigned antialiasing_level = 0;
 	float speed = 10;
@@ -2123,8 +2263,9 @@ int main()
 
 	map<string, State*> states;
 	states["MainMenu"] = new MainMenuState(window, &states, player);
-	states.insert(pair<string, State*>("Game2", new GameState(window, &states, player)));
-	states.insert(pair<string, State*>("Game", new GameState(window, &states, player)));
+	states["Game2"] = new GameState(window, &states, player, 2);
+	states["Game"] = new GameState(window, &states, player);
+	states["Draw"] = new DrawState(window, &states, player);
 
 	while (window->isOpen())
 	{
@@ -2165,12 +2306,13 @@ int main()
 		window->display();
 	}
 
+	for (auto& i : states)
+		delete i.second;
+
+	delete player;
 	delete window;
 
-	while (!states.empty())
-	{
-		states.clear();
-	}
 
 	return 0;
+
 }
