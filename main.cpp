@@ -13,17 +13,15 @@
 #include "SFML/Window.hpp"
 #include "SFML/Audio.hpp"
 #include "SFML/Network.hpp"
-#include "Collision.h"
 
 using namespace std;
 using namespace sf;
 
 string currentState = "MainMenu";
-string openWorldState = "Game";
+string openWorldState = "Map1_1";
 string battleState = "Battle";
-string drawState = "Draw";
 Font font;
-map<string, Texture> enemyTexture;
+map<string, Texture> enemyTextures;
 
 class ChatDialog
 {
@@ -378,7 +376,6 @@ public:
 class Entity
 {
 protected:
-	Sprite sprite;
 	Texture texture;
 	string name;
 	Text textDamage;
@@ -416,26 +413,21 @@ public:
 	}
 
 	//Accessors
-	const FloatRect& getGlobalBounds() const
-	{
-		return sprite.getGlobalBounds();
-	}
-
 	virtual const Vector2f& getPosition() const
 	{
-		return this->sprite.getPosition();
+		return Vector2f(0.f,0.f);
 	}
+	
 	//Component functions
 
 	void setTexture(Texture& texture)
 	{
 		this->texture = texture;
-		this->sprite.setTexture(texture);
 	}
 
 	virtual void createAnimationComponent(Texture& texture_sheet)
 	{
-		this->animationComponent = new AnimationComponent(this->sprite, texture_sheet);
+		
 	}
 
 	//Functions
@@ -473,12 +465,13 @@ public:
 
 	virtual void render(RenderTarget& target)
 	{
-		target.draw(this->sprite);
+	
 	}
 };
 
 class Enemy : public Entity
 {
+	Sprite sprite;
 	Bar* hpBar;
 
 	int droprate;
@@ -746,7 +739,7 @@ public:
 		return this->openWorldSprite.getGlobalBounds();
 	}
 
-	Sprite& getSprite()
+	const Sprite& getSprite() const
 	{
 		return this->openWorldSprite;
 	}
@@ -856,6 +849,11 @@ public:
 			return this->openWorldSprite.getPosition();
 	}
 
+	void collisionFixed()
+	{
+		this->openWorldSprite.move(-this->getVelocity().x, -this->getVelocity().y);
+	}
+
 	virtual void setScale(const float x, const float y)
 	{
 		this->openWorldSprite.setScale(x, y);
@@ -897,7 +895,7 @@ public:
 		this->current_exp -= max_exp;
 		this->max_exp += lvl * 300;
 		this->lvl++;
-		this->showEvent.push_back(new ShowDamage(Vector2f(this->getPosition()), "Level Up!!!!"));
+		this->showEvent.push_back(new ShowDamage(Vector2f(this->battleSprite.getPosition()), "Level Up!!!!"));
 		this->max_hp += 30;
 		this->att += 10;
 		this->def += 5;
@@ -1019,6 +1017,7 @@ public:
 	{
 		target.draw(this->openWorldSprite);
 		target.draw(this->light);
+		this->hitboxComponent->render(target);
 		this->rendered = true;
 	}
 
@@ -1049,12 +1048,12 @@ public:
 class CollisionBox
 {
 	//Variables
-	Sprite shape;
+	RectangleShape shape;
 	Player& player;
 
 public:
 	//Accessors
-	const Sprite& getShape() const
+	const RectangleShape& getShape() const
 	{
 		return this->shape;
 	}
@@ -1064,8 +1063,8 @@ public:
 		:player(player)
 	{
 		
+		this->shape.setSize(Vector2f(width, height));
 		this->shape.setPosition(x, y);
-		
 	}
 
 	~CollisionBox()
@@ -1076,9 +1075,9 @@ public:
 	//Functions
 	void update(const float& dt)
 	{
-		if (Collision::PixelPerfectTest(this->player.getSprite(),this->shape))
+		if (this->shape.getGlobalBounds().intersects(this->player.getGlobalBounds()))
 		{
-			this->player.getSprite().move(-this->player.getVelocity().x, -this->player.getVelocity().y);
+			this->player.collisionFixed();
 		}
 	}
 
@@ -1441,7 +1440,7 @@ public:
 		{
 			delete it->second;
 		}
-		for (auto it = this->Skillbuttons.begin(); it != this->Itembuttons.end(); ++it)
+		for (auto it = this->Skillbuttons.begin(); it != this->Skillbuttons.end(); ++it)
 		{
 			delete it->second;
 		}
@@ -1872,7 +1871,6 @@ public:
 			this->objects.push_back(new Object("Tree3", this->player, 77.f, 984.f));
 			this->objects.push_back(new Object("Tree3", this->player, 422.f, 1014.f));
 			this->objects.push_back(new Object("Tree3", this->player, 1654.f, 1030.f));
-			this->objects.push_back(new Object("Tree3", this->player, 1595.f, 871.f));
 			this->objects.push_back(new Object("Tree3", this->player, 1830.f, 945.f));
 			this->objects.push_back(new Object("Tree3", this->player, 1838.f, 96.f));
 			this->objects.push_back(new Object("Rock", this->player, 1802.f, 1011.f));
@@ -1888,13 +1886,7 @@ public:
 		else if (this->stage == 2)
 		{
 
-			this->source.open("dest.txt");
-			while (getline(source, textline))
-			{
-				float a, b;
-				sscanf_s(textline.c_str(), "%f %f", &a, &b);
-				this->collisions.push_back(new CollisionBox(*this->player, a, b));
-			}
+			
 			this->backgroundTexture.loadFromFile("Images/map/map1/map1_2.png");
 			this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");
 		}
@@ -1950,23 +1942,23 @@ public:
 			if (this->player->getGlobalBounds().left > this->window->getView().getSize().x)
 			{
 				this->player->setPosition(0, this->player->getPosition().y);
-				openWorldState = "Game2";
-				currentState = "Game2";
+				openWorldState = "Map1_2";
+				currentState = "Map1_2";
 			}
 
 			if (this->player->getGlobalBounds().left < 0.f)
 			{
-				this->player->setPosition(0, this->player->getPosition().y);
+				this->player->collisionFixed();
 			}
 
 			if (this->player->getGlobalBounds().top > this->window->getView().getSize().y)
 			{
-				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - 75.f);
+				this->player->collisionFixed();
 			}
 
 			if (this->player->getGlobalBounds().top < 0)
 			{
-				this->player->setPosition(this->player->getPosition().x, -75.f);
+				this->player->collisionFixed();
 			}
 		}
 		else if (this->stage == 2)
@@ -2004,6 +1996,7 @@ public:
 		{
 			i->update(dt);
 		}
+
 	}
 
 	void render(RenderTarget* target = NULL)
@@ -2035,76 +2028,6 @@ public:
 	}
 };
 
-class DrawState : public State
-{
-	Player* player;
-	ofstream* draw;
-	Texture* backgroundTexture;
-	RectangleShape background;
-	vector<CollisionBox*> collisions;
-public:
-	DrawState(RenderWindow* window, map<string, State*>* states, Player* player)
-		: State(window, states), player(player)
-	{
-		this->draw = new ofstream("dest.txt");
-		this->backgroundTexture = new Texture();
-		this->backgroundTexture->loadFromFile("Images/map/map1/map1_2.png");
-		this->backgroundTexture->setSmooth(true);
-		this->background.setSize(window->getView().getSize());
-		this->background.setTexture(this->backgroundTexture);
-	}
-
-	~DrawState()
-	{
-		delete this->draw;
-		delete this->backgroundTexture;
-	}
-
-	void updateEvent(const Event& event)
-	{
-		if (event.type == Event::KeyPressed)
-		{
-			if (event.key.code == Keyboard::Escape)
-			{
-				currentState = "MainMenu";
-			}
-		}
-	}
-
-	void update(const float& dt)
-	{
-		this->updateMousePositions();
-
-		if (Mouse::isButtonPressed(Mouse::Left))
-		{
-			this->collisions.push_back(new CollisionBox(*this->player, this->mousePosView.x, this->mousePosView.y));
-		}
-
-		if (Mouse::isButtonPressed(Mouse::Right))
-		{
-			this->collisions.pop_back();
-		}
-
-		for (auto& i : collisions)
-		{
-			i->update(dt);
-		}
-	}
-
-	void render(RenderTarget* target = NULL)
-	{
-		if (!target)
-			target = this->window;
-
-		target->draw(this->background);
-
-		for (auto& i : collisions)
-		{
-			i->render(*target);
-		}
-	}
-};
-
 class MainMenuState : public State
 {
 	//Variables
@@ -2127,11 +2050,11 @@ public:
 
 	void initButtons()
 	{
-		this->buttons["GAME_STATE"] = new Button(835, 500, 250, 50, "เข้าสู่เกม", 50,
+		this->buttons["CONTINUE_STATE"] = new Button(835, 500, 250, 50, "เล่นต่อ", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["BATTLE_STATE"] = new Button(835, 600, 250, 50, "ฝึกต่อสู้", 50,
+		this->buttons["START_STATE"] = new Button(835, 600, 250, 50, "เริ่มเกมใหม่", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
@@ -2141,7 +2064,7 @@ public:
 	}
 
 	//Constructor / Destructor
-	MainMenuState(RenderWindow* window, map<string, State*>* states, Player* player)
+	MainMenuState(RenderWindow* window, map<string, State*>* states)
 		: State(window, states), player(player)
 	{
 		this->initBackground();
@@ -2160,16 +2083,26 @@ public:
 	void updateButtons()
 	{
 		//New game
-		if (this->buttons["GAME_STATE"]->isPressed())
+		if(this->player != nullptr)
+		if (this->buttons["CONTINUE_STATE"]->isPressed())
 		{
 			currentState = openWorldState;
 		}
 
-		if (this->buttons["BATTLE_STATE"]->isPressed())
+		if (this->buttons["START_STATE"]->isPressed())
 		{
-			currentState = drawState;
-		}
+			if (this->player != nullptr)
+			{
+				delete this->player;
+			}
 
+			this->player = new Player();
+			this->states->emplace("Map1_1", new GameState(this->window, this->states, this->player));
+			this->states->emplace("Map1_2", new GameState(this->window, this->states, this->player,2));
+			openWorldState = "Map1_1";
+			currentState = openWorldState;
+		}
+		
 		//Quit the game
 		if (this->buttons["EXIT_STATE"]->isPressed())
 		{
@@ -2230,14 +2163,14 @@ public:
 int main()
 {
 	font.loadFromFile("Fonts/2005_iannnnnJPG.ttf");
-	enemyTexture["battleKarakasa"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
-	enemyTexture["battleHitosume"].loadFromFile("Images/on_battle_stage/monmap1_boss_oni.png");
-	enemyTexture["battleBossOni"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
-	enemyTexture["battleKappa"].loadFromFile("Images/on_battle_stage/monmap2_kappa.png");
-	enemyTexture["battleAmikiri"].loadFromFile("Images/on_battle_stage/monmap2_amikiri.png");
-	enemyTexture["battleBossUmibozu"].loadFromFile("Images/on_battle_stage/monmap2_boss_umibozu.png");
-	enemyTexture["battleSkeleton"].loadFromFile("Images/on_battle_stage/monmap3_skeleton.png");
-	enemyTexture["battleWanyudo"].loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");
+	enemyTextures["battleKarakasa"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
+	enemyTextures["battleHitosume"].loadFromFile("Images/on_battle_stage/monmap1_boss_oni.png");
+	enemyTextures["battleBossOni"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
+	enemyTextures["battleKappa"].loadFromFile("Images/on_battle_stage/monmap2_kappa.png");
+	enemyTextures["battleAmikiri"].loadFromFile("Images/on_battle_stage/monmap2_amikiri.png");
+	enemyTextures["battleBossUmibozu"].loadFromFile("Images/on_battle_stage/monmap2_boss_umibozu.png");
+	enemyTextures["battleSkeleton"].loadFromFile("Images/on_battle_stage/monmap3_skeleton.png");
+	enemyTextures["battleWanyudo"].loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");
 
 	bool fullscreen = true;
 	unsigned antialiasing_level = 0;
@@ -2246,15 +2179,13 @@ int main()
 
 	Event event;
 	Clock dtClock;
-	Player* player;
-	player = new Player();
 
 	ContextSettings windowSettings;
 	windowSettings.antialiasingLevel = antialiasing_level;
 
 	RenderWindow* window;
 	if (fullscreen)
-		window = new RenderWindow(VideoMode::getDesktopMode(), "The Curse", Style::Fullscreen, windowSettings);
+		window = new RenderWindow(VideoMode::getDesktopMode(), "The Curse", Style::Default, windowSettings);
 	else
 		window = new RenderWindow(VideoMode(1280, 720), "The Curse", Style::Default, windowSettings);
 
@@ -2262,10 +2193,7 @@ int main()
 	window->setVerticalSyncEnabled(true);
 
 	map<string, State*> states;
-	states["MainMenu"] = new MainMenuState(window, &states, player);
-	states["Game2"] = new GameState(window, &states, player, 2);
-	states["Game"] = new GameState(window, &states, player);
-	states["Draw"] = new DrawState(window, &states, player);
+	states["MainMenu"] = new MainMenuState(window, &states);
 
 	while (window->isOpen())
 	{
@@ -2309,9 +2237,7 @@ int main()
 	for (auto& i : states)
 		delete i.second;
 
-	delete player;
 	delete window;
-
 
 	return 0;
 
