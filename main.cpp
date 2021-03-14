@@ -2,6 +2,7 @@
 #include <map>
 #include <sstream>
 #include <cmath>
+#include <list>
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
@@ -1841,6 +1842,7 @@ public:
 	Object(string name, Player* player, float positionX, float positionY)
 		:player(player), name(name)
 	{
+		this->collisionBox = NULL;
 		if (this->name == "Rock")
 		{
 			this->texture.loadFromFile("Images/map/rock_type_1.png");
@@ -1856,7 +1858,7 @@ public:
 		else if (this->name == "Tree2")
 		{
 			this->texture.loadFromFile("Images/map/tree_type_2.png");
-			this->sparite.setTexture(this->texture);
+			this->sprite.setTexture(this->texture);
 			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 220.f, 45.f, 40.f);
 		}
 		else if (this->name == "Tree3")
@@ -1867,12 +1869,12 @@ public:
 		}
 		else if (this->name == "Rock2")
 		{
-			this->texture.loadFromeFile("Images/map/rock_type_2.png")
+			this->texture.loadFromFile("Images/map/rock_type_2.png");
 			this->sprite.setTexture(this->texture);
 		}
 		else if (this->name == "Rock3")
 		{
-			this->texture.loadFromeFile("Images/map/rock_type_3.png")
+			this->texture.loadFromFile("Images/map/rock_type_3.png");
 			this->sprite.setTexture(this->texture);
 		}
 		else
@@ -1925,6 +1927,7 @@ class GameState : public State
 	vector<Object*> objects;
 	vector<CollisionBox*> collisions;
 	string textline;
+	list<ChatDialog*> chat;
 
 	int gameStage;
 
@@ -1986,6 +1989,8 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 309.f, 379.f));
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
+			this->chat.push_back(new ChatDialog(L"ฮัลโหล"));
+			this->chat.push_back(new ChatDialog(L"เทสๆ"));
 		}
 		else if (this->gameStage == 12)
 		{
@@ -2044,16 +2049,18 @@ public:
 	void updateInput(const float& dt)
 	{
 		//Update player input
-		if (Keyboard::isKeyPressed(Keyboard::W))
-			this->player->move(0.f, -1.f, dt);
-		else if (Keyboard::isKeyPressed(Keyboard::A))
-			this->player->move(-1.f, 0.f, dt);
-		else if (Keyboard::isKeyPressed(Keyboard::S))
-			this->player->move(0.f, 1.f, dt);
-		else if (Keyboard::isKeyPressed(Keyboard::D))
-			this->player->move(1.f, 0.f, dt);
-		else
-			this->player->move(0.f, 0.f, dt);
+		if (this->chat.empty()) {
+			if (Keyboard::isKeyPressed(Keyboard::W))
+				this->player->move(0.f, -1.f, dt);
+			else if (Keyboard::isKeyPressed(Keyboard::A))
+				this->player->move(-1.f, 0.f, dt);
+			else if (Keyboard::isKeyPressed(Keyboard::S))
+				this->player->move(0.f, 1.f, dt);
+			else if (Keyboard::isKeyPressed(Keyboard::D))
+				this->player->move(1.f, 0.f, dt);
+			else
+				this->player->move(0.f, 0.f, dt);
+		}
 
 		if (Keyboard::isKeyPressed(Keyboard::B))
 		{
@@ -2371,6 +2378,7 @@ public:
 			i->update(dt);
 		}
 
+
 	}
 
 	void render(RenderTarget* target = NULL)
@@ -2391,6 +2399,9 @@ public:
 
 		if (!this->player->isRendered()) this->player->render(*target);
 
+		if (!this->chat.empty())
+			this->chat.front()->render(target);
+
 		Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
 		mouseText.setFont(font);
@@ -2400,6 +2411,20 @@ public:
 		mouseText.setString(ss.str());
 		target->draw(mouseText);
 	}
+
+	void updateEvent(const Event& event)
+	{
+		if (event.type == Event::MouseButtonPressed)
+		{
+			if (event.mouseButton.button == Mouse::Left) {
+				if (!this->chat.empty())
+					this->chat.pop_front();
+			}
+		}
+
+	}
+
+
 };
 
 class MainMenuState : public State
@@ -2424,15 +2449,15 @@ public:
 
 	void initButtons()
 	{
-		this->buttons["CONTINUE_STATE"] = new Button(835, 500, 250, 50, "��蹵��", 50,
+		this->buttons["CONTINUE_STATE"] = new Button(835, 500, 250, 50, "เล่นต่อ", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["START_STATE"] = new Button(835, 600, 250, 50, "�����������", 50,
+		this->buttons["START_STATE"] = new Button(835, 600, 250, 50, "เริ่มเกมใหม่", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, "�͡�ҡ��", 50,
+		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, "ออกจากเกม", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(100, 100, 100, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 	}
