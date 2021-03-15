@@ -1999,6 +1999,39 @@ public:
 			this->collisions.push_back(new CollisionBox(*this->player, 1434.f, 584.f, 1.f, 358.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 1634.f, 589.f, 1.f, 353.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 610.f, 0.f, 1.f, 295.f));
+
+			this->objects.push_back(new Object("Tree1", this->player, 1317.f, -161.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1555.f, -161.f));
+			this->objects.push_back(new Object("Rock", this->player, 968.f, 614.f));
+			this->objects.push_back(new Object("Rock", this->player, 761.f, 504.f));
+			this->objects.push_back(new Object("Rock", this->player, 1074.f, 681.f));
+			this->objects.push_back(new Object("Rock", this->player, 1110.f, 395.f));
+			this->objects.push_back(new Object("Rock", this->player, 524.f, 34.f));
+			this->objects.push_back(new Object("Tree3", this->player, 866.f, 0.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1046.f, 1.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1225.f, 15.f));
+			this->objects.push_back(new Object("Tree3", this->player, 712.f, 853.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1010.f, 330.f));
+			this->objects.push_back(new Object("Tree2", this->player, 768.f, 313.f));
+			this->objects.push_back(new Object("Tree2", this->player, 994.f, 411.f));
+			this->objects.push_back(new Object("Tree1", this->player, 524.f, 73.f));
+			this->objects.push_back(new Object("Tree2", this->player, 594.f, 184.f));
+			this->objects.push_back(new Object("Tree1", this->player, 0.f, -145.f));
+			this->objects.push_back(new Object("Tree1", this->player, 296.f, -118.f));
+			this->objects.push_back(new Object("Tree1", this->player, 659.f, 249.f));
+			this->objects.push_back(new Object("Tree1", this->player, 866.f, 344.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1073.f, 468.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1685.f, 540.f));
+			this->objects.push_back(new Object("Tree2", this->player, -28.f, 578.f));
+			this->objects.push_back(new Object("Tree1", this->player, -43.f, 789.f));
+			this->objects.push_back(new Object("Tree1", this->player, 509.f, 562.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1799.f, -145.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1261.f, 572.f));
+			this->objects.push_back(new Object("Tree2", this->player, 603.f, -145.f));
+			this->objects.push_back(new Object("Tree2", this->player, 768.f, 28.f));
+			this->objects.push_back(new Object("Tree2", this->player, 160.f, -75.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1761.f, 256.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1734.f, 821.f));
 		}
 		else if (this->gameStage == 13)
 		{
