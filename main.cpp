@@ -3,6 +3,7 @@
 #include <sstream>
 #include <cmath>
 #include <list>
+#include <iostream>
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
@@ -248,7 +249,7 @@ public:
 	//Functions
 	void update()
 	{
-		this->sprite.move(velocity);
+		this->sprite.move(this->velocity.x * this->maxVelocity, this->velocity.y * this->maxVelocity);
 		if (this->velocity.y < 0)
 			this->state = movementState::MOVING_UP;
 		else if (this->velocity.x < 0)
@@ -259,9 +260,14 @@ public:
 			this->state = movementState::MOVING_RIGHT;
 	}
 
+	void test()
+	{
+		this->sprite.move(-this->velocity.x * this->maxVelocity, -this->velocity.y * this->maxVelocity);
+	}
+
 	void move(const float dir_x, const float dir_y, const float& dt)
 	{
-		this->velocity = Vector2f(dir_x * maxVelocity * dt, dir_y * maxVelocity * dt);
+		this->velocity = Vector2f(dir_x * dt, dir_y * dt);
 	}
 };
 
@@ -734,6 +740,16 @@ class Player : public Entity
 
 public:
 	//Accessors
+	Sprite& getSprite()
+	{
+		return this->openWorldSprite;
+	}
+
+	const Vector2f getVelocity() const
+	{
+		return this->movementComponent->getVelocity();
+	}
+
 	const movementState getMovementState() const
 	{
 		return this->movementComponent->getMovementState();
@@ -853,6 +869,10 @@ public:
 	}
 
 	//Component functions
+	virtual void test(const float& dt)
+	{
+		this->movementComponent->test();
+	}
 
 	virtual void setScale(const float x, const float y)
 	{
@@ -1097,27 +1117,33 @@ public:
 	}
 
 	//Functions
-	void update(const float& dt)
+	bool update(const float& dt)
 	{
 		if (this->shape.getGlobalBounds().intersects(this->player.getHitboxGlobalBounds()))
 		{
-			if (this->player.getMovementState() == movementState::MOVING_UP)
+			if (this->player.getVelocity().y < 0)
 			{
-				this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height + 1.f);
+				//this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height);
+				this->player.getSprite().move(0, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height - this->player.getHitboxGlobalBounds().top);
 			}
-			if (this->player.getMovementState() == movementState::MOVING_LEFT)
+			if (this->player.getVelocity().x < 0)
 			{
-				this->player.setPosition(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width + 1.f, this->player.getPosition().y);
+				//this->player.setPosition(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width, this->player.getPosition().y);
+				this->player.getSprite().move(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width - this->player.getHitboxGlobalBounds().left, 0);
 			}
-			if (this->player.getMovementState() == movementState::MOVING_DOWN)
+			if (this->player.getVelocity().y > 0)
 			{
-				this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top - this->player.getHitboxGlobalBounds().height - 1.f);
+				//this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top - this->player.getHitboxGlobalBounds().height);
+				this->player.getSprite().move(0, this->shape.getGlobalBounds().top - (this->player.getHitboxGlobalBounds().top + this->player.getHitboxGlobalBounds().height));
 			}
-			if (this->player.getMovementState() == movementState::MOVING_RIGHT)
+			if (this->player.getVelocity().x > 0)
 			{
-				this->player.setPosition(this->shape.getGlobalBounds().left - this->player.getHitboxGlobalBounds().width - 1.f, this->player.getPosition().y);
+				//this->player.setPosition(this->shape.getGlobalBounds().left - this->player.getHitboxGlobalBounds().width, this->player.getPosition().y);
+				this->player.getSprite().move(this->shape.getGlobalBounds().left - (this->player.getHitboxGlobalBounds().left + this->player.getHitboxGlobalBounds().width), 0);
 			}
+			return false;
 		}
+		return true;
 	}
 
 	void render(RenderTarget& target)
@@ -1396,9 +1422,9 @@ class BattleState : public State
 public:
 	void initBackground()
 	{
-		if(this->battleStage == 1)
+		if (this->battleStage == 1)
 			this->bgtexture.loadFromFile("Images/battle_scene/map1.png");
-		else if(this->battleStage == 2)
+		else if (this->battleStage == 2)
 			this->bgtexture.loadFromFile("Images/battle_scene/map2.png");
 
 		this->background.setSize(Vector2f(this->window->getView().getSize()));
@@ -1417,14 +1443,14 @@ public:
 		this->Itembuttons["ITEM2"] = new Button(530, 700, 220, 100, "Sacred water", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->Skillbuttons["SKILL1"] = new Button(200, 600, 420, 100, "ï¿½ï¿½ï¿½ï¿½Ç¨Ñ¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ç§ ï¿½ï¿½ï¿½Ã¤ï¿½", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL1"] = new Button(200, 600, 420, 100, "à¢ÕéÂÇ¨Ñ¹·ÃÒ ·ÐÅÇ§ ÊÇÃÃ¤ì", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Skillbuttons["SKILL2"] = new Button(200, 700, 420, 100, "ï¿½ï¿½ï¿½ï¿½ï¿½ä¤¨Ô¹ï¿½ï¿½ï¿½", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL2"] = new Button(200, 700, 420, 100, "àºÕÂÇâ´ä¤¨Ô¹à«ç¹ä«", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->detailButtons["SkillDetail"] = new Button(1650, 850, 200, 100, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´Ê¡ï¿½ï¿½", 30, Color::White, Color::White, Color::White,
+		this->detailButtons["SkillDetail"] = new Button(1650, 850, 200, 100, "ÃÒÂÅÐàÍÕÂ´Ê¡ÔÅ", 30, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->detailButtons["ItemDetail"] = new Button(1650, 950, 200, 100, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½ï¿½", 30, Color::White, Color::White, Color::White,
+		this->detailButtons["ItemDetail"] = new Button(1650, 950, 200, 100, "ÃÒÂÅÐàÍÕÂ´äÍà·Á", 30, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 	}
 
@@ -1751,7 +1777,7 @@ public:
 		if (this->player->isdead())
 		{
 			currentState = "MainMenu";
-			this->states->erase(this->states->find("Map1_1"),this->states->end());
+			this->states->erase(this->states->find("Map1_1"), this->states->end());
 		}
 
 	}
@@ -1888,9 +1914,9 @@ public:
 		this->sprite.setPosition(positionX, positionY);
 	}
 
-	virtual void update(const float& dt)
+	virtual bool update(const float& dt)
 	{
-		this->collisionBox->update(dt);
+		if(!this->collisionBox->update(dt)) return false;
 	}
 
 	virtual void render(RenderTarget& target)
@@ -1991,8 +2017,8 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 309.f, 379.f));
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
-			this->chat.push_back(new ChatDialog(L"à¸®à¸±à¸¥à¹‚à¸«à¸¥"));
-			this->chat.push_back(new ChatDialog(L"à¹€à¸—à¸ªà¹†"));
+			this->chat.push_back(new ChatDialog(L"ÎÑÅâËÅ"));
+			this->chat.push_back(new ChatDialog(L"à·Êæ"));
 		}
 		else if (this->gameStage == 12)
 		{
@@ -2000,7 +2026,7 @@ public:
 			/*this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");*/
 			this->collisions.push_back(new CollisionBox(*this->player, 1434.f, 584.f, 1.f, 358.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 1634.f, 589.f, 1.f, 353.f));
-			this->collisions.push_back(new CollisionBox(*this->player, 610.f, 0.f, 1.f, 295.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 610.f, 0.f, 1.f, 310.f));
 
 			this->objects.push_back(new Object("Rock2", this->player, 531.f, 78.f));
 			this->objects.push_back(new Object("Rock2", this->player, 531.f, 146.f));
@@ -2428,12 +2454,12 @@ public:
 
 		for (auto& i : objects)
 		{
-			i->update(dt);
+			if(!i->update(dt)) break;
 		}
 
 		for (auto& i : collisions)
 		{
-			i->update(dt);
+			if (!i->update(dt)) break;
 		}
 
 
@@ -2507,15 +2533,15 @@ public:
 
 	void initButtons()
 	{
-		this->buttons["CONTINUE_STATE"] = new Button(835, 500, 250, 50, "à¹€à¸¥à¹ˆà¸™à¸•à¹ˆà¸­", 50,
+		this->buttons["CONTINUE_STATE"] = new Button(835, 500, 250, 50, "àÅè¹µèÍ", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["START_STATE"] = new Button(835, 600, 250, 50, "à¹€à¸£à¸´à¹ˆà¸¡à¹€à¸à¸¡à¹ƒà¸«à¸¡à¹ˆ", 50,
+		this->buttons["START_STATE"] = new Button(835, 600, 250, 50, "àÃÔèÁà¡ÁãËÁè", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, "à¸­à¸­à¸à¸ˆà¸²à¸à¹€à¸à¸¡", 50,
+		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, "ÍÍ¡¨Ò¡à¡Á", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(100, 100, 100, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 	}
