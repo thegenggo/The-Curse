@@ -1871,11 +1871,13 @@ public:
 		{
 			this->texture.loadFromFile("Images/map/rock_type_2.png");
 			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 105.f, 75.f);
 		}
 		else if (this->name == "Rock3")
 		{
 			this->texture.loadFromFile("Images/map/rock_type_3.png");
 			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 105.f, 75.f);
 		}
 		else
 		{
