@@ -20,14 +20,164 @@ string battleState = "Battle";
 Font font;
 map<string, Texture> enemyTextures;
 
+enum class button_states { BTN_IDLE, BTN_HOVER, BTN_ACTIVE };
+
+class Button
+{
+	button_states buttonState;
+
+	RectangleShape shape;
+	Text text;
+
+	Color textIdleColor;
+	Color textHoverColor;
+	Color textActiveColor;
+
+	Color idleColor;
+	Color hoverColor;
+	Color activeColor;
+
+	bool pressed;
+
+public:
+
+	Button(float x, float y, float width, float height, string text, unsigned character_size, Color text_idle_color, Color text_hover_color, Color text_active_color,
+		Color idle_color, Color hover_color, Color active_color)
+	{
+		this->buttonState = button_states::BTN_IDLE;
+
+		this->shape.setPosition(Vector2f(x, y));
+		this->shape.setSize(Vector2f(width, height));
+		this->shape.setFillColor(idle_color);
+
+		this->text.setFont(font);
+		this->text.setString(text);
+		this->text.setFillColor(text_idle_color);
+		this->text.setCharacterSize(character_size);
+		this->text.setPosition(
+			this->shape.getPosition().x + this->shape.getGlobalBounds().width / 2.f - this->text.getGlobalBounds().width / 2.f,
+			this->shape.getPosition().y + this->shape.getGlobalBounds().height / 2.f - this->text.getCharacterSize() / 2.f);
+
+		this->textIdleColor = text_idle_color;
+		this->textHoverColor = text_hover_color;
+		this->textActiveColor = text_active_color;
+
+		this->idleColor = idle_color;
+		this->hoverColor = hover_color;
+		this->activeColor = active_color;
+
+		this->pressed = false;
+	}
+
+	//Accessors
+	const bool isPressed() const
+	{
+		return pressed;
+	}
+
+	const bool isHovered() const
+	{
+		if (this->buttonState == button_states::BTN_HOVER) return true;
+		return false;
+	}
+
+	//check click
+	void updateEvent(const Event& event, const Vector2f mousePos)
+	{
+		if (event.type == Event::MouseButtonPressed)
+		{
+			if (event.mouseButton.button == Mouse::Left && this->shape.getGlobalBounds().contains(mousePos)) pressed = true;
+		}
+	}
+
+	//Functions
+	void update(const Vector2f mousePos)
+	{
+		//Update the booleans for hover and pressed
+
+		//Idle
+		this->buttonState = button_states::BTN_IDLE;
+
+		//Hover
+		if (this->shape.getGlobalBounds().contains(mousePos))
+		{
+			this->buttonState = button_states::BTN_HOVER;
+
+			if (Mouse::isButtonPressed(Mouse::Left))
+			{
+				this->buttonState = button_states::BTN_ACTIVE;
+			}
+		}
+
+		this->pressed = false;
+
+		switch (this->buttonState)
+		{
+		case button_states::BTN_IDLE:
+			this->shape.setFillColor(this->idleColor);
+			this->text.setFillColor(this->textIdleColor);
+			break;
+
+		case button_states::BTN_HOVER:
+			this->shape.setFillColor(this->hoverColor);
+			this->text.setFillColor(this->textHoverColor);
+			break;
+
+		case button_states::BTN_ACTIVE:
+			this->shape.setFillColor(this->activeColor);
+			this->text.setFillColor(this->textActiveColor);
+			break;
+
+		default:
+			this->shape.setFillColor(Color::Red);
+			this->text.setFillColor(Color::Blue);
+			break;
+		}
+	}
+
+	void render(RenderTarget& target)
+	{
+		target.draw(this->shape);
+		target.draw(this->text);
+	}
+};
+
 class ChatDialog
 {
 	RectangleShape shape;
 	Text text;
+	Button* choice1;
+	Button* choice2;
+	int* dialoglog;
+	list<ChatDialog*>* chat;
 
 public:
 	ChatDialog(wstring text)
 	{
+		this->dialoglog = NULL;
+		this->choice1 = NULL;
+		this->choice2 = NULL;
+		this->shape.setSize(Vector2f(1900, 200));
+		this->text.setCharacterSize(30);
+		this->shape.setOrigin(1900 / 2.f, 200 / 2.f);
+
+		this->text.setFont(font);
+		this->text.setString(text);
+		this->shape.setFillColor(Color(70, 70, 70, 200));
+		this->text.setFillColor(Color::White);
+		this->shape.setPosition(960, 980);
+		this->text.setPosition(30, 900);
+	}
+
+	ChatDialog(wstring text, string choice1, string choice2, int* dialoglog, list<ChatDialog*>* chat)
+		:dialoglog(dialoglog), chat(chat)
+	{
+		this->choice1 = new Button(835, 500, 250, 50, choice1, 50,
+			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
+		this->choice2 = new Button(835, 600, 250, 50, choice2, 50,
+			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 		this->shape.setSize(Vector2f(1900, 200));
 		this->text.setCharacterSize(30);
 		this->shape.setOrigin(1900 / 2.f, 200 / 2.f);
@@ -45,8 +195,27 @@ public:
 
 	}
 
-	void update()
+	bool haveButton() {
+		if (this->choice1) return true;
+		else return false;
+	}
+
+	void update(const Vector2f mousePos)
 	{
+		if (choice1 != NULL) {
+			this->choice1->update(mousePos);
+			if (this->choice1->isPressed()) {
+				*dialoglog = 2;
+				this->chat->pop_front();
+			}
+		}
+		if (choice2 != NULL) {
+			this->choice2->update(mousePos);
+			if (this->choice2->isPressed()) {
+				*dialoglog = 1;
+				this->chat->pop_front();
+			}
+		}
 
 	}
 
@@ -54,7 +223,10 @@ public:
 	{
 		target->draw(this->shape);
 		target->draw(this->text);
+		if (choice1 != NULL) this->choice1->render(*target);
+		if (choice2 != NULL) this->choice2->render(*target);
 	}
+
 };
 
 class ShowText
@@ -180,7 +352,7 @@ public:
 
 	void render(RenderTarget& target)
 	{
-		target.draw(this->hitbox);
+
 	}
 };
 
@@ -1148,7 +1320,7 @@ public:
 
 	void render(RenderTarget& target)
 	{
-		target.draw(this->shape);
+
 	}
 };
 
@@ -1223,127 +1395,7 @@ public:
 	}
 };
 
-enum class button_states { BTN_IDLE, BTN_HOVER, BTN_ACTIVE };
 
-class Button
-{
-	button_states buttonState;
-
-	RectangleShape shape;
-	Text text;
-
-	Color textIdleColor;
-	Color textHoverColor;
-	Color textActiveColor;
-
-	Color idleColor;
-	Color hoverColor;
-	Color activeColor;
-
-	bool pressed;
-
-public:
-
-	Button(float x, float y, float width, float height, string text, unsigned character_size, Color text_idle_color, Color text_hover_color, Color text_active_color,
-		Color idle_color, Color hover_color, Color active_color)
-	{
-		this->buttonState = button_states::BTN_IDLE;
-
-		this->shape.setPosition(Vector2f(x, y));
-		this->shape.setSize(Vector2f(width, height));
-		this->shape.setFillColor(idle_color);
-
-		this->text.setFont(font);
-		this->text.setString(text);
-		this->text.setFillColor(text_idle_color);
-		this->text.setCharacterSize(character_size);
-		this->text.setPosition(
-			this->shape.getPosition().x + this->shape.getGlobalBounds().width / 2.f - this->text.getGlobalBounds().width / 2.f,
-			this->shape.getPosition().y + this->shape.getGlobalBounds().height / 2.f - this->text.getCharacterSize() / 2.f);
-
-		this->textIdleColor = text_idle_color;
-		this->textHoverColor = text_hover_color;
-		this->textActiveColor = text_active_color;
-
-		this->idleColor = idle_color;
-		this->hoverColor = hover_color;
-		this->activeColor = active_color;
-
-		this->pressed = false;
-	}
-
-	//Accessors
-	const bool isPressed() const
-	{
-		return pressed;
-	}
-
-	const bool isHovered() const
-	{
-		if (this->buttonState == button_states::BTN_HOVER) return true;
-		return false;
-	}
-
-	//check click
-	void updateEvent(const Event& event, const Vector2f mousePos)
-	{
-		if (event.type == Event::MouseButtonPressed)
-		{
-			if (event.mouseButton.button == Mouse::Left && this->shape.getGlobalBounds().contains(mousePos)) pressed = true;
-		}
-	}
-
-	//Functions
-	void update(const Vector2f mousePos)
-	{
-		//Update the booleans for hover and pressed
-
-		//Idle
-		this->buttonState = button_states::BTN_IDLE;
-
-		//Hover
-		if (this->shape.getGlobalBounds().contains(mousePos))
-		{
-			this->buttonState = button_states::BTN_HOVER;
-
-			if (Mouse::isButtonPressed(Mouse::Left))
-			{
-				this->buttonState = button_states::BTN_ACTIVE;
-			}
-		}
-
-		this->pressed = false;
-
-		switch (this->buttonState)
-		{
-		case button_states::BTN_IDLE:
-			this->shape.setFillColor(this->idleColor);
-			this->text.setFillColor(this->textIdleColor);
-			break;
-
-		case button_states::BTN_HOVER:
-			this->shape.setFillColor(this->hoverColor);
-			this->text.setFillColor(this->textHoverColor);
-			break;
-
-		case button_states::BTN_ACTIVE:
-			this->shape.setFillColor(this->activeColor);
-			this->text.setFillColor(this->textActiveColor);
-			break;
-
-		default:
-			this->shape.setFillColor(Color::Red);
-			this->text.setFillColor(Color::Blue);
-			break;
-		}
-	}
-
-	void render(RenderTarget& target)
-	{
-		target.draw(this->shape);
-		target.draw(this->text);
-	}
-};
 
 class ImageButton
 {
@@ -1916,7 +1968,7 @@ public:
 
 	virtual bool update(const float& dt)
 	{
-		if(!this->collisionBox->update(dt)) return false;
+		if (!this->collisionBox->update(dt)) return false;
 	}
 
 	virtual void render(RenderTarget& target)
@@ -1958,6 +2010,8 @@ class GameState : public State
 	list<ChatDialog*> chat;
 
 	int gameStage;
+	int dialog;
+	int dialogchat;
 
 public:
 	//Initilizer functions
@@ -1966,6 +2020,8 @@ public:
 	GameState(RenderWindow* window, map<string, State*>* states, Player* player, int gameStage = 11)
 		: State(window, states), player(player), gameStage(gameStage)
 	{
+		this->dialog = 0;
+		this->dialogchat = 0;
 		if (this->gameStage == 11)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map1/map1_1.png");
@@ -2017,8 +2073,7 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 309.f, 379.f));
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
-			this->chat.push_back(new ChatDialog(L"ฮัลโหล"));
-			this->chat.push_back(new ChatDialog(L"เทสๆ"));
+			this->chat.push_back(new ChatDialog(L"ชายหนุ่มได้ออกเดินทางตามหาต้นตอของคำสาปที่ทำให้หญิงผู้ที่เป็นที่รักต้องทนทุกข์ทรมาร จนมาถึงป่าแห่งหนึ่งที่เต็มไปด้วยกลิ่นอายอันชั่วร้าย"));
 		}
 		else if (this->gameStage == 12)
 		{
@@ -2146,9 +2201,13 @@ public:
 				this->player->move(0.f, 0.f, dt);
 		}
 
+		if (!this->chat.empty()) {
+			this->player->move(0.f, 0.f, dt);
+		}
+
 		if (Keyboard::isKeyPressed(Keyboard::B))
 		{
-			this->states->insert_or_assign("Battle", new BattleState(this->window, this->states, this->player, 2));
+			this->states->insert_or_assign("Battle", new BattleState(this->window, this->states, this->player, 1));
 			currentState = "Battle";
 			this->player->setMode(true);
 		}
@@ -2201,6 +2260,23 @@ public:
 			if (this->player->getHitboxGlobalBounds().top < 0.f)
 			{
 				this->player->setPosition(this->player->getPosition().x, 0.f);
+			}
+			if (player->getHitboxGlobalBounds().contains(186.f, 196.f) && dialog == 0)
+			{
+				this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน"));
+				this->chat.push_back(new ChatDialog(L" ", "พูดความจริง", "โกหกว่ามาตามหาคน", &dialogchat, &this->chat));
+				dialog = 1;
+			}
+			if (dialogchat == 2 && dialog == 1) {
+				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาวิธีแก้คำสาปให้คนรัก"));
+				this->chat.push_back(new ChatDialog(L"คำสาปงั้นเหรอ? ข้าไม่รู้หรอกว่าในป่าแห่งนี้มันจะมีวิธีถอนคำสาปที่เจ้าต้องการรึเปล่าแต่ข้าขอแนะนำเจ้าอย่าง เจ้าอย่าได้เข้าไปเลย เอาชีวิตมาเสี่ยงเสียเปล่าๆ"));
+				this->chat.push_back(new ChatDialog(L"ทำไมละ?"));
+				this->chat.push_back(new ChatDialog(L"เมื่อไม่กี่วันก่อนจู่ๆก็มีพวกโยไคปรากฏตัวที่หมู่บ้านที่อยู่ในป่าแห่งนี้และไล่ฆ่าทุกคนในหมู่บ้าน จนตอนนี้ก็ลามมาถึงป่าแห่งนี้แล้วแต่โชคยังดีที่ทางเข้าป่าแห่งนี้มีอาคมที่ช่วยไล่พวกโยไคเอาไว้อยู่"));
+				this->chat.push_back(new ChatDialog(L"แต่ถึงอย่างนั้นข้าก็จะเข้าไป"));
+				this->chat.push_back(new ChatDialog(L"ทำไมเจ้าถึงได้ดื้อดึงที่จะเข้าไปถึงขนาดนั้นกัน?"));
+				this->chat.push_back(new ChatDialog(L"เพราะถ้าข้าไม่รีบจัดการเกี่ยวกับคำสาปละก็ นางคง...."));
+				this->chat.push_back(new ChatDialog(L"เฮ้อ...ก็ได้ข้าจะปล่อยให้เจ้าเข้าไปแต่ขอบอกเอาไว้ก่อนนะ ถ้าเจ้าตายหรือเป็นอะไรจะไม่มีใครเข้าไปช่วยเจ้าเด็ดขาดเข้าใจมั้ย?"));
+				dialog = 2;
 			}
 		}
 		else if (this->gameStage == 12)
@@ -2448,13 +2524,14 @@ public:
 			{
 				this->player->setPosition(this->player->getPosition().x, 0.f);
 			}
+
 		}
 
 		this->player->update(dt);
 
 		for (auto& i : objects)
 		{
-			if(!i->update(dt)) break;
+			if (!i->update(dt)) break;
 		}
 
 		for (auto& i : collisions)
@@ -2463,6 +2540,8 @@ public:
 		}
 
 
+		if (!this->chat.empty())
+			this->chat.front()->update(mousePosView);
 	}
 
 	void render(RenderTarget* target = NULL)
@@ -2480,6 +2559,7 @@ public:
 		{
 			i->render(*target);
 		}
+
 
 		if (!this->player->isRendered()) this->player->render(*target);
 
@@ -2501,7 +2581,7 @@ public:
 		if (event.type == Event::MouseButtonPressed)
 		{
 			if (event.mouseButton.button == Mouse::Left) {
-				if (!this->chat.empty())
+				if (!this->chat.empty() && !this->chat.front()->haveButton())
 					this->chat.pop_front();
 			}
 		}
