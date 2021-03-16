@@ -1511,14 +1511,14 @@ public:
 		this->Itembuttons["ITEM2"] = new Button(530, 700, 220, 100, "Sacred water", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->Skillbuttons["SKILL1"] = new Button(200, 600, 420, 100, "����Ǩѹ��� ���ǧ ���ä�", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL1"] = new Button(200, 600, 420, 100, "เขี้ยวจันทรา ทะลวง สวรรค์", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Skillbuttons["SKILL2"] = new Button(200, 700, 420, 100, "�����䤨Թ���", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL2"] = new Button(200, 700, 420, 100, "เบียวโดไคจินเซ็นไซ", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->detailButtons["SkillDetail"] = new Button(1650, 850, 200, 100, "��������´ʡ��", 30, Color::White, Color::White, Color::White,
+		this->detailButtons["SkillDetail"] = new Button(1650, 850, 200, 100, "รายละเอียดสกิล", 30, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->detailButtons["ItemDetail"] = new Button(1650, 950, 200, 100, "��������´����", 30, Color::White, Color::White, Color::White,
+		this->detailButtons["ItemDetail"] = new Button(1650, 950, 200, 100, "รายละเอียดไอเทม", 30, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 	}
 
