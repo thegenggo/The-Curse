@@ -2159,6 +2159,26 @@ public:
 		else if (this->gameStage == 21)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map2/map2_1.png");
+
+			this->objects.push_back(new Object("Rock3", this->player, -20.f, 763.f));
+			this->objects.push_back(new Object("Rock3", this->player, 927.f, 270.f));
+			this->objects.push_back(new Object("Rock2", this->player, 375.f, 763.f));
+			this->objects.push_back(new Object("Rock2", this->player, 613.f, 293.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1595.f, 220.f));
+			this->objects.push_back(new Object("Rock2", this->player, 159.f, 0.f));
+			this->objects.push_back(new Object("Rock", this->player, 806.f, 704.f));
+			this->objects.push_back(new Object("Rock", this->player, 1376.f, 119.f));
+			this->objects.push_back(new Object("Rock", this->player, 917.f, 99.f));
+			this->objects.push_back(new Object("Rock", this->player, 180.f, 429.f));
+			this->objects.push_back(new Object("Tree1", this->player, -20.f, 39.f));
+			this->objects.push_back(new Object("Tree1", this->player, -29.f, 472.f));
+			this->objects.push_back(new Object("Tree1", this->player, 720.f, 37.f));
+			this->objects.push_back(new Object("Tree1", this->player, 335.f, -145.f));
+			this->objects.push_back(new Object("Tree1", this->player, 335.f, 220.f));
+			this->objects.push_back(new Object("Tree1", this->player, 562.f, -172.f));
+			this->objects.push_back(new Object("Tree2", this->player, 0.f, 257.f));
+			this->objects.push_back(new Object("Tree2", this->player, 403.f, 445.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1003.f, -139.f));
 		}
 		else if (this->gameStage == 22)
 		{
