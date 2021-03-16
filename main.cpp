@@ -2786,7 +2786,7 @@ public:
 	void updateButtons()
 	{
 		//New game
-		if (this->player != nullptr && !this->player->isdead())
+		if (this->player != NULL && !this->player->isdead())
 			if (this->buttons["CONTINUE_STATE"]->isPressed())
 			{
 				currentState = openWorldState;
@@ -2794,22 +2794,22 @@ public:
 
 		if (this->buttons["START_STATE"]->isPressed())
 		{
-			if (this->player != nullptr)
+			if (this->player != NULL)
 			{
 				delete this->player;
 				this->player = NULL;
 			}
 
 			this->player = new Player();
-			this->states->emplace("Map1_1", new GameState(this->window, this->states, this->player, 11));
-			this->states->emplace("Map1_2", new GameState(this->window, this->states, this->player, 12));
-			this->states->emplace("Map1_3", new GameState(this->window, this->states, this->player, 13));
-			this->states->emplace("Map2_1", new GameState(this->window, this->states, this->player, 21));
-			this->states->emplace("Map2_2", new GameState(this->window, this->states, this->player, 22));
-			this->states->emplace("Map2_3", new GameState(this->window, this->states, this->player, 23));
-			this->states->emplace("Map3_1", new GameState(this->window, this->states, this->player, 31));
-			this->states->emplace("Map3_2", new GameState(this->window, this->states, this->player, 32));
-			this->states->emplace("Map3_3", new GameState(this->window, this->states, this->player, 33));
+			this->states->insert_or_assign("Map1_1", new GameState(this->window, this->states, this->player, 11));
+			this->states->insert_or_assign("Map1_2", new GameState(this->window, this->states, this->player, 12));
+			this->states->insert_or_assign("Map1_3", new GameState(this->window, this->states, this->player, 13));
+			this->states->insert_or_assign("Map2_1", new GameState(this->window, this->states, this->player, 21));
+			this->states->insert_or_assign("Map2_2", new GameState(this->window, this->states, this->player, 22));
+			this->states->insert_or_assign("Map2_3", new GameState(this->window, this->states, this->player, 23));
+			this->states->insert_or_assign("Map3_1", new GameState(this->window, this->states, this->player, 31));
+			this->states->insert_or_assign("Map3_2", new GameState(this->window, this->states, this->player, 32));
+			this->states->insert_or_assign("Map3_3", new GameState(this->window, this->states, this->player, 33));
 			openWorldState = "Map1_1";
 			currentState = openWorldState;
 		}
