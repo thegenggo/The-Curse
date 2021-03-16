@@ -91,7 +91,7 @@ public:
 	}
 
 	//Functions
-	void update(const Vector2f mousePos)
+	void update(const Vector2f& mousePos)
 	{
 		//Update the booleans for hover and pressed
 
@@ -154,6 +154,7 @@ class ChatDialog
 public:
 	ChatDialog(wstring text)
 	{
+		this->chat = NULL;
 		this->dialoglog = NULL;
 		this->choice1 = NULL;
 		this->choice2 = NULL;
@@ -195,26 +196,41 @@ public:
 
 	}
 
-	bool haveButton() {
+	const bool haveButton() const
+	{
 		if (this->choice1) return true;
 		else return false;
 	}
 
-	void update(const Vector2f mousePos)
+	void updateEvent(const Event& event, const Vector2f& mousePos)
+	{
+		if (this->choice1 != NULL)
+		{
+			this->choice1->updateEvent(event, mousePos);
+		}
+		if (this->choice2 != NULL)
+		{
+			this->choice1->updateEvent(event, mousePos);
+		}
+	}
+
+	void update(const Vector2f& mousePos)
 	{
 		if (choice1 != NULL) {
-			this->choice1->update(mousePos);
-			if (this->choice1->isPressed()) {
-				*dialoglog = 2;
+			if (this->choice1->isPressed())
+			{
+				*this->dialoglog = 2;
 				this->chat->pop_front();
 			}
+			this->choice1->update(mousePos);
 		}
 		if (choice2 != NULL) {
-			this->choice2->update(mousePos);
-			if (this->choice2->isPressed()) {
-				*dialoglog = 1;
+			if (this->choice2->isPressed())
+			{
+				*this->dialoglog = 1;
 				this->chat->pop_front();
 			}
+			this->choice2->update(mousePos);
 		}
 
 	}
@@ -223,8 +239,8 @@ public:
 	{
 		target->draw(this->shape);
 		target->draw(this->text);
-		if (choice1 != NULL) this->choice1->render(*target);
-		if (choice2 != NULL) this->choice2->render(*target);
+		if (this->choice1 != NULL) this->choice1->render(*target);
+		if (this->choice2 != NULL) this->choice2->render(*target);
 	}
 
 };
@@ -1495,14 +1511,14 @@ public:
 		this->Itembuttons["ITEM2"] = new Button(530, 700, 220, 100, "Sacred water", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->Skillbuttons["SKILL1"] = new Button(200, 600, 420, 100, "ï¿½ï¿½ï¿½ï¿½Ç¨Ñ¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ç§ ï¿½ï¿½ï¿½Ã¤ï¿½", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL1"] = new Button(200, 600, 420, 100, "????????? ???? ?????", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Skillbuttons["SKILL2"] = new Button(200, 700, 420, 100, "ï¿½ï¿½ï¿½ï¿½ï¿½ä¤¨Ô¹ï¿½ï¿½ï¿½", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL2"] = new Button(200, 700, 420, 100, "??????????", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->detailButtons["SkillDetail"] = new Button(1650, 850, 200, 100, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´Ê¡ï¿½ï¿½", 30, Color::White, Color::White, Color::White,
+		this->detailButtons["SkillDetail"] = new Button(1650, 850, 200, 100, "????????????", 30, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->detailButtons["ItemDetail"] = new Button(1650, 950, 200, 100, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½ï¿½", 30, Color::White, Color::White, Color::White,
+		this->detailButtons["ItemDetail"] = new Button(1650, 950, 200, 100, "?????????????", 30, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 	}
 
@@ -2098,7 +2114,7 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 309.f, 379.f));
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
-			this->chat.push_back(new ChatDialog(L"à¸Šà¸²à¸¢à¸«à¸™à¸¸à¹ˆà¸¡à¹„à¸”à¹‰à¸­à¸­à¸à¹€à¸”à¸´à¸™à¸—à¸²à¸‡à¸•à¸²à¸¡à¸«à¸²à¸•à¹‰à¸™à¸•à¸­à¸‚à¸­à¸‡à¸„à¸³à¸ªà¸²à¸›à¸—à¸µà¹ˆà¸—à¸³à¹ƒà¸«à¹‰à¸«à¸à¸´à¸‡à¸œà¸¹à¹‰à¸—à¸µà¹ˆà¹€à¸›à¹‡à¸™à¸—à¸µà¹ˆà¸£à¸±à¸à¸•à¹‰à¸­à¸‡à¸—à¸™à¸—à¸¸à¸à¸‚à¹Œà¸—à¸£à¸¡à¸²à¸£ à¸ˆà¸™à¸¡à¸²à¸–à¸¶à¸‡à¸›à¹ˆà¸²à¹à¸«à¹ˆà¸‡à¸«à¸™à¸¶à¹ˆà¸‡à¸—à¸µà¹ˆà¹€à¸•à¹‡à¸¡à¹„à¸›à¸”à¹‰à¸§à¸¢à¸à¸¥à¸´à¹ˆà¸™à¸­à¸²à¸¢à¸­à¸±à¸™à¸Šà¸±à¹ˆà¸§à¸£à¹‰à¸²à¸¢"));
+			this->chat.push_back(new ChatDialog(L"ªÒÂË¹ØèÁä´éÍÍ¡à´Ô¹·Ò§µÒÁËÒµé¹µÍ¢Í§¤ÓÊÒ»·Õè·ÓãËéË­Ô§¼Ùé·Õèà»ç¹·ÕèÃÑ¡µéÍ§·¹·Ø¡¢ì·ÃÁÒÃ ¨¹ÁÒ¶Ö§»èÒáËè§Ë¹Öè§·ÕèàµçÁä»´éÇÂ¡ÅÔè¹ÍÒÂÍÑ¹ªÑèÇÃéÒÂ"));
 		}
 		else if (this->gameStage == 12)
 		{
@@ -2211,7 +2227,7 @@ public:
 			this->objects.push_back(new Object("Tree3", this->player, 793.f, 79.f));
 			this->objects.push_back(new Object("Tree3", this->player, 996.f, 769.f));
 			this->objects.push_back(new Object("Tree3", this->player, 58.f, 1023.f));
-			
+
 		}
 		else if (this->gameStage == 21)
 		{
@@ -2342,6 +2358,20 @@ public:
 		}
 	}
 
+	void updateEvent(const Event& event)
+	{
+		if (!this->chat.empty())
+			this->chat.front()->updateEvent(event, this->mousePosView);
+		if (event.type == Event::MouseButtonPressed)
+		{
+			if (event.mouseButton.button == Mouse::Left) {
+				if (!this->chat.empty() && !this->chat.front()->haveButton())
+					this->chat.pop_front();
+			}
+		}
+
+	}
+
 	void update(const float& dt)
 	{
 		this->updateMousePositions();
@@ -2387,19 +2417,19 @@ public:
 			}
 			if (player->getHitboxGlobalBounds().contains(186.f, 196.f) && dialog == 0)
 			{
-				this->chat.push_back(new ChatDialog(L"à¸«à¸¢à¸¸à¸”à¸à¹ˆà¸­à¸™à¹€à¸ˆà¹‰à¸²à¸«à¸™à¸¸à¹ˆà¸¡ à¹€à¸ˆà¹‰à¸²à¸¡à¸µà¸˜à¸¸à¸£à¸°à¸­à¸°à¹„à¸£à¹ƒà¸™à¸›à¹ˆà¸²à¹à¸«à¹ˆà¸‡à¸™à¸µà¹‰à¸à¸±à¸™"));
-				this->chat.push_back(new ChatDialog(L" ", "à¸žà¸¹à¸”à¸„à¸§à¸²à¸¡à¸ˆà¸£à¸´à¸‡", "à¹‚à¸à¸«à¸à¸§à¹ˆà¸²à¸¡à¸²à¸•à¸²à¸¡à¸«à¸²à¸„à¸™", &dialogchat, &this->chat));
+				this->chat.push_back(new ChatDialog(L"ËÂØ´¡èÍ¹à¨éÒË¹ØèÁ à¨éÒÁÕ¸ØÃÐÍÐäÃã¹»èÒáËè§¹Õé¡Ñ¹"));
+				this->chat.push_back(new ChatDialog(L" ", "¾Ù´¤ÇÒÁ¨ÃÔ§", "â¡Ë¡ÇèÒÁÒµÒÁËÒ¤¹", &dialogchat, &this->chat));
 				dialog = 1;
 			}
 			if (dialogchat == 2 && dialog == 1) {
-				this->chat.push_back(new ChatDialog(L"à¸‚à¹‰à¸²à¸¡à¸²à¸•à¸²à¸¡à¸«à¸²à¸§à¸´à¸˜à¸µà¹à¸à¹‰à¸„à¸³à¸ªà¸²à¸›à¹ƒà¸«à¹‰à¸„à¸™à¸£à¸±à¸"));
-				this->chat.push_back(new ChatDialog(L"à¸„à¸³à¸ªà¸²à¸›à¸‡à¸±à¹‰à¸™à¹€à¸«à¸£à¸­? à¸‚à¹‰à¸²à¹„à¸¡à¹ˆà¸£à¸¹à¹‰à¸«à¸£à¸­à¸à¸§à¹ˆà¸²à¹ƒà¸™à¸›à¹ˆà¸²à¹à¸«à¹ˆà¸‡à¸™à¸µà¹‰à¸¡à¸±à¸™à¸ˆà¸°à¸¡à¸µà¸§à¸´à¸˜à¸µà¸–à¸­à¸™à¸„à¸³à¸ªà¸²à¸›à¸—à¸µà¹ˆà¹€à¸ˆà¹‰à¸²à¸•à¹‰à¸­à¸‡à¸à¸²à¸£à¸£à¸¶à¹€à¸›à¸¥à¹ˆà¸²à¹à¸•à¹ˆà¸‚à¹‰à¸²à¸‚à¸­à¹à¸™à¸°à¸™à¸³à¹€à¸ˆà¹‰à¸²à¸­à¸¢à¹ˆà¸²à¸‡ à¹€à¸ˆà¹‰à¸²à¸­à¸¢à¹ˆà¸²à¹„à¸”à¹‰à¹€à¸‚à¹‰à¸²à¹„à¸›à¹€à¸¥à¸¢ à¹€à¸­à¸²à¸Šà¸µà¸§à¸´à¸•à¸¡à¸²à¹€à¸ªà¸µà¹ˆà¸¢à¸‡à¹€à¸ªà¸µà¸¢à¹€à¸›à¸¥à¹ˆà¸²à¹†"));
-				this->chat.push_back(new ChatDialog(L"à¸—à¸³à¹„à¸¡à¸¥à¸°?"));
-				this->chat.push_back(new ChatDialog(L"à¹€à¸¡à¸·à¹ˆà¸­à¹„à¸¡à¹ˆà¸à¸µà¹ˆà¸§à¸±à¸™à¸à¹ˆà¸­à¸™à¸ˆà¸¹à¹ˆà¹†à¸à¹‡à¸¡à¸µà¸žà¸§à¸à¹‚à¸¢à¹„à¸„à¸›à¸£à¸²à¸à¸à¸•à¸±à¸§à¸—à¸µà¹ˆà¸«à¸¡à¸¹à¹ˆà¸šà¹‰à¸²à¸™à¸—à¸µà¹ˆà¸­à¸¢à¸¹à¹ˆà¹ƒà¸™à¸›à¹ˆà¸²à¹à¸«à¹ˆà¸‡à¸™à¸µà¹‰à¹à¸¥à¸°à¹„à¸¥à¹ˆà¸†à¹ˆà¸²à¸—à¸¸à¸à¸„à¸™à¹ƒà¸™à¸«à¸¡à¸¹à¹ˆà¸šà¹‰à¸²à¸™ à¸ˆà¸™à¸•à¸­à¸™à¸™à¸µà¹‰à¸à¹‡à¸¥à¸²à¸¡à¸¡à¸²à¸–à¸¶à¸‡à¸›à¹ˆà¸²à¹à¸«à¹ˆà¸‡à¸™à¸µà¹‰à¹à¸¥à¹‰à¸§à¹à¸•à¹ˆà¹‚à¸Šà¸„à¸¢à¸±à¸‡à¸”à¸µà¸—à¸µà¹ˆà¸—à¸²à¸‡à¹€à¸‚à¹‰à¸²à¸›à¹ˆà¸²à¹à¸«à¹ˆà¸‡à¸™à¸µà¹‰à¸¡à¸µà¸­à¸²à¸„à¸¡à¸—à¸µà¹ˆà¸Šà¹ˆà¸§à¸¢à¹„à¸¥à¹ˆà¸žà¸§à¸à¹‚à¸¢à¹„à¸„à¹€à¸­à¸²à¹„à¸§à¹‰à¸­à¸¢à¸¹à¹ˆ"));
-				this->chat.push_back(new ChatDialog(L"à¹à¸•à¹ˆà¸–à¸¶à¸‡à¸­à¸¢à¹ˆà¸²à¸‡à¸™à¸±à¹‰à¸™à¸‚à¹‰à¸²à¸à¹‡à¸ˆà¸°à¹€à¸‚à¹‰à¸²à¹„à¸›"));
-				this->chat.push_back(new ChatDialog(L"à¸—à¸³à¹„à¸¡à¹€à¸ˆà¹‰à¸²à¸–à¸¶à¸‡à¹„à¸”à¹‰à¸”à¸·à¹‰à¸­à¸”à¸¶à¸‡à¸—à¸µà¹ˆà¸ˆà¸°à¹€à¸‚à¹‰à¸²à¹„à¸›à¸–à¸¶à¸‡à¸‚à¸™à¸²à¸”à¸™à¸±à¹‰à¸™à¸à¸±à¸™?"));
-				this->chat.push_back(new ChatDialog(L"à¹€à¸žà¸£à¸²à¸°à¸–à¹‰à¸²à¸‚à¹‰à¸²à¹„à¸¡à¹ˆà¸£à¸µà¸šà¸ˆà¸±à¸”à¸à¸²à¸£à¹€à¸à¸µà¹ˆà¸¢à¸§à¸à¸±à¸šà¸„à¸³à¸ªà¸²à¸›à¸¥à¸°à¸à¹‡ à¸™à¸²à¸‡à¸„à¸‡...."));
-				this->chat.push_back(new ChatDialog(L"à¹€à¸®à¹‰à¸­...à¸à¹‡à¹„à¸”à¹‰à¸‚à¹‰à¸²à¸ˆà¸°à¸›à¸¥à¹ˆà¸­à¸¢à¹ƒà¸«à¹‰à¹€à¸ˆà¹‰à¸²à¹€à¸‚à¹‰à¸²à¹„à¸›à¹à¸•à¹ˆà¸‚à¸­à¸šà¸­à¸à¹€à¸­à¸²à¹„à¸§à¹‰à¸à¹ˆà¸­à¸™à¸™à¸° à¸–à¹‰à¸²à¹€à¸ˆà¹‰à¸²à¸•à¸²à¸¢à¸«à¸£à¸·à¸­à¹€à¸›à¹‡à¸™à¸­à¸°à¹„à¸£à¸ˆà¸°à¹„à¸¡à¹ˆà¸¡à¸µà¹ƒà¸„à¸£à¹€à¸‚à¹‰à¸²à¹„à¸›à¸Šà¹ˆà¸§à¸¢à¹€à¸ˆà¹‰à¸²à¹€à¸”à¹‡à¸”à¸‚à¸²à¸”à¹€à¸‚à¹‰à¸²à¹ƒà¸ˆà¸¡à¸±à¹‰à¸¢?"));
+				this->chat.push_back(new ChatDialog(L"¢éÒÁÒµÒÁËÒÇÔ¸Õá¡é¤ÓÊÒ»ãËé¤¹ÃÑ¡"));
+				this->chat.push_back(new ChatDialog(L"¤ÓÊÒ»§Ñé¹àËÃÍ? ¢éÒäÁèÃÙéËÃÍ¡ÇèÒã¹»èÒáËè§¹ÕéÁÑ¹¨ÐÁÕÇÔ¸Õ¶Í¹¤ÓÊÒ»·Õèà¨éÒµéÍ§¡ÒÃÃÖà»ÅèÒáµè¢éÒ¢Íá¹Ð¹Óà¨éÒÍÂèÒ§ à¨éÒÍÂèÒä´éà¢éÒä»àÅÂ àÍÒªÕÇÔµÁÒàÊÕèÂ§àÊÕÂà»ÅèÒæ"));
+				this->chat.push_back(new ChatDialog(L"·ÓäÁÅÐ?"));
+				this->chat.push_back(new ChatDialog(L"àÁ×èÍäÁè¡ÕèÇÑ¹¡èÍ¹¨Ùèæ¡çÁÕ¾Ç¡âÂä¤»ÃÒ¡¯µÑÇ·ÕèËÁÙèºéÒ¹·ÕèÍÂÙèã¹»èÒáËè§¹ÕéáÅÐäÅè¦èÒ·Ø¡¤¹ã¹ËÁÙèºéÒ¹ ¨¹µÍ¹¹Õé¡çÅÒÁÁÒ¶Ö§»èÒáËè§¹ÕéáÅéÇáµèâª¤ÂÑ§´Õ·Õè·Ò§à¢éÒ»èÒáËè§¹ÕéÁÕÍÒ¤Á·ÕèªèÇÂäÅè¾Ç¡âÂä¤àÍÒäÇéÍÂÙè"));
+				this->chat.push_back(new ChatDialog(L"áµè¶Ö§ÍÂèÒ§¹Ñé¹¢éÒ¡ç¨Ðà¢éÒä»"));
+				this->chat.push_back(new ChatDialog(L"·ÓäÁà¨éÒ¶Ö§ä´é´×éÍ´Ö§·Õè¨Ðà¢éÒä»¶Ö§¢¹Ò´¹Ñé¹¡Ñ¹?"));
+				this->chat.push_back(new ChatDialog(L"à¾ÃÒÐ¶éÒ¢éÒäÁèÃÕº¨Ñ´¡ÒÃà¡ÕèÂÇ¡Ñº¤ÓÊÒ»ÅÐ¡ç ¹Ò§¤§...."));
+				this->chat.push_back(new ChatDialog(L"àÎéÍ...¡çä´é¢éÒ¨Ð»ÅèÍÂãËéà¨éÒà¢éÒä»áµè¢ÍºÍ¡àÍÒäÇé¡èÍ¹¹Ð ¶éÒà¨éÒµÒÂËÃ×Íà»ç¹ÍÐäÃ¨ÐäÁèÁÕã¤Ãà¢éÒä»ªèÇÂà¨éÒà´ç´¢Ò´à¢éÒã¨ÁÑéÂ?"));
 				dialog = 2;
 			}
 		}
@@ -2665,7 +2695,7 @@ public:
 
 
 		if (!this->chat.empty())
-			this->chat.front()->update(mousePosView);
+			this->chat.front()->update(this->mousePosView);
 	}
 
 	void render(RenderTarget* target = NULL)
@@ -2699,20 +2729,6 @@ public:
 		mouseText.setString(ss.str());
 		target->draw(mouseText);
 	}
-
-	void updateEvent(const Event& event)
-	{
-		if (event.type == Event::MouseButtonPressed)
-		{
-			if (event.mouseButton.button == Mouse::Left) {
-				if (!this->chat.empty() && !this->chat.front()->haveButton())
-					this->chat.pop_front();
-			}
-		}
-
-	}
-
-
 };
 
 class MainMenuState : public State
@@ -2737,15 +2753,15 @@ public:
 
 	void initButtons()
 	{
-		this->buttons["CONTINUE_STATE"] = new Button(835, 500, 250, 50, "ï¿½ï¿½è¹µï¿½ï¿½", 50,
+		this->buttons["CONTINUE_STATE"] = new Button(835, 500, 250, 50, "àÅè¹µèÍ", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["START_STATE"] = new Button(835, 600, 250, 50, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", 50,
+		this->buttons["START_STATE"] = new Button(835, 600, 250, 50, "àÃÔèÁà¡ÁãËÁè", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, "ï¿½Í¡ï¿½Ò¡ï¿½ï¿½", 50,
+		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, "ÍÍ¡¨Ò¡à¡Á", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(100, 100, 100, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 	}
