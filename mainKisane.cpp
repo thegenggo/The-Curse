@@ -3,7 +3,6 @@
 #include <sstream>
 #include <cmath>
 #include <list>
-#include <iostream>
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
@@ -249,7 +248,7 @@ public:
 	//Functions
 	void update()
 	{
-		this->sprite.move(this->velocity.x * this->maxVelocity, this->velocity.y * this->maxVelocity);
+		this->sprite.move(velocity);
 		if (this->velocity.y < 0)
 			this->state = movementState::MOVING_UP;
 		else if (this->velocity.x < 0)
@@ -260,14 +259,9 @@ public:
 			this->state = movementState::MOVING_RIGHT;
 	}
 
-	void test()
-	{
-		this->sprite.move(-this->velocity.x * this->maxVelocity, -this->velocity.y * this->maxVelocity);
-	}
-
 	void move(const float dir_x, const float dir_y, const float& dt)
 	{
-		this->velocity = Vector2f(dir_x * dt, dir_y * dt);
+		this->velocity = Vector2f(dir_x * maxVelocity * dt, dir_y * maxVelocity * dt);
 	}
 };
 
@@ -740,16 +734,6 @@ class Player : public Entity
 
 public:
 	//Accessors
-	Sprite& getSprite()
-	{
-		return this->openWorldSprite;
-	}
-
-	const Vector2f getVelocity() const
-	{
-		return this->movementComponent->getVelocity();
-	}
-
 	const movementState getMovementState() const
 	{
 		return this->movementComponent->getMovementState();
@@ -869,11 +853,6 @@ public:
 	}
 
 	//Component functions
-	virtual void test(const float& dt)
-	{
-		this->movementComponent->test();
-	}
-
 	virtual void setScale(const float x, const float y)
 	{
 		this->openWorldSprite.setScale(x, y);
@@ -1117,33 +1096,12 @@ public:
 	}
 
 	//Functions
-	bool update(const float& dt)
+	void update(const float& dt)
 	{
 		if (this->shape.getGlobalBounds().intersects(this->player.getHitboxGlobalBounds()))
 		{
-			if (this->player.getVelocity().y < 0)
-			{
-				//this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height);
-				this->player.getSprite().move(0, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height - this->player.getHitboxGlobalBounds().top);
-			}
-			if (this->player.getVelocity().x < 0)
-			{
-				//this->player.setPosition(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width, this->player.getPosition().y);
-				this->player.getSprite().move(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width - this->player.getHitboxGlobalBounds().left, 0);
-			}
-			if (this->player.getVelocity().y > 0)
-			{
-				//this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top - this->player.getHitboxGlobalBounds().height);
-				this->player.getSprite().move(0, this->shape.getGlobalBounds().top - (this->player.getHitboxGlobalBounds().top + this->player.getHitboxGlobalBounds().height));
-			}
-			if (this->player.getVelocity().x > 0)
-			{
-				//this->player.setPosition(this->shape.getGlobalBounds().left - this->player.getHitboxGlobalBounds().width, this->player.getPosition().y);
-				this->player.getSprite().move(this->shape.getGlobalBounds().left - (this->player.getHitboxGlobalBounds().left + this->player.getHitboxGlobalBounds().width), 0);
-			}
-			return false;
+			this->player.move();
 		}
-		return true;
 	}
 
 	void render(RenderTarget& target)
@@ -1914,9 +1872,9 @@ public:
 		this->sprite.setPosition(positionX, positionY);
 	}
 
-	virtual bool update(const float& dt)
+	virtual void update(const float& dt)
 	{
-		if(!this->collisionBox->update(dt)) return false;
+		this->collisionBox->update(dt);
 	}
 
 	virtual void render(RenderTarget& target)
@@ -2028,16 +1986,6 @@ public:
 			this->collisions.push_back(new CollisionBox(*this->player, 1634.f, 589.f, 1.f, 353.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 610.f, 0.f, 1.f, 310.f));
 
-			this->objects.push_back(new Object("Rock", this->player, 1341.f, 821.f));
-			this->objects.push_back(new Object("Rock", this->player, 761.f, 504.f));
-			this->objects.push_back(new Object("Rock", this->player, 1074.f, 681.f));
-			this->objects.push_back(new Object("Rock", this->player, 1110.f, 395.f));
-			this->objects.push_back(new Object("Rock", this->player, 524.f, 34.f));
-			this->objects.push_back(new Object("Rock", this->player, 968.f, 614.f));
-			this->objects.push_back(new Object("Rock2", this->player, 866.f, 536.f));
-			this->objects.push_back(new Object("Rock2", this->player, 1713.f, 489.f));
-			this->objects.push_back(new Object("Rock2", this->player, 1649.f, 805.f));
-			this->objects.push_back(new Object("Rock2", this->player, 1820.f, 723.f));
 			this->objects.push_back(new Object("Rock2", this->player, 531.f, 78.f));
 			this->objects.push_back(new Object("Rock2", this->player, 531.f, 146.f));
 			this->objects.push_back(new Object("Rock2", this->player, 541.f, 203.f));
@@ -2046,90 +1994,57 @@ public:
 			this->objects.push_back(new Object("Rock2", this->player, 884.f, 239.f));
 			this->objects.push_back(new Object("Rock2", this->player, 768.f, 176.f));
 			this->objects.push_back(new Object("Rock2", this->player, 683.f, 100.f));
-			this->objects.push_back(new Object("Rock2", this->player, 1196.f, 741.f));
-			this->objects.push_back(new Object("Rock2", this->player, 661.f, 424.f));
-			this->objects.push_back(new Object("Tree1", this->player, 524.f, 73.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1873.f, 469.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1713.f, 489.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1649.f, 805.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1820.f, 723.f));
+			this->objects.push_back(new Object("Rock", this->player, 968.f, 614.f));
+			this->objects.push_back(new Object("Rock2", this->player, 866.f, 536.f));
 			this->objects.push_back(new Object("Tree1", this->player, 1317.f, -161.f));
 			this->objects.push_back(new Object("Tree1", this->player, 1555.f, -161.f));
+			this->objects.push_back(new Object("Rock", this->player, 761.f, 504.f));
+			this->objects.push_back(new Object("Rock", this->player, 1074.f, 681.f));
+			this->objects.push_back(new Object("Rock", this->player, 1110.f, 395.f));
+			this->objects.push_back(new Object("Rock", this->player, 524.f, 34.f));
+			this->objects.push_back(new Object("Tree3", this->player, 866.f, 0.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1046.f, 1.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1225.f, 15.f));
+			this->objects.push_back(new Object("Tree3", this->player, 712.f, 853.f));
+			this->objects.push_back(new Object("Tree3", this->player, 1010.f, 330.f));
+			this->objects.push_back(new Object("Tree1", this->player, 524.f, 73.f));
+			this->objects.push_back(new Object("Tree3", this->player, 638.f, 380.f));
+			this->objects.push_back(new Object("Tree2", this->player, 594.f, 184.f));
 			this->objects.push_back(new Object("Tree1", this->player, 0.f, -145.f));
 			this->objects.push_back(new Object("Tree1", this->player, 296.f, -118.f));
+			this->objects.push_back(new Object("Rock2", this->player, 661.f, 424.f));
 			this->objects.push_back(new Object("Tree1", this->player, 659.f, 249.f));
+			this->objects.push_back(new Object("Tree2", this->player, 768.f, 28.f));
+			this->objects.push_back(new Object("Tree2", this->player, 768.f, 313.f));
+			this->objects.push_back(new Object("Tree2", this->player, 994.f, 411.f));
 			this->objects.push_back(new Object("Tree1", this->player, 866.f, 344.f));
 			this->objects.push_back(new Object("Tree1", this->player, 1073.f, 468.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1196.f, 741.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1685.f, 540.f));
+			this->objects.push_back(new Object("Tree2", this->player, -28.f, 578.f));
 			this->objects.push_back(new Object("Tree1", this->player, -43.f, 789.f));
 			this->objects.push_back(new Object("Tree1", this->player, 509.f, 562.f));
 			this->objects.push_back(new Object("Tree1", this->player, 1799.f, -145.f));
-			this->objects.push_back(new Object("Tree1", this->player, 1685.f, 540.f));
-			this->objects.push_back(new Object("Tree2", this->player, -28.f, 578.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1261.f, 572.f));
+			this->objects.push_back(new Object("Rock", this->player, 1341.f, 821.f));
 			this->objects.push_back(new Object("Tree2", this->player, 603.f, -145.f));
 			this->objects.push_back(new Object("Tree2", this->player, 669.f, -40.f));
 			this->objects.push_back(new Object("Tree2", this->player, 160.f, -75.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1761.f, 256.f));
-			this->objects.push_back(new Object("Tree2", this->player, 768.f, 28.f));
-			this->objects.push_back(new Object("Tree2", this->player, 768.f, 313.f));
-			this->objects.push_back(new Object("Tree2", this->player, 994.f, 411.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1734.f, 821.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1597.f, 330.f));
 			this->objects.push_back(new Object("Tree2", this->player, 889.f, 75.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1001.f, 146.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1170.f, 265.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1305.f, 319.f));
-			this->objects.push_back(new Object("Tree2", this->player, 594.f, 184.f));
-			this->objects.push_back(new Object("Tree3", this->player, 1873.f, 469.f));
-			this->objects.push_back(new Object("Tree3", this->player, 638.f, 380.f));
-			this->objects.push_back(new Object("Tree3", this->player, 866.f, 0.f));
-			this->objects.push_back(new Object("Tree3", this->player, 1046.f, 1.f));
-			this->objects.push_back(new Object("Tree3", this->player, 1225.f, 15.f));
-			this->objects.push_back(new Object("Tree3", this->player, 712.f, 853.f));
-			this->objects.push_back(new Object("Tree3", this->player, 1010.f, 330.f));
-
 		}
 		else if (this->gameStage == 13)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map1/map1_3.png");
-
-			this->objects.push_back(new Object("Rock", this->player, 738.f, 730.f));
-			this->objects.push_back(new Object("Rock", this->player, 1165.f, 210.f));
-			this->objects.push_back(new Object("Rock", this->player, 199.f, 169.f));
-			this->objects.push_back(new Object("Rock", this->player, 584.f, 982.f));
-			this->objects.push_back(new Object("Rock", this->player, 1740.f, 675.f));
-			this->objects.push_back(new Object("Rock", this->player, 221.f, 962.f));
-			this->objects.push_back(new Object("Rock", this->player, 1580.f, 190.f));
-			this->objects.push_back(new Object("Tree1", this->player, 327.f, 767.f));
-			this->objects.push_back(new Object("Tree1", this->player, 94.f, 148.f));
-			this->objects.push_back(new Object("Tree1", this->player, 1230.f, 210.f));
-			this->objects.push_back(new Object("Tree1", this->player, 829.f, 783.f));
-			this->objects.push_back(new Object("Tree1", this->player, 199.f, 439.f));
-			this->objects.push_back(new Object("Tree1", this->player, 965.f, -65.f));
-			this->objects.push_back(new Object("Tree1", this->player, 1267.f, 524.f));
-			this->objects.push_back(new Object("Tree1", this->player, 453.f, 0.f));
-			this->objects.push_back(new Object("Tree1", this->player, 1669.f, 194.f));
-			this->objects.push_back(new Object("Tree1", this->player, 362.f, 492.f));
-			this->objects.push_back(new Object("Tree1", this->player, 1097.f, 783.f));
-			this->objects.push_back(new Object("Tree1", this->player, 47.f, 508.f));
-			this->objects.push_back(new Object("Tree1", this->player, 1689.f, 749.f));
-			this->objects.push_back(new Object("Tree2", this->player, -18.f, -88.f));
-			this->objects.push_back(new Object("Tree2", this->player, -18.f, 355.f));
-			this->objects.push_back(new Object("Tree2", this->player, 979.f, 355.f));
-			this->objects.push_back(new Object("Tree2", this->player, 547.f, 540.f));
-			this->objects.push_back(new Object("Tree2", this->player, 1609.f, -112.f));
-			this->objects.push_back(new Object("Tree2", this->player, 62.f, 723.f));
-			this->objects.push_back(new Object("Tree2", this->player, 1032.f, 566.f));
-			this->objects.push_back(new Object("Tree2", this->player, 1418.f, 147.f));
-			this->objects.push_back(new Object("Tree2", this->player, 627.f, 18.f));
-			this->objects.push_back(new Object("Tree2", this->player, 1339.f, 799.f));
-			this->objects.push_back(new Object("Tree2", this->player, 1530.f, 566.f));
-			this->objects.push_back(new Object("Tree3", this->player, 1173.f, 457.f));
-			this->objects.push_back(new Object("Tree3", this->player, 1324.f, 118.f));
-			this->objects.push_back(new Object("Tree3", this->player, 282.f, 801.f));
-			this->objects.push_back(new Object("Tree3", this->player, 224.f, 81.f));
-			this->objects.push_back(new Object("Tree3", this->player, 1462.f, 675.f));
-			this->objects.push_back(new Object("Tree3", this->player, 1623.f, 443.f));
-			this->objects.push_back(new Object("Tree3", this->player, 793.f, 79.f));
-			this->objects.push_back(new Object("Tree3", this->player, 996.f, 769.f));
-			this->objects.push_back(new Object("Tree3", this->player, 58.f, 1023.f));
-			
 		}
 		else if (this->gameStage == 21)
 		{
@@ -2497,12 +2412,12 @@ public:
 
 		for (auto& i : objects)
 		{
-			if(!i->update(dt)) break;
+			i->update(dt);
 		}
 
 		for (auto& i : collisions)
 		{
-			if (!i->update(dt)) break;
+			i->update(dt);
 		}
 
 
