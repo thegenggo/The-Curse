@@ -1443,14 +1443,14 @@ public:
 		this->Itembuttons["ITEM2"] = new Button(530, 700, 220, 100, "Sacred water", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->Skillbuttons["SKILL1"] = new Button(200, 600, 420, 100, "à¢ÕéÂÇ¨Ñ¹·ÃÒ ·ÐÅÇ§ ÊÇÃÃ¤ì", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL1"] = new Button(200, 600, 420, 100, "ï¿½ï¿½ï¿½ï¿½Ç¨Ñ¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ç§ ï¿½ï¿½ï¿½Ã¤ï¿½", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->Skillbuttons["SKILL2"] = new Button(200, 700, 420, 100, "àºÕÂÇâ´ä¤¨Ô¹à«ç¹ä«", 50, Color::White, Color::White, Color::White,
+		this->Skillbuttons["SKILL2"] = new Button(200, 700, 420, 100, "ï¿½ï¿½ï¿½ï¿½ï¿½ä¤¨Ô¹ï¿½ï¿½ï¿½", 50, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 
-		this->detailButtons["SkillDetail"] = new Button(1650, 850, 200, 100, "ÃÒÂÅÐàÍÕÂ´Ê¡ÔÅ", 30, Color::White, Color::White, Color::White,
+		this->detailButtons["SkillDetail"] = new Button(1650, 850, 200, 100, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´Ê¡ï¿½ï¿½", 30, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
-		this->detailButtons["ItemDetail"] = new Button(1650, 950, 200, 100, "ÃÒÂÅÐàÍÕÂ´äÍà·Á", 30, Color::White, Color::White, Color::White,
+		this->detailButtons["ItemDetail"] = new Button(1650, 950, 200, 100, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½ï¿½", 30, Color::White, Color::White, Color::White,
 			Color(70, 70, 70, 200), Color(150, 150, 150, 255), Color(20, 20, 20, 200));
 	}
 
@@ -1905,6 +1905,31 @@ public:
 			this->sprite.setTexture(this->texture);
 			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 105.f, 75.f);
 		}
+		else if (this->name == "house1")
+		{
+			this->texture.loadFromFile("Images/map/house1.png");
+			this->sprite.setTexture(this->texture);
+		}
+		else if (this->name == "house2")
+		{
+			this->texture.loadFromFile("Images/map/house2.png");
+			this->sprite.setTexture(this->texture);
+		}
+		else if (this->name == "house3")
+		{
+			this->texture.loadFromFile("Images/map/house3.png");
+			this->sprite.setTexture(this->texture);
+		}
+		else if (this->name == "fence1")
+		{
+			this->texture.loadFromFile("Images/map/fence1.png");
+			this->sprite.setTexture(this->texture);
+		}
+		else if (this->name == "fence2")
+		{
+			this->texture.loadFromFile("Images/map/fence2.png");
+			this->sprite.setTexture(this->texture);
+		}
 		else
 		{
 			this->texture.loadFromFile("Images/map/tree_type_1.png");
@@ -2017,8 +2042,8 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 309.f, 379.f));
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
-			this->chat.push_back(new ChatDialog(L"ÎÑÅâËÅ"));
-			this->chat.push_back(new ChatDialog(L"à·Êæ"));
+			this->chat.push_back(new ChatDialog(L"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
+			this->chat.push_back(new ChatDialog(L"ï¿½ï¿½ï¿½"));
 		}
 		else if (this->gameStage == 12)
 		{
@@ -2576,15 +2601,15 @@ public:
 
 	void initButtons()
 	{
-		this->buttons["CONTINUE_STATE"] = new Button(835, 500, 250, 50, "àÅè¹µèÍ", 50,
+		this->buttons["CONTINUE_STATE"] = new Button(835, 500, 250, 50, "ï¿½ï¿½è¹µï¿½ï¿½", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["START_STATE"] = new Button(835, 600, 250, 50, "àÃÔèÁà¡ÁãËÁè", 50,
+		this->buttons["START_STATE"] = new Button(835, 600, 250, 50, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 
-		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, "ÍÍ¡¨Ò¡à¡Á", 50,
+		this->buttons["EXIT_STATE"] = new Button(835, 700, 250, 50, "ï¿½Í¡ï¿½Ò¡ï¿½ï¿½", 50,
 			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
 			Color(100, 100, 100, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 	}
