@@ -1294,7 +1294,6 @@ public:
 	CollisionBox(Player& player, float x, float y, float width = 1.f, float height = 1.f)
 		:player(player)
 	{
-
 		this->shape.setSize(Vector2f(width, height));
 		this->shape.setPosition(x, y);
 	}
@@ -1336,7 +1335,7 @@ public:
 
 	void render(RenderTarget& target)
 	{
-
+		target.draw(this->shape);
 	}
 };
 
@@ -1971,29 +1970,29 @@ public:
 		{
 			this->texture.loadFromFile("Images/map/rock_type_3.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 105.f, 75.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 425.f, 320.f);
 		}
-		else if (this->name == "house1")
+		else if (this->name == "House1")
 		{
 			this->texture.loadFromFile("Images/map/house1.png");
 			this->sprite.setTexture(this->texture);
 		}
-		else if (this->name == "house2")
+		else if (this->name == "House2")
 		{
 			this->texture.loadFromFile("Images/map/house2.png");
 			this->sprite.setTexture(this->texture);
 		}
-		else if (this->name == "house3")
+		else if (this->name == "House3")
 		{
 			this->texture.loadFromFile("Images/map/house3.png");
 			this->sprite.setTexture(this->texture);
 		}
-		else if (this->name == "fence1")
+		else if (this->name == "Fence1")
 		{
 			this->texture.loadFromFile("Images/map/fence1.png");
 			this->sprite.setTexture(this->texture);
 		}
-		else if (this->name == "fence2")
+		else if (this->name == "Fence2")
 		{
 			this->texture.loadFromFile("Images/map/fence2.png");
 			this->sprite.setTexture(this->texture);
@@ -2005,6 +2004,10 @@ public:
 			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 220.f, 45.f, 40.f);
 		}
 		this->sprite.setPosition(positionX, positionY);
+	}
+
+	~Object()
+	{
 	}
 
 	virtual bool update(const float& dt)
@@ -2233,6 +2236,8 @@ public:
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map2/map2_1.png");
 
+			this->collisions.push_back(new CollisionBox(*this->player, 490.f, 815.f, 1430.f, 1.f));
+
 			this->objects.push_back(new Object("Rock", this->player, 806.f, 704.f));
 			this->objects.push_back(new Object("Rock", this->player, 1376.f, 119.f));
 			this->objects.push_back(new Object("Rock", this->player, 917.f, 99.f));
@@ -2257,12 +2262,15 @@ public:
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map2/map2_2.png");
 
+			this->collisions.push_back(new CollisionBox(*this->player, 1700.f, 320.f, 1.f, 500.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 1660.f, 840.f, 50.f, 50.f));
+
 			this->objects.push_back(new Object("Rock", this->player, 509.f, 743.f));
 			this->objects.push_back(new Object("Rock", this->player, 1231.f, 406.f));
 			this->objects.push_back(new Object("Rock", this->player, 1059.f, 794.f));
 			this->objects.push_back(new Object("Rock", this->player, 151.f, 390.f));
 			this->objects.push_back(new Object("Rock2", this->player, 1531.f, 814.f));
-			this->objects.push_back(new Object("Rock2", this->player, 1210.f, 18.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1210.f, 8.f));
 			this->objects.push_back(new Object("Rock2", this->player, 1563.f, 294.f));
 			this->objects.push_back(new Object("Rock2", this->player, 429.f, 374.f));
 			this->objects.push_back(new Object("Rock2", this->player, 886.f, 612.f));
@@ -2294,14 +2302,74 @@ public:
 		else if (this->gameStage == 23)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map2/map2_3.png");
+
+			this->collisions.push_back(new CollisionBox(*this->player, 1310.f, 870.f, 1.f, 210.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 1310.f, 870.f, 610.f, 1.f));
+
+			this->objects.push_back(new Object("Rock", this->player, 200.f, 967.f))
+			this->objects.push_back(new Object("Rock", this->player, 376.f, 728.f))
+			this->objects.push_back(new Object("Rock", this->player, 672.f, 360.f))
+			this->objects.push_back(new Object("Rock2", this->player, 1150.f, 866.f))
+			this->objects.push_back(new Object("Rock2", this->player, 1177.f, 987.f))
+			this->objects.push_back(new Object("Rock2", this->player, 269.f, 416.f))
+			this->objects.push_back(new Object("Rock2", this->player, 1550.f, 202.f))
+			this->objects.push_back(new Object("Rock2", this->player, 1592.f, 769.f))
+			this->objects.push_back(new Object("Tree1", this->player, 113.f, -16.f))
+			this->objects.push_back(new Object("Tree1", this->player, -39.f, 276.f))
+			this->objects.push_back(new Object("Tree1", this->player, -39.f, 769.f))
+			this->objects.push_back(new Object("Tree1", this->player, -11.f, 490.f))
+			this->objects.push_back(new Object("Tree1", this->player, 343.f, 131.f))
+			this->objects.push_back(new Object("Tree1", this->player, 646.f, -105.f))
+			this->objects.push_back(new Object("Tree1", this->player, 1010.f, 12.f))
+			this->objects.push_back(new Object("Tree1", this->player, 1336.f, -118.f))
+			this->objects.push_back(new Object("Tree1", this->player, 1699.f, -32.f))
+			this->objects.push_back(new Object("Tree2", this->player, 0.f, -73.f))
+			this->objects.push_back(new Object("Tree2", this->player, 97.f, 230.f))
+			this->objects.push_back(new Object("Tree2", this->player, 487.f, 0.f))
+			this->objects.push_back(new Object("Tree2", this->player, 18.f, 680.f))
+			this->objects.push_back(new Object("Tree2", this->player, 243.f, -102.f))
+			this->objects.push_back(new Object("Tree2", this->player, 832.f, -73.f))
+			this->objects.push_back(new Object("Tree2", this->player, 1177.f, -102.f))
+			this->objects.push_back(new Object("Tree2", this->player, -104.f, 421.f))
+			this->objects.push_back(new Object("Tree2", this->player, 1498.f, -129.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1475.f, 608.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1531.f, 608.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1587.f, 608.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1643.f, 608.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1699.f, 608.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1755.f, 608.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1811.f, 608.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1475.f, 416.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1531.f, 416.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1587.f, 416.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1643.f, 416.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1699.f, 416.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1755.f, 416.f))
+			this->objects.push_back(new Object("Fence1", this->player, 1811.f, 416.f))
 		}
 		else if (this->gameStage == 31)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map3/map3_1.png");
+
+			this->collisions.push_back(new CollisionBox(*this->player, 10.f, 870.f, 50.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 70.f, 885.f, 50.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 130.f, 895.f, 50.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 190.f, 910.f, 50.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 250.f, 925.f, 50.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 310.f, 940.f, 50.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 370.f, 950.f, 50.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 430.f, 965.f, 1490.f, 1.f));
 		}
 		else if (this->gameStage == 32)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map3/map3_2.png");
+
+			this->collisions.push_back(new CollisionBox(*this->player, 10.f, 960.f, 50.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 70.f, 980.f, 50.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 130.f, 1000.f, 50.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 190.f, 1025.f, 15.f, 50.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 215.f, 1035.f, 1705.f, 1.f));
+
 		}
 		else if (this->gameStage == 33)
 		{
@@ -2376,6 +2444,22 @@ public:
 	{
 		this->updateMousePositions();
 		this->updateInput(dt);
+
+		this->player->update(dt);
+
+		for (auto& i : objects)
+		{
+			if (!i->update(dt)) break;
+		}
+
+		for (auto& i : collisions)
+		{
+			if (!i->update(dt)) break;
+		}
+
+		if (!this->chat.empty())
+			this->chat.front()->update(this->mousePosView);
+
 		if (this->gameStage == 11)
 		{
 			//RIGHT
@@ -2483,7 +2567,18 @@ public:
 		else if (this->gameStage == 13)
 		{
 			//RIGHT
-			if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			/*if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y);
+				openWorldState = "Map2_1";
+				currentState = "Map2_1";
+			}*/
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x &&
+				!(this->player->getHitboxGlobalBounds().top > 500.f && this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 650.f))
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+			}
+			else if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
 			{
 				this->player->setPosition(0.f, this->player->getPosition().y);
 				openWorldState = "Map2_1";
@@ -2518,9 +2613,20 @@ public:
 		else if (this->gameStage == 21)
 		{
 			//RIGHT
-			if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+		/*	if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
 			{
-				this->player->setPosition(0.f, this->player->getPosition().y);
+				this->player->setPosition(0.f, this->player->getPosition().y + 265.f);
+				openWorldState = "Map2_2";
+				currentState = "Map2_2";
+			}*/
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x &&
+				!(this->player->getHitboxGlobalBounds().top > 30.f && this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 1080.f))
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+			}
+			else if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y + 265.f);
 				openWorldState = "Map2_2";
 				currentState = "Map2_2";
 			}
@@ -2554,9 +2660,9 @@ public:
 			}
 
 			//LEFT
-			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 0.f)
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().left < 0.f)
 			{
-				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y - 265.f);
 				openWorldState = "Map2_1";
 				currentState = "Map2_1";
 			}
@@ -2568,7 +2674,12 @@ public:
 			}
 
 			//UP
-			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 0.f)
+			if (this->player->getHitboxGlobalBounds().top < 0.f &&
+				!(this->player->getHitboxGlobalBounds().left > 955.f && this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 1090.f))
+			{
+				this->player->setPosition(this->player->getPosition().x, 0.f);
+			}
+			else if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 0.f)
 			{
 				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
 				openWorldState = "Map2_3";
@@ -2592,7 +2703,12 @@ public:
 			}
 
 			//DOWN
-			if (this->player->getHitboxGlobalBounds().top > this->window->getView().getSize().y)
+			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height > this->window->getView().getSize().y &&
+				!(this->player->getHitboxGlobalBounds().left > 955.f && this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 1090.f))
+			{
+				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
+			}
+			else if (this->player->getHitboxGlobalBounds().top > this->window->getView().getSize().y)
 			{
 				this->player->setPosition(this->player->getPosition().x, 0.f);
 				openWorldState = "Map2_2";
@@ -2707,22 +2823,6 @@ public:
 			}
 
 		}
-
-		this->player->update(dt);
-
-		for (auto& i : objects)
-		{
-			if (!i->update(dt)) break;
-		}
-
-		for (auto& i : collisions)
-		{
-			if (!i->update(dt)) break;
-		}
-
-
-		if (!this->chat.empty())
-			this->chat.front()->update(this->mousePosView);
 	}
 
 	void render(RenderTarget* target = NULL)
