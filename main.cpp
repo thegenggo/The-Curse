@@ -150,8 +150,33 @@ class ChatDialog
 	Button* choice2;
 	int* dialoglog;
 	list<ChatDialog*>* chat;
+	Sprite sprite;
+	Texture texture;
 
 public:
+	ChatDialog(wstring text, string fileloc)
+	{
+		this->chat = NULL;
+		this->dialoglog = NULL;
+		this->choice1 = NULL;
+		this->choice2 = NULL;
+		this->shape.setSize(Vector2f(1900, 200));
+		this->text.setCharacterSize(30);
+		this->shape.setOrigin(1900 / 2.f, 200 / 2.f);
+
+		this->text.setFont(font);
+		this->text.setString(text);
+		this->shape.setFillColor(Color::White);
+		this->text.setFillColor(Color::Black);
+		this->shape.setOutlineThickness(3.f);
+		this->shape.setOutlineColor(Color::Black);
+		this->shape.setPosition(960, 980);
+		this->text.setPosition(30, 900);
+		this->texture.loadFromFile(fileloc);
+		this->sprite.setTexture(this->texture);
+		this->sprite.setPosition(10, 330);
+	}
+
 	ChatDialog(wstring text)
 	{
 		this->chat = NULL;
@@ -164,31 +189,37 @@ public:
 
 		this->text.setFont(font);
 		this->text.setString(text);
-		this->shape.setFillColor(Color(70, 70, 70, 200));
-		this->text.setFillColor(Color::White);
+		this->shape.setFillColor(Color::White);
+		this->text.setFillColor(Color::Black);
+		this->shape.setOutlineThickness(3.f);
+		this->shape.setOutlineColor(Color::Black);
 		this->shape.setPosition(960, 980);
 		this->text.setPosition(30, 900);
+
 	}
 
 	ChatDialog(wstring text, string choice1, string choice2, int* dialoglog, list<ChatDialog*>* chat)
 		:dialoglog(dialoglog), chat(chat)
 	{
-		this->choice1 = new Button(835, 500, 250, 50, choice1, 50,
-			Color(70, 70, 70, 200), Color(120, 120, 120, 0), Color(20, 20, 20, 50),
-			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
-		this->choice2 = new Button(835, 600, 250, 50, choice2, 50,
-			Color(70, 70, 70, 200), Color(120, 120, 120, 0), Color(20, 20, 20, 50),
-			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
+		this->choice1 = new Button(835, 500, 350, 80, choice1, 50,
+			Color(70, 70, 70, 200), Color(255, 255, 255, 255), Color(20, 20, 20, 50),
+			Color(70, 70, 70, 100), Color(150, 150, 150, 150), Color(20, 20, 20, 100));
+		this->choice2 = new Button(835, 600, 350, 80, choice2, 50,
+			Color(70, 70, 70, 200), Color(255, 255, 255, 255), Color(20, 20, 20, 50),
+			Color(70, 70, 70, 100), Color(150, 150, 150, 150), Color(20, 20, 20, 100));
 		this->shape.setSize(Vector2f(1900, 200));
 		this->text.setCharacterSize(30);
 		this->shape.setOrigin(1900 / 2.f, 200 / 2.f);
 
 		this->text.setFont(font);
 		this->text.setString(text);
-		this->shape.setFillColor(Color(70, 70, 70, 200));
-		this->text.setFillColor(Color::White);
+		this->shape.setFillColor(Color::White);
+		this->text.setFillColor(Color::Black);
+		this->shape.setOutlineThickness(3.f);
+		this->shape.setOutlineColor(Color::Black);
 		this->shape.setPosition(960, 980);
 		this->text.setPosition(30, 900);
+
 	}
 
 	~ChatDialog()
@@ -237,6 +268,7 @@ public:
 
 	void render(RenderTarget* target)
 	{
+		target->draw(this->sprite);
 		target->draw(this->shape);
 		target->draw(this->text);
 		if (this->choice1 != NULL) this->choice1->render(*target);
@@ -990,7 +1022,7 @@ public:
 		this->hitboxComponent = new HitboxComponent(this->openWorldSprite, 0.f, 0.f, 45.f, 30.f);
 		this->openWorldanimationComponent = new AnimationComponent(this->openWorldSprite, this->openWorldTexture);
 		this->battleAnimationComponent = new AnimationComponent(this->battleSprite, this->battleTexture);
-		this->movementComponent = new MovementComponent(this->openWorldSprite, 300.f);
+		this->movementComponent = new MovementComponent(this->openWorldSprite, 1000.f);
 
 		this->lightTexture.loadFromFile("Images/light.png");
 		this->light.setTexture(lightTexture);
@@ -1976,26 +2008,31 @@ public:
 		{
 			this->texture.loadFromFile("Images/map/house1.png");
 			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 37.f, 30.f);
 		}
 		else if (this->name == "House2")
 		{
 			this->texture.loadFromFile("Images/map/house2.png");
 			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 37.f, 30.f);
 		}
 		else if (this->name == "House3")
 		{
 			this->texture.loadFromFile("Images/map/house3.png");
 			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 37.f, 30.f);
 		}
 		else if (this->name == "Fence1")
 		{
 			this->texture.loadFromFile("Images/map/fence1.png");
 			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 21.f, 122.f);
 		}
 		else if (this->name == "Fence2")
 		{
 			this->texture.loadFromFile("Images/map/fence2.png");
 			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
 		}
 		else
 		{
@@ -2055,14 +2092,14 @@ class GameState : public State
 
 	int gameStage;
 	int dialog;
-	int dialogchat;
+	int& dialogchat;
 
 public:
 	//Initilizer functions
 
 	//Constructor / Destructor
-	GameState(RenderWindow* window, map<string, State*>* states, Player* player, int gameStage = 11)
-		: State(window, states), player(player), gameStage(gameStage)
+	GameState(RenderWindow* window, map<string, State*>* states, Player* player, int& dialogchat, int gameStage = 11)
+		: State(window, states), player(player), gameStage(gameStage), dialogchat(dialogchat)
 	{
 		this->dialog = 0;
 		this->dialogchat = 0;
@@ -2306,46 +2343,46 @@ public:
 			this->collisions.push_back(new CollisionBox(*this->player, 1310.f, 870.f, 1.f, 210.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 1310.f, 870.f, 610.f, 1.f));
 
-			this->objects.push_back(new Object("Rock", this->player, 200.f, 967.f))
-			this->objects.push_back(new Object("Rock", this->player, 376.f, 728.f))
-			this->objects.push_back(new Object("Rock", this->player, 672.f, 360.f))
-			this->objects.push_back(new Object("Rock2", this->player, 1150.f, 866.f))
-			this->objects.push_back(new Object("Rock2", this->player, 1177.f, 987.f))
-			this->objects.push_back(new Object("Rock2", this->player, 269.f, 416.f))
-			this->objects.push_back(new Object("Rock2", this->player, 1550.f, 202.f))
-			this->objects.push_back(new Object("Rock2", this->player, 1592.f, 769.f))
-			this->objects.push_back(new Object("Tree1", this->player, 113.f, -16.f))
-			this->objects.push_back(new Object("Tree1", this->player, -39.f, 276.f))
-			this->objects.push_back(new Object("Tree1", this->player, -39.f, 769.f))
-			this->objects.push_back(new Object("Tree1", this->player, -11.f, 490.f))
-			this->objects.push_back(new Object("Tree1", this->player, 343.f, 131.f))
-			this->objects.push_back(new Object("Tree1", this->player, 646.f, -105.f))
-			this->objects.push_back(new Object("Tree1", this->player, 1010.f, 12.f))
-			this->objects.push_back(new Object("Tree1", this->player, 1336.f, -118.f))
-			this->objects.push_back(new Object("Tree1", this->player, 1699.f, -32.f))
-			this->objects.push_back(new Object("Tree2", this->player, 0.f, -73.f))
-			this->objects.push_back(new Object("Tree2", this->player, 97.f, 230.f))
-			this->objects.push_back(new Object("Tree2", this->player, 487.f, 0.f))
-			this->objects.push_back(new Object("Tree2", this->player, 18.f, 680.f))
-			this->objects.push_back(new Object("Tree2", this->player, 243.f, -102.f))
-			this->objects.push_back(new Object("Tree2", this->player, 832.f, -73.f))
-			this->objects.push_back(new Object("Tree2", this->player, 1177.f, -102.f))
-			this->objects.push_back(new Object("Tree2", this->player, -104.f, 421.f))
-			this->objects.push_back(new Object("Tree2", this->player, 1498.f, -129.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1475.f, 608.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1531.f, 608.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1587.f, 608.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1643.f, 608.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1699.f, 608.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1755.f, 608.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1811.f, 608.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1475.f, 416.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1531.f, 416.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1587.f, 416.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1643.f, 416.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1699.f, 416.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1755.f, 416.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1811.f, 416.f))
+			this->objects.push_back(new Object("Rock", this->player, 200.f, 967.f));
+			this->objects.push_back(new Object("Rock", this->player, 376.f, 728.f));
+			this->objects.push_back(new Object("Rock", this->player, 672.f, 360.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1150.f, 866.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1177.f, 987.f));
+			this->objects.push_back(new Object("Rock2", this->player, 269.f, 416.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1550.f, 202.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1592.f, 769.f));
+			this->objects.push_back(new Object("Tree1", this->player, 113.f, -16.f));
+			this->objects.push_back(new Object("Tree1", this->player, -39.f, 276.f));
+			this->objects.push_back(new Object("Tree1", this->player, -39.f, 769.f));
+			this->objects.push_back(new Object("Tree1", this->player, -11.f, 490.f));
+			this->objects.push_back(new Object("Tree1", this->player, 343.f, 131.f));
+			this->objects.push_back(new Object("Tree1", this->player, 646.f, -105.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1010.f, 12.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1336.f, -118.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1699.f, -32.f));
+			this->objects.push_back(new Object("Tree2", this->player, 0.f, -73.f));
+			this->objects.push_back(new Object("Tree2", this->player, 97.f, 230.f));
+			this->objects.push_back(new Object("Tree2", this->player, 487.f, 0.f));
+			this->objects.push_back(new Object("Tree2", this->player, 18.f, 680.f));
+			this->objects.push_back(new Object("Tree2", this->player, 243.f, -102.f));
+			this->objects.push_back(new Object("Tree2", this->player, 832.f, -73.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1177.f, -102.f));
+			this->objects.push_back(new Object("Tree2", this->player, -104.f, 421.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1498.f, -129.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1475.f, 608.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1531.f, 608.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1587.f, 608.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1643.f, 608.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1699.f, 608.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1755.f, 608.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1811.f, 608.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1475.f, 416.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1531.f, 416.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1587.f, 416.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1643.f, 416.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1699.f, 416.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1755.f, 416.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1811.f, 416.f));
 		}
 		else if (this->gameStage == 31)
 		{
@@ -2501,32 +2538,32 @@ public:
 			}
 			if (player->getHitboxGlobalBounds().contains(186.f, 196.f) && dialog == 0)
 			{
-				this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน"));
+				this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน","Images/character/gurad.png"));
 				this->chat.push_back(new ChatDialog(L" ", "พูดความจริง", "โกหกว่ามาตามหาคน", &dialogchat, &this->chat));
 				dialog = 1;
 			}
 			if (dialogchat == 2 && dialog == 1) {
-				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาวิธีแก้คำสาปให้คนรัก"));
-				this->chat.push_back(new ChatDialog(L"คำสาปงั้นเหรอ? ข้าไม่รู้หรอกว่าในป่าแห่งนี้มันจะมีวิธีถอนคำสาปที่เจ้าต้องการรึเปล่าแต่ข้าขอแนะนำเจ้าอย่าง เจ้าอย่าได้เข้าไปเลย เอาชีวิตมาเสี่ยงเสียเปล่าๆ"));
-				this->chat.push_back(new ChatDialog(L"ทำไมละ?"));
-				this->chat.push_back(new ChatDialog(L"เมื่อไม่กี่วันก่อนจู่ๆก็มีพวกโยไคปรากฏตัวที่หมู่บ้านที่อยู่ในป่าแห่งนี้และไล่ฆ่าทุกคนในหมู่บ้าน จนตอนนี้ก็ลามมาถึงป่าแห่งนี้แล้วแต่โชคยังดีที่ทางเข้าป่าแห่งนี้มีอาคมที่ช่วยไล่พวกโยไคเอาไว้อยู่"));
-				this->chat.push_back(new ChatDialog(L"แต่ถึงอย่างนั้นข้าก็จะเข้าไป"));
-				this->chat.push_back(new ChatDialog(L"ทำไมเจ้าถึงได้ดื้อดึงที่จะเข้าไปถึงขนาดนั้นกัน?"));
-				this->chat.push_back(new ChatDialog(L"เพราะถ้าข้าไม่รีบจัดการเกี่ยวกับคำสาปละก็ นางคง...."));
-				this->chat.push_back(new ChatDialog(L"เฮ้อ...ก็ได้ข้าจะปล่อยให้เจ้าเข้าไปแต่ขอบอกเอาไว้ก่อนนะ ถ้าเจ้าตายหรือเป็นอะไรจะไม่มีใครเข้าไปช่วยเจ้าเด็ดขาดเข้าใจมั้ย?"));
+				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาวิธีแก้คำสาปให้คนรัก", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"คำสาปงั้นเหรอ? ข้าไม่รู้หรอกว่าในป่าแห่งนี้มันจะมีวิธีถอนคำสาปที่เจ้าต้องการรึเปล่าแต่ข้าขอแนะนำเจ้าอย่าง เจ้าอย่าได้เข้าไปเลย เอาชีวิตมาเสี่ยงเสียเปล่าๆ", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"ทำไมละ?", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"เมื่อไม่กี่วันก่อนจู่ๆก็มีพวกโยไคปรากฏตัวที่หมู่บ้านที่อยู่ในป่าแห่งนี้และไล่ฆ่าทุกคนในหมู่บ้าน จนตอนนี้ก็ลามมาถึงป่าแห่งนี้แล้วแต่โชคยังดีที่ทางเข้าป่าแห่งนี้มีอาคมที่ช่วยไล่พวกโยไคเอาไว้อยู่", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"แต่ถึงอย่างนั้นข้าก็จะเข้าไป", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"ทำไมเจ้าถึงได้ดื้อดึงที่จะเข้าไปถึงขนาดนั้นกัน?", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"เพราะถ้าข้าไม่รีบจัดการเกี่ยวกับคำสาปละก็ นางคง....", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"เฮ้อ...ก็ได้ข้าจะปล่อยให้เจ้าเข้าไปแต่ขอบอกเอาไว้ก่อนนะ ถ้าเจ้าตายหรือเป็นอะไรจะไม่มีใครเข้าไปช่วยเจ้าเด็ดขาดเข้าใจมั้ย?", "Images/character/gurad.png"));
 
 				dialog = 2;
 			}
 
 			if (dialogchat == 1 && dialog == 1) {
-				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาคนรู้จักที่อยู่ในหมู่บ้านข้างหน้านี้"));
-				this->chat.push_back(new ChatDialog(L"อะไรนะเจ้ามาตามหาคนงั้นเหรอ? งั้นก็ขอบอกเลยว่าโชคร้ายหน่อย"));
-				this->chat.push_back(new ChatDialog(L"เกิดเรื่องอะไรขึ้น"));
-				this->chat.push_back(new ChatDialog(L"เมื่อไม่กี่วันก่อนจู่ๆก็มีพวกโยไคปรากฏตัวที่หมู่บ้านที่อยู่ในป่าแห่งนี้และไล่ฆ่าทุกคนในหมู่บ้าน จนตอนนี้ก็ลามมาถึงป่าแห่งนี้แล้วแต่โชคยังดีที่ทางเข้าป่าแห่งนี้มีอาคมที่ช่วยไล่พวกโยไคเอาไว้อยู่"));
-				this->chat.push_back(new ChatDialog(L"ถ้าอย่างนั้นขอข้าเข้าไปดูเพื่อความแน่ใจจะได้มั้ย"));
-				this->chat.push_back(new ChatDialog(L"ไม่ได้ถึงเจ้าจะเข้าไปแต่ก็ทำอะไรไม่ได้หรอก"));
-				this->chat.push_back(new ChatDialog(L"ยังงั้นเหรอ? อะมีโยไคอยู่ข้างหลังเจ้าน่ะ"));
-				this->chat.push_back(new ChatDialog(L"ฮะ! อยู่ไหนๆ....เฮ้อ ไม่เห็นมีเลยโล่งอกไปที....ทำไมเจ้า เอะ หายไปไหนแล้ว"));
+				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาคนรู้จักที่อยู่ในหมู่บ้านข้างหน้านี้", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"อะไรนะเจ้ามาตามหาคนงั้นเหรอ? งั้นก็ขอบอกเลยว่าโชคร้ายหน่อย", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"เกิดเรื่องอะไรขึ้น", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"เมื่อไม่กี่วันก่อนจู่ๆก็มีพวกโยไคปรากฏตัวที่หมู่บ้านที่อยู่ในป่าแห่งนี้และไล่ฆ่าทุกคนในหมู่บ้าน จนตอนนี้ก็ลามมาถึงป่าแห่งนี้แล้วแต่โชคยังดีที่ทางเข้าป่าแห่งนี้มีอาคมที่ช่วยไล่พวกโยไคเอาไว้อยู่", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"ถ้าอย่างนั้นขอข้าเข้าไปดูเพื่อความแน่ใจจะได้มั้ย", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"ไม่ได้ถึงเจ้าจะเข้าไปแต่ก็ทำอะไรไม่ได้หรอก", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"ยังงั้นเหรอ? อะมีโยไคอยู่ข้างหลังเจ้าน่ะ", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"ฮะ! อยู่ไหนๆ....เฮ้อ ไม่เห็นมีเลยโล่งอกไปที....ทำไมเจ้า เอะ หายไปไหนแล้ว", "Images/character/gurad.png"));
 
 				dialog = 2;
 			}
@@ -2752,15 +2789,16 @@ public:
 				openWorldState = "Map3_3";
 				currentState = "Map3_3";
 			}
-
-			if (player->getHitboxGlobalBounds().contains(150.f, 547.f) && dialog == 2)
+			
+			cout << player->getHitboxGlobalBounds().intersects(FloatRect(150.f, 547.f, 100, 300)) << endl;
+			if (player->getHitboxGlobalBounds().intersects(FloatRect(150.f,547.f,100,300)) && dialog == 0)
 			{
 				if (dialogchat == 2) {
-					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้มันอะไรกัน ราวกับเคยพบเจอมาก่อนเลย"));
+					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้มันอะไรกัน ราวกับเคยพบเจอมาก่อนเลย", "Images/character/MC.png"));
 					dialog = 3;
 				}
-				else if (dialogchat == 1) {
-					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้ไม่ผิดแน่ต้องเป็นมันแน่นอน"));
+				if (dialogchat == 1) {
+					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้ไม่ผิดแน่ต้องเป็นมันแน่นอน", "Images/character/MC.png"));
 
 					dialog = 3;
 				}
@@ -2864,6 +2902,7 @@ class MainMenuState : public State
 	Player* player;
 	Texture backgroundTexture;
 	RectangleShape background;
+	int dialog;
 
 	map<string, Button*> buttons;
 
@@ -2899,6 +2938,7 @@ public:
 	{
 		this->initBackground();
 		this->initButtons();
+		this->dialog = 0;
 	}
 
 	~MainMenuState()
@@ -2928,15 +2968,15 @@ public:
 			}
 
 			this->player = new Player();
-			this->states->insert_or_assign("Map1_1", new GameState(this->window, this->states, this->player, 11));
-			this->states->insert_or_assign("Map1_2", new GameState(this->window, this->states, this->player, 12));
-			this->states->insert_or_assign("Map1_3", new GameState(this->window, this->states, this->player, 13));
-			this->states->insert_or_assign("Map2_1", new GameState(this->window, this->states, this->player, 21));
-			this->states->insert_or_assign("Map2_2", new GameState(this->window, this->states, this->player, 22));
-			this->states->insert_or_assign("Map2_3", new GameState(this->window, this->states, this->player, 23));
-			this->states->insert_or_assign("Map3_1", new GameState(this->window, this->states, this->player, 31));
-			this->states->insert_or_assign("Map3_2", new GameState(this->window, this->states, this->player, 32));
-			this->states->insert_or_assign("Map3_3", new GameState(this->window, this->states, this->player, 33));
+			this->states->insert_or_assign("Map1_1", new GameState(this->window, this->states, this->player, this->dialog, 11));
+			this->states->insert_or_assign("Map1_2", new GameState(this->window, this->states, this->player, this->dialog, 12));
+			this->states->insert_or_assign("Map1_3", new GameState(this->window, this->states, this->player, this->dialog, 13));
+			this->states->insert_or_assign("Map2_1", new GameState(this->window, this->states, this->player, this->dialog, 21));
+			this->states->insert_or_assign("Map2_2", new GameState(this->window, this->states, this->player, this->dialog, 22));
+			this->states->insert_or_assign("Map2_3", new GameState(this->window, this->states, this->player, this->dialog, 23));
+			this->states->insert_or_assign("Map3_1", new GameState(this->window, this->states, this->player, this->dialog, 31));
+			this->states->insert_or_assign("Map3_2", new GameState(this->window, this->states, this->player, this->dialog, 32));
+			this->states->insert_or_assign("Map3_3", new GameState(this->window, this->states, this->player, this->dialog, 33));
 			openWorldState = "Map1_1";
 			currentState = openWorldState;
 		}
