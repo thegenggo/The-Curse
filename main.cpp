@@ -1294,7 +1294,6 @@ public:
 	CollisionBox(Player& player, float x, float y, float width = 1.f, float height = 1.f)
 		:player(player)
 	{
-
 		this->shape.setSize(Vector2f(width, height));
 		this->shape.setPosition(x, y);
 	}
@@ -2237,7 +2236,7 @@ public:
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map2/map2_1.png");
 
-			this->collisions.push_back(new CollisionBox(*this->player, 480.f, 815.f, 1500.f, 1.f));
+			this->collisions.push_back(new CollisionBox(*this->player, 490.f, 815.f, 1430.f, 1.f));
 
 			this->objects.push_back(new Object("Rock", this->player, 806.f, 704.f));
 			this->objects.push_back(new Object("Rock", this->player, 1376.f, 119.f));
@@ -2404,6 +2403,22 @@ public:
 	{
 		this->updateMousePositions();
 		this->updateInput(dt);
+
+		this->player->update(dt);
+
+		for (auto& i : objects)
+		{
+			if (!i->update(dt)) break;
+		}
+
+		for (auto& i : collisions)
+		{
+			if (!i->update(dt)) break;
+		}
+
+		if (!this->chat.empty())
+			this->chat.front()->update(this->mousePosView);
+
 		if (this->gameStage == 11)
 		{
 			//RIGHT
@@ -2497,7 +2512,18 @@ public:
 		else if (this->gameStage == 13)
 		{
 			//RIGHT
-			if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			/*if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y);
+				openWorldState = "Map2_1";
+				currentState = "Map2_1";
+			}*/
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x &&
+				!(this->player->getHitboxGlobalBounds().top > 500.f && this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 650.f))
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+			}
+			else if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
 			{
 				this->player->setPosition(0.f, this->player->getPosition().y);
 				openWorldState = "Map2_1";
@@ -2532,9 +2558,20 @@ public:
 		else if (this->gameStage == 21)
 		{
 			//RIGHT
-			if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+		/*	if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
 			{
-				this->player->setPosition(0.f, this->player->getPosition().y);
+				this->player->setPosition(0.f, this->player->getPosition().y + 265.f);
+				openWorldState = "Map2_2";
+				currentState = "Map2_2";
+			}*/
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x &&
+				!(this->player->getHitboxGlobalBounds().top > 30.f && this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 1080.f))
+			{
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+			}
+			else if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
+			{
+				this->player->setPosition(0.f, this->player->getPosition().y + 265.f);
 				openWorldState = "Map2_2";
 				currentState = "Map2_2";
 			}
@@ -2568,9 +2605,9 @@ public:
 			}
 
 			//LEFT
-			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 0.f)
+			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().left < 0.f)
 			{
-				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y);
+				this->player->setPosition(this->window->getView().getSize().x - this->player->getHitboxGlobalBounds().width, this->player->getPosition().y - 265.f);
 				openWorldState = "Map2_1";
 				currentState = "Map2_1";
 			}
@@ -2583,7 +2620,7 @@ public:
 
 			//UP
 			if (this->player->getHitboxGlobalBounds().top < 0.f &&
-				!(this->player->getHitboxGlobalBounds().left > 955.f && this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 1065.f))
+				!(this->player->getHitboxGlobalBounds().left > 955.f && this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 1090.f))
 			{
 				this->player->setPosition(this->player->getPosition().x, 0.f);
 			}
@@ -2612,15 +2649,15 @@ public:
 
 			//DOWN
 			if (this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height > this->window->getView().getSize().y &&
-				!(this->player->getHitboxGlobalBounds().left > 955.f && this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 1065.f))
+				!(this->player->getHitboxGlobalBounds().left > 955.f && this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width < 1090.f))
 			{
 				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
 			}
 			else if (this->player->getHitboxGlobalBounds().top > this->window->getView().getSize().y)
 			{
 				this->player->setPosition(this->player->getPosition().x, 0.f);
-				openWorldState = "Map3_1";
-				currentState = "Map3_1";
+				openWorldState = "Map2_2";
+				currentState = "Map2_2";
 			}
 
 			//UP
@@ -2718,22 +2755,6 @@ public:
 			}
 
 		}
-
-		this->player->update(dt);
-
-		for (auto& i : objects)
-		{
-			if (!i->update(dt)) break;
-		}
-
-		for (auto& i : collisions)
-		{
-			if (!i->update(dt)) break;
-		}
-
-
-		if (!this->chat.empty())
-			this->chat.front()->update(this->mousePosView);
 	}
 
 	void render(RenderTarget* target = NULL)
