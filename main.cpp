@@ -174,10 +174,10 @@ public:
 		:dialoglog(dialoglog), chat(chat)
 	{
 		this->choice1 = new Button(835, 500, 250, 50, choice1, 50,
-			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+			Color(70, 70, 70, 200), Color(120, 120, 120, 0), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 		this->choice2 = new Button(835, 600, 250, 50, choice2, 50,
-			Color(70, 70, 70, 200), Color(250, 250, 250, 250), Color(20, 20, 20, 50),
+			Color(70, 70, 70, 200), Color(120, 120, 120, 0), Color(20, 20, 20, 50),
 			Color(70, 70, 70, 0), Color(150, 150, 150, 0), Color(20, 20, 20, 0));
 		this->shape.setSize(Vector2f(1900, 200));
 		this->text.setCharacterSize(30);
@@ -210,7 +210,7 @@ public:
 		}
 		if (this->choice2 != NULL)
 		{
-			this->choice1->updateEvent(event, mousePos);
+			this->choice2->updateEvent(event, mousePos);
 		}
 	}
 
@@ -2430,6 +2430,20 @@ public:
 				this->chat.push_back(new ChatDialog(L"ทำไมเจ้าถึงได้ดื้อดึงที่จะเข้าไปถึงขนาดนั้นกัน?"));
 				this->chat.push_back(new ChatDialog(L"เพราะถ้าข้าไม่รีบจัดการเกี่ยวกับคำสาปละก็ นางคง...."));
 				this->chat.push_back(new ChatDialog(L"เฮ้อ...ก็ได้ข้าจะปล่อยให้เจ้าเข้าไปแต่ขอบอกเอาไว้ก่อนนะ ถ้าเจ้าตายหรือเป็นอะไรจะไม่มีใครเข้าไปช่วยเจ้าเด็ดขาดเข้าใจมั้ย?"));
+
+				dialog = 2;
+			}
+
+			if (dialogchat == 1 && dialog == 1) {
+				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาคนรู้จักที่อยู่ในหมู่บ้านข้างหน้านี้"));
+				this->chat.push_back(new ChatDialog(L"อะไรนะเจ้ามาตามหาคนงั้นเหรอ? งั้นก็ขอบอกเลยว่าโชคร้ายหน่อย"));
+				this->chat.push_back(new ChatDialog(L"เกิดเรื่องอะไรขึ้น"));
+				this->chat.push_back(new ChatDialog(L"เมื่อไม่กี่วันก่อนจู่ๆก็มีพวกโยไคปรากฏตัวที่หมู่บ้านที่อยู่ในป่าแห่งนี้และไล่ฆ่าทุกคนในหมู่บ้าน จนตอนนี้ก็ลามมาถึงป่าแห่งนี้แล้วแต่โชคยังดีที่ทางเข้าป่าแห่งนี้มีอาคมที่ช่วยไล่พวกโยไคเอาไว้อยู่"));
+				this->chat.push_back(new ChatDialog(L"ถ้าอย่างนั้นขอข้าเข้าไปดูเพื่อความแน่ใจจะได้มั้ย"));
+				this->chat.push_back(new ChatDialog(L"ไม่ได้ถึงเจ้าจะเข้าไปแต่ก็ทำอะไรไม่ได้หรอก"));
+				this->chat.push_back(new ChatDialog(L"ยังงั้นเหรอ? อะมีโยไคอยู่ข้างหลังเจ้าน่ะ"));
+				this->chat.push_back(new ChatDialog(L"ฮะ! อยู่ไหนๆ....เฮ้อ ไม่เห็นมีเลยโล่งอกไปที....ทำไมเจ้า เอะ หายไปไหนแล้ว"));
+
 				dialog = 2;
 			}
 		}
@@ -2621,6 +2635,19 @@ public:
 				this->player->setPosition(this->player->getPosition().x, this->window->getView().getSize().y - this->player->getHitboxGlobalBounds().height);
 				openWorldState = "Map3_3";
 				currentState = "Map3_3";
+			}
+
+			if (player->getHitboxGlobalBounds().contains(150.f, 547.f) && dialog == 2)
+			{
+				if (dialogchat == 2) {
+					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้มันอะไรกัน ราวกับเคยพบเจอมาก่อนเลย"));
+					dialog = 3;
+				}
+				else if (dialogchat == 1) {
+					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้ไม่ผิดแน่ต้องเป็นมันแน่นอน"));
+
+					dialog = 3;
+				}
 			}
 		}
 		else if (this->gameStage == 32)
