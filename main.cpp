@@ -40,6 +40,18 @@ class Button
 	bool pressed;
 
 public:
+	//Accessors
+	const bool& isPressed() const
+	{
+		return pressed;
+	}
+
+	const bool& isHovered() const
+	{
+		if (this->buttonState == button_states::BTN_HOVER) return true;
+		return false;
+	}
+
 
 	Button(float x, float y, float width, float height, string text, unsigned character_size, Color text_idle_color, Color text_hover_color, Color text_active_color,
 		Color idle_color, Color hover_color, Color active_color)
@@ -69,19 +81,7 @@ public:
 		this->pressed = false;
 	}
 
-	//Accessors
-	const bool isPressed() const
-	{
-		return pressed;
-	}
-
-	const bool isHovered() const
-	{
-		if (this->buttonState == button_states::BTN_HOVER) return true;
-		return false;
-	}
-
-	//check click
+	//Check click
 	void updateEvent(const Event& event, const Vector2f mousePos)
 	{
 		if (event.type == Event::MouseButtonPressed)
@@ -93,8 +93,6 @@ public:
 	//Functions
 	void update(const Vector2f& mousePos)
 	{
-		//Update the booleans for hover and pressed
-
 		//Idle
 		this->buttonState = button_states::BTN_IDLE;
 
@@ -146,14 +144,20 @@ class ChatDialog
 {
 	RectangleShape shape;
 	Text text;
-	Button* choice1;
-	Button* choice2;
-	int* dialoglog;
-	list<ChatDialog*>* chat;
 	Sprite sprite;
 	Texture texture;
+	Button* choice1;
+	Button* choice2;
+	list<ChatDialog*>* chat;
+	int* dialoglog; 
 
 public:
+	const bool& haveButton() const
+	{
+		if (this->choice1) return true;
+		else return false;
+	}
+
 	ChatDialog(wstring text, string fileloc)
 	{
 		this->chat = NULL;
@@ -219,18 +223,12 @@ public:
 		this->shape.setOutlineColor(Color::Black);
 		this->shape.setPosition(960, 980);
 		this->text.setPosition(30, 900);
-
 	}
 
 	~ChatDialog()
 	{
-
-	}
-
-	const bool haveButton() const
-	{
-		if (this->choice1) return true;
-		else return false;
+		delete choice1;
+		delete choice2;
 	}
 
 	void updateEvent(const Event& event, const Vector2f& mousePos)
@@ -283,9 +281,9 @@ class ShowText
 	float time;
 
 public:
-	const bool isEnd() const
+	const bool& isEnd() const
 	{
-		if (time > 2.f)
+		if (this->time > 2.f)
 			return true;
 		return false;
 	}
@@ -363,19 +361,11 @@ class HitboxComponent
 	//Variables
 	Sprite& sprite;
 	RectangleShape hitbox;
+
 	float offsetX;
 	float offsetY;
 
 public:
-	//Constructor / Destructor
-	HitboxComponent(Sprite& sprite, float offset_x, float offset_y, float width, float height)
-		:sprite(sprite), offsetX(offset_x), offsetY(offset_y)
-	{
-		this->hitbox.setPosition(this->sprite.getPosition().x + offset_x, this->sprite.getPosition().y + offset_y);
-		this->hitbox.setSize(Vector2f(width, height));
-		this->hitbox.setFillColor(Color::White);
-	}
-
 	//Accessors
 	const FloatRect& getGlobalBounds() const
 	{
@@ -387,12 +377,21 @@ public:
 		return this->hitbox;
 	}
 
-	//Functions
-	const bool& checkIntersect(const FloatRect& frect) const
+	const bool& intersects(const FloatRect& frect) const
 	{
 		return this->hitbox.getGlobalBounds().intersects(frect);
 	}
 
+	//Constructor / Destructor
+	HitboxComponent(Sprite& sprite, float offset_x, float offset_y, float width, float height)
+		:sprite(sprite), offsetX(offset_x), offsetY(offset_y)
+	{
+		this->hitbox.setPosition(this->sprite.getPosition().x + offset_x, this->sprite.getPosition().y + offset_y);
+		this->hitbox.setSize(Vector2f(width, height));
+		this->hitbox.setFillColor(Color::White);
+	}
+
+	//Functions
 	void update()
 	{
 		this->hitbox.setPosition(this->sprite.getPosition().x + this->offsetX, this->sprite.getPosition().y + this->offsetY);
@@ -411,20 +410,13 @@ class MovementComponent
 	//Variables
 	Sprite& sprite;
 	Vector2f velocity;
-
-	float maxVelocity;
 	movementState state;
 
+	float maxVelocity;
+
 public:
-	//Constructor / Destructor
-	MovementComponent(Sprite& sprite, float maxVelocity)
-		: sprite(sprite), velocity(Vector2f(0, 0)), maxVelocity(maxVelocity), state(movementState::IDLE)
-	{
-
-	}
-
 	//Accessors
-	const movementState getMovementState() const
+	const movementState& getMovementState() const
 	{
 		return this->state;
 	}
@@ -434,7 +426,7 @@ public:
 		return this->velocity;
 	}
 
-	const int getState() const
+	const int& getState() const
 	{
 		if (this->velocity.x == 0.f && this->velocity.y == 0.f)
 			switch (state)
@@ -466,7 +458,19 @@ public:
 		return 0;
 	}
 
+	//Constructor / Destructor
+	MovementComponent(Sprite& sprite, float maxVelocity)
+		: sprite(sprite), velocity(Vector2f(0, 0)), maxVelocity(maxVelocity), state(movementState::IDLE)
+	{
+
+	}
+
 	//Functions
+	void move(const float dir_x, const float dir_y, const float& dt)
+	{
+		this->velocity = Vector2f(dir_x * dt, dir_y * dt);
+	}
+
 	void update()
 	{
 		this->sprite.move(this->velocity.x * this->maxVelocity, this->velocity.y * this->maxVelocity);
@@ -480,15 +484,6 @@ public:
 			this->state = movementState::MOVING_RIGHT;
 	}
 
-	void test()
-	{
-		this->sprite.move(-this->velocity.x * this->maxVelocity, -this->velocity.y * this->maxVelocity);
-	}
-
-	void move(const float dir_x, const float dir_y, const float& dt)
-	{
-		this->velocity = Vector2f(dir_x * dt, dir_y * dt);
-	}
 };
 
 class AnimationComponent
@@ -499,15 +494,15 @@ public:
 		//Variables
 		Sprite& sprite;
 		Texture& textureSheet;
+		vector<IntRect> rect;
+
 		float animationTimer;
 		float timer;
 		int width;
 		int height;
 		bool end;
-		vector<IntRect> rect;
 
 	public:
-
 		Animation(Sprite& sprite, Texture& textureSheet, float animation_timer, int start_frame_x, int start_frame_y, int frames_x, int frames_y, int width, int height)
 			: sprite(sprite), textureSheet(textureSheet), animationTimer(animation_timer / (frames_x + 1 - start_frame_x)), width(width), height(height)
 		{
@@ -531,21 +526,15 @@ public:
 			if (n > 0) sprite.setTextureRect(rect[int(this->timer)]);
 		}
 
-		//Accessors
-		bool isEnd()
-		{
-			return this->end;
-		}
-
 		void reset()
 		{
 			this->timer = 0.f;
 		}
 	};
 	//Variables
-	map<string, Animation* > animations;
 	Sprite& sprite;
 	Texture& textureSheet;
+	map<string, Animation* > animations;
 
 	//Constructor / Destructor
 	AnimationComponent(Sprite& sprite, Texture& texture_sheet)
@@ -554,7 +543,7 @@ public:
 
 	}
 
-	virtual ~AnimationComponent()
+	~AnimationComponent()
 	{
 		for (auto& i : this->animations)
 		{
@@ -578,11 +567,6 @@ public:
 		this->animations[key]->play(dt);
 	}
 
-	bool isEnd(const string key)
-	{
-		return this->animations[key]->isEnd();
-	}
-
 	void reset()
 	{
 		for (auto& i : this->animations)
@@ -598,6 +582,7 @@ protected:
 	Texture texture;
 	string name;
 	vector<ShowText*> showText;
+
 	int lvl;
 	int hp;
 	int max_hp;
@@ -608,26 +593,6 @@ protected:
 
 	AnimationComponent* animationComponent;
 public:
-	//Variables
-
-	//Initilizer functions
-	virtual void initVariables()
-	{
-		this->time = 0.f;
-	}
-
-	//Constructor / Destructor
-	Entity()
-	{
-		this->initVariables();
-		this->createAnimationComponent(this->texture);
-	}
-
-	virtual ~Entity()
-	{
-		delete this->animationComponent;
-	}
-
 	//Accessors
 	virtual const Vector2f& getPosition() const
 	{
@@ -639,29 +604,46 @@ public:
 		return FloatRect();
 	}
 
-	//Component functions
+	//Constructor / Destructor
+	Entity()
+	{
+		this->animationComponent = NULL;
 
+		this->lvl = 0;
+		this->hp = 0;
+		this->max_hp = 0;
+		this->att = 0;
+		this->def = 0;
+		this->time = 0.f;
+	}
+
+	virtual ~Entity()
+	{
+		delete this->animationComponent;
+	}
+
+	//Component functions
 	void setTexture(Texture& texture)
 	{
 		this->texture = texture;
 	}
 
+	//Functions
 	virtual void createAnimationComponent(Texture& texture_sheet)
 	{
 
 	}
 
-	//Functions
 	virtual void showTextPushBack(int dmg)
 	{
-		showText.push_back(new ShowText(Vector2f(this->getPosition().x + this->getGlobalBounds().width / 2, this->getPosition().y), dmg));
+		this->showText.push_back(new ShowText(Vector2f(this->getPosition().x + this->getGlobalBounds().width / 2, this->getPosition().y), dmg));
 	}
 
-	void attack(Entity& opp) {
+	virtual void attack(Entity& opp) {
 		opp.beAttacked(att + rand() % 10);
 	}
 
-	void beAttacked(int oppatk) {
+	virtual void beAttacked(int oppatk) {
 		int dmg = 0;
 		if (oppatk > this->def) {
 			dmg = oppatk - this->def;
@@ -687,7 +669,7 @@ public:
 
 	virtual void showTextRender(RenderTarget& target)
 	{
-		for (auto& i : showText)
+		for (auto& i : this->showText)
 		{
 			i->render(target);
 		}
@@ -871,7 +853,7 @@ public:
 
 	void showTextPushBack(int dmg)
 	{
-		showText.push_back(new ShowText(Vector2f(this->getPosition().x + this->getGlobalBounds().width / 2, this->getPosition().y - 50.f), dmg));
+		this->showText.push_back(new ShowText(Vector2f(this->getGlobalBounds().left + this->getGlobalBounds().width / 2, this->getGlobalBounds().top - 50.f), dmg));
 	}
 
 	void updateEvent(const Event& event, const Vector2f mousePos)
@@ -903,16 +885,16 @@ class TargetCursor
 	Texture texture;
 
 public:
-	void setPosition(Enemy* enemy)
-	{
-		this->sprite.setPosition(enemy->getPosition().x + enemy->getGlobalBounds().width / 2 - this->sprite.getGlobalBounds().width / 2, enemy->getPosition().y - 150.f);
-	}
-
 	TargetCursor()
 	{
 		this->texture.loadFromFile("Images/targetcursor.png");
 		this->sprite.setTexture(this->texture);
 		this->sprite.setPosition(0.f, 0.f);
+	}
+
+	void setPosition(Enemy* enemy)
+	{
+		this->sprite.setPosition(enemy->getPosition().x + enemy->getGlobalBounds().width / 2 - this->sprite.getGlobalBounds().width / 2, enemy->getPosition().y - 150.f);
 	}
 
 	void render(RenderTarget& target)
@@ -933,6 +915,7 @@ class Player : public Entity
 
 	Bar* hpBar;
 	Bar* staminaBar;
+
 	bool mode; // 0 = OpenWorld, 1 = Battle
 	bool rendered;
 
@@ -960,17 +943,12 @@ class Player : public Entity
 
 public:
 	//Accessors
-	Sprite& getSprite()
-	{
-		return this->openWorldSprite;
-	}
-
-	const Vector2f getVelocity() const
+	const Vector2f& getVelocity() const
 	{
 		return this->movementComponent->getVelocity();
 	}
 
-	const movementState getMovementState() const
+	const movementState& getMovementState() const
 	{
 		return this->movementComponent->getMovementState();
 	}
@@ -982,9 +960,9 @@ public:
 			return this->openWorldSprite.getGlobalBounds();
 	}
 
-	const bool& isRendered() const
+	const FloatRect& getHitboxGlobalBounds() const
 	{
-		return this->rendered;
+		return this->hitboxComponent->getGlobalBounds();
 	}
 
 	const Vector2f& getPosition() const
@@ -994,15 +972,20 @@ public:
 			return this->openWorldSprite.getPosition();
 	}
 
-	const FloatRect& getHitboxGlobalBounds() const
-	{
-		return this->hitboxComponent->getGlobalBounds();
-	}
-
 	const bool& isdead() const
 	{
 		if (this->hp <= 0) return true;
 		return false;
+	}
+
+	const bool& isRendered() const
+	{
+		return this->rendered;
+	}
+
+	const bool& intersects(const FloatRect& frect) const
+	{
+		return this->hitboxComponent->intersects(frect);
 	}
 
 	//Constructor / Destructor
@@ -1089,11 +1072,6 @@ public:
 	}
 
 	//Component functions
-	virtual void test(const float& dt)
-	{
-		this->movementComponent->test();
-	}
-
 	virtual void setScale(const float x, const float y)
 	{
 		this->openWorldSprite.setScale(x, y);
@@ -1123,12 +1101,22 @@ public:
 	}
 
 	//Functions
-	void showTextPushBack(int dmg, Color color = Color::Red)
-	{
-		showText.push_back(new ShowText(Vector2f(this->getPosition().x + this->getSpriteGlobalBounds().width / 2.f, this->getPosition().y), dmg, color));
+	void beAttacked(int oppatk) {
+		int dmg = 0;
+		if (oppatk > this->def) {
+			dmg = oppatk - this->def;
+		}
+		this->hp -= dmg;
+		if (this->hp <= 0) this->hp = 0;
+		this->showTextPushBack(dmg);
 	}
 
-	virtual void move(const float dir_x, const float dir_y, const float& dt)
+	void showTextPushBack(int dmg, Color color = Color::Red)
+	{
+		this->showText.push_back(new ShowText(Vector2f(this->getSpriteGlobalBounds().left + this->getSpriteGlobalBounds().width / 2.f, this->getSpriteGlobalBounds().top), dmg, color));
+	}
+
+	void move(const float dir_x, const float dir_y, const float& dt)
 	{
 		if (this->movementComponent)
 		{
@@ -1155,11 +1143,11 @@ public:
 		this->current_exp += exp;
 	}
 
-	bool useSkill1(vector<Enemy*>& enemies, vector<ShowText*>& showDamages)
+	bool useSkill1(vector<Enemy*>& enemies)
 	{
-		if (stamina >= 30)
+		if (this->stamina >= 30)
 		{
-			stamina -= 30;
+			this->stamina -= 30;
 			for (auto& i : enemies)
 			{
 				i->beAttacked(att / 2);
@@ -1168,23 +1156,23 @@ public:
 		}
 		else
 		{
-			showText.push_back(new ShowText(this->getPosition(), "Mp is not enough"));
+			this->showText.push_back(new ShowText(this->getPosition(), "Mp is not enough"));
 			return false;
 		}
 		return false;
 	}
 
-	bool useSkill2(Enemy*& enemy, vector<ShowText*>& showDamages)
+	bool useSkill2(Enemy*& enemy)
 	{
-		if (stamina >= 30)
+		if (this->stamina >= 30)
 		{
-			stamina -= 30;
+			this->stamina -= 30;
 			enemy->beAttacked(att * 2);
 			return true;
 		}
 		else
 		{
-			showText.push_back(new ShowText(this->getPosition(), "Mp is not enough"));
+			this->showText.push_back(new ShowText(this->getPosition(), "Mp is not enough"));
 			return false;
 		}
 	}
@@ -1274,10 +1262,15 @@ public:
 
 	void update(const float& dt)
 	{
+		if (currentState == "Battle") this->mode = true;
+		else this->mode = false;
+
 		if (!mode) this->openWorldUpdate(dt);
 		else this->battleUpdate(dt);
+
 		if (this->current_exp >= this->max_exp)
 			this->levelUp();
+
 		this->showTextUpdate(dt);
 	}
 
@@ -1305,6 +1298,7 @@ public:
 	{
 		if (!mode) this->openWorldRender(target);
 		else this->battleRender(target);
+
 		this->showTextRender(target);
 	}
 };
@@ -1312,8 +1306,8 @@ public:
 class CollisionBox
 {
 	//Variables
-	RectangleShape shape;
 	Player& player;
+	RectangleShape shape;
 
 public:
 	//Accessors
@@ -1342,23 +1336,19 @@ public:
 		{
 			if (this->player.getVelocity().y < 0)
 			{
-				//this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height);
-				this->player.getSprite().move(0, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height - this->player.getHitboxGlobalBounds().top);
+				this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top + this->shape.getGlobalBounds().height);
 			}
 			if (this->player.getVelocity().x < 0)
 			{
-				//this->player.setPosition(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width, this->player.getPosition().y);
-				this->player.getSprite().move(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width - this->player.getHitboxGlobalBounds().left, 0);
+				this->player.setPosition(this->shape.getGlobalBounds().left + this->shape.getGlobalBounds().width, this->player.getPosition().y);
 			}
 			if (this->player.getVelocity().y > 0)
 			{
-				//this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top - this->player.getHitboxGlobalBounds().height);
-				this->player.getSprite().move(0, this->shape.getGlobalBounds().top - (this->player.getHitboxGlobalBounds().top + this->player.getHitboxGlobalBounds().height));
+				this->player.setPosition(this->player.getPosition().x, this->shape.getGlobalBounds().top - this->player.getHitboxGlobalBounds().height);
 			}
 			if (this->player.getVelocity().x > 0)
 			{
-				//this->player.setPosition(this->shape.getGlobalBounds().left - this->player.getHitboxGlobalBounds().width, this->player.getPosition().y);
-				this->player.getSprite().move(this->shape.getGlobalBounds().left - (this->player.getHitboxGlobalBounds().left + this->player.getHitboxGlobalBounds().width), 0);
+				this->player.setPosition(this->shape.getGlobalBounds().left - this->player.getHitboxGlobalBounds().width, this->player.getPosition().y);
 			}
 			return false;
 		}
@@ -1375,19 +1365,21 @@ class State
 {
 protected:
 	//Variables
-	RenderWindow* window;
-	map<string, State*>* states;
-	map<string, int> keybinds;
-	bool quit;
-
 	Vector2i mousePosScreen;
 	Vector2i mousePosWindow;
 	Vector2f mousePosView;
 
-	//Resources
-	map<string, Texture> textures;
+	RenderWindow* window;
+	map<string, State*>* states;
+
+	bool quit;
 
 public:
+	//Accessors
+	const bool& getQuit() const
+	{
+		return this->quit;
+	}
 
 	//Constructor / Destructor
 	State(RenderWindow* window, map<string, State*>* states)
@@ -1400,12 +1392,6 @@ public:
 	virtual ~State()
 	{
 
-	}
-
-	//Accessors
-	const bool& getQuit() const
-	{
-		return this->quit;
 	}
 
 	//Functions
@@ -1448,20 +1434,21 @@ class ImageButton
 {
 	Texture texture;
 	Sprite sprite;
+
 	bool pressed;
 
 public:
+	const bool& isPressed() const
+	{
+		return this->pressed;
+	}
+
 	ImageButton(float x, float y, string textureLocation)
 	{
 		this->pressed = false;
 		this->texture.loadFromFile(textureLocation);
 		this->sprite.setTexture(this->texture);
 		this->sprite.setPosition(x, y);
-	}
-
-	bool isPressed()
-	{
-		return pressed;
 	}
 
 	void updateEvent(const Event& event, const Vector2f mousePos)
@@ -1490,23 +1477,19 @@ class BattleState : public State
 	Texture skillDetailTexture;
 	Texture itemDetailTexture;
 
-	//target cursor
-	Entity* targetentity;
-
 	//button
 	map<string, ImageButton*> Mainbuttons;
 	map<string, Button*> Itembuttons, Skillbuttons;
 	map<string, Button*> detailButtons;
 
 	//entity player&ene
-	Player* player;
 	Sprite skillDetail;
 	Sprite itemDetail;
+	vector<Enemy*> enemy;
+	Player* player;
 	Enemy* target;
 	TargetCursor* targetCursor;
 	ShowText* clear;
-	vector<Enemy*> enemy;
-	vector<ShowText*> showDamages;
 
 	//item window
 	bool isItemWindowActive;
@@ -1525,6 +1508,8 @@ public:
 			this->bgtexture.loadFromFile("Images/battle_scene/map1.png");
 		else if (this->battleStage == 2)
 			this->bgtexture.loadFromFile("Images/battle_scene/map2.png");
+		else if (this->battleStage == 3)
+			this->bgtexture.loadFromFile("Images/battle_scene/map3.png");
 
 		this->background.setSize(Vector2f(this->window->getView().getSize()));
 		this->background.setTexture(&this->bgtexture);
@@ -1601,6 +1586,29 @@ public:
 			{
 				return false;
 			}
+		else
+			if (this->stage == 1)
+			{
+				this->enemy.push_back(new Enemy("Karakasa", 400, 200));
+				this->enemy.push_back(new Enemy("Karakasa", 600, 400));
+				this->enemy.push_back(new Enemy("Karakasa", 300, 500));
+				return true;
+			}
+			else if (this->stage == 2)
+			{
+				this->enemy.push_back(new Enemy("Hitotsume", 400, 200));
+				this->enemy.push_back(new Enemy("Hitotsume", 150, 350));
+				return true;
+			}
+			else if (this->stage == 3)
+			{
+				this->enemy.push_back(new Enemy("Boss Oni", 300, 200));
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 	}
 
 	void deleteButtons()
@@ -1645,7 +1653,7 @@ public:
 		this->itemDetail.setTexture(this->itemDetailTexture);
 	}
 
-	virtual ~BattleState()
+	~BattleState()
 	{
 		this->deleteButtons();
 		for (auto& it : enemy)
@@ -1663,6 +1671,14 @@ public:
 			this->clear = new ShowText(Vector2f(960.f, 540.f), "Stage Clear", 300, Color::White);
 		else if (!this->clear && x == 0)
 			this->clear = new ShowText(Vector2f(960.f, 540.f), "Run!!!", 250, Color::White);
+	}
+
+	void enemyTurn()
+	{
+		for (auto& i : enemy)
+		{
+			i->attack(*this->player);
+		}
 	}
 
 	void updateButtons()
@@ -1686,13 +1702,13 @@ public:
 
 			if (this->Skillbuttons["SKILL1"]->isPressed() && this->clear == nullptr)
 			{
-				if (this->player->useSkill1(this->enemy, this->showDamages))
+				if (this->player->useSkill1(this->enemy))
 					this->isPlayerturn = false;
 			}
 
 			if (this->Skillbuttons["SKILL2"]->isPressed() && this->clear == nullptr)
 			{
-				if (this->player->useSkill2(this->target, this->showDamages))
+				if (this->player->useSkill2(this->target))
 					this->isPlayerturn = false;
 			}
 
@@ -1769,15 +1785,6 @@ public:
 
 	}
 
-	void enemyTurn()
-	{
-		for (auto& i : enemy)
-		{
-			i->attack(*this->player);
-		}
-
-	}
-
 	void updateTarget()
 	{
 		for (auto& i : enemy)
@@ -1828,20 +1835,6 @@ public:
 				this->target = NULL;
 				it--;
 			}
-		}
-
-		for (auto it = this->showDamages.begin(); it != this->showDamages.end(); it++)
-		{
-			if ((*it)->isEnd())
-			{
-				this->showDamages.erase(it);
-				it--;
-			}
-		}
-
-		for (auto& i : showDamages)
-		{
-			i->update(dt);
 		}
 
 		if (!this->isPlayerturn)
@@ -1954,9 +1947,9 @@ class Object
 protected:
 	string name;
 	Texture texture;
+	Sprite sprite;
 	CollisionBox* collisionBox;
 	Player* player;
-	Sprite sprite;
 
 public:
 	const float& getObjectPosition() const
@@ -2008,19 +2001,19 @@ public:
 		{
 			this->texture.loadFromFile("Images/map/house1.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 37.f, 30.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX + 15.f, positionY + 190.f , 350.f, 130.f);
 		}
 		else if (this->name == "House2")
 		{
 			this->texture.loadFromFile("Images/map/house2.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 37.f, 30.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX + 15.f, positionY + 190.f, 350.f, 130.f);
 		}
 		else if (this->name == "House3")
 		{
 			this->texture.loadFromFile("Images/map/house3.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 37.f, 30.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY + 120.f, 540.f, 140.f);
 		}
 		else if (this->name == "Fence1")
 		{
@@ -2045,6 +2038,7 @@ public:
 
 	~Object()
 	{
+		delete this->collisionBox;
 	}
 
 	virtual bool update(const float& dt)
@@ -2080,19 +2074,18 @@ void sortObject(vector<Object*>& objects)
 class GameState : public State
 {
 	//Variables
-	Player* player;
 	Texture backgroundTexture;
-	/*Texture environmentTexture;*/
 	RectangleShape background;
 	Sprite environment;
 	vector<Object*> objects;
 	vector<CollisionBox*> collisions;
 	string textline;
 	list<ChatDialog*> chat;
+	Player* player;
 
+	int& dialogchat;
 	int gameStage;
 	int dialog;
-	int& dialogchat;
 
 public:
 	//Initilizer functions
@@ -2106,7 +2099,7 @@ public:
 		if (this->gameStage == 11)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map1/map1_1.png");
-			/*this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");*/
+
 			this->objects.push_back(new Object("Tree1", this->player, 704.f, -172.f));
 			this->objects.push_back(new Object("Tree1", this->player, 948.f, -5.f));
 			this->objects.push_back(new Object("Tree1", this->player, 927.f, -163.f));
@@ -2154,12 +2147,13 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 309.f, 379.f));
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
+
 			this->chat.push_back(new ChatDialog(L"ชายหนุ่มได้ออกเดินทางตามหาต้นตอของคำสาปที่ทำให้หญิงผู้ที่เป็นที่รักต้องทนทุกข์ทรมาร จนมาถึงป่าแห่งหนึ่งที่เต็มไปด้วยกลิ่นอายอันชั่วร้าย"));
 		}
 		else if (this->gameStage == 12)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map1/map1_2.png");
-			/*this->environmentTexture.loadFromFile("Images/map/map1/map1_1obj.png");*/
+
 			this->collisions.push_back(new CollisionBox(*this->player, 1434.f, 584.f, 1.f, 358.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 1634.f, 589.f, 1.f, 353.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 610.f, 0.f, 1.f, 310.f));
@@ -2219,7 +2213,6 @@ public:
 			this->objects.push_back(new Object("Tree3", this->player, 1225.f, 15.f));
 			this->objects.push_back(new Object("Tree3", this->player, 712.f, 853.f));
 			this->objects.push_back(new Object("Tree3", this->player, 1010.f, 330.f));
-
 		}
 		else if (this->gameStage == 13)
 		{
@@ -2267,7 +2260,6 @@ public:
 			this->objects.push_back(new Object("Tree3", this->player, 793.f, 79.f));
 			this->objects.push_back(new Object("Tree3", this->player, 996.f, 769.f));
 			this->objects.push_back(new Object("Tree3", this->player, 58.f, 1023.f));
-
 		}
 		else if (this->gameStage == 21)
 		{
@@ -2397,45 +2389,45 @@ public:
 			this->collisions.push_back(new CollisionBox(*this->player, 370.f, 950.f, 50.f, 50.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 430.f, 965.f, 1490.f, 1.f));
 
-			this->objects.push_back(new Object("Rock", this->player, 191.f, 69.f))
-			this->objects.push_back(new Object("Rock", this->player, 1428.f, 90.f))
-			this->objects.push_back(new Object("Rock", this->player, 1821.f, 280.f))
-			this->objects.push_back(new Object("Rock", this->player, 6322.f, 868.f))
-			this->objects.push_back(new Object("Rock2", this->player, 1272.f, 868.f))
-			this->objects.push_back(new Object("Rock2", this->player, 75.f, 688.f))
-			this->objects.push_back(new Object("Rock2", this->player, 1714.f, 852.f))
-			this->objects.push_back(new Object("Rock2", this->player, 1116.f, 652.f))
-			this->objects.push_back(new Object("Tree1", this->player, 296.f, -90.f))
-			this->objects.push_back(new Object("Tree1", this->player, 16.f, -90.f))
-			this->objects.push_back(new Object("Tree1", this->player, 1514.f, -126.f))
-			this->objects.push_back(new Object("Tree2", this->player, 595.f, -69.f))
-			this->objects.push_back(new Object("Tree2", this->player, 1192.f, -84.f))
-			this->objects.push_back(new Object("House1", this->player, 18.f, 117.f))
-			this->objects.push_back(new Object("House1", this->player, 409.f, 117.f))
-			this->objects.push_back(new Object("House2", this->player, 246.f, 540.f))
-			this->objects.push_back(new Object("House2", this->player, 744.f, 540.f))
-			this->objects.push_back(new Object("House3", this->player, 1229.f, 567.f))
-			this->objects.push_back(new Object("House3", this->player, 1229.f, 144.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 0.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 55.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 110.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 165.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 220.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 275.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 330.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 0.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 55.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 110.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 165.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 220.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 275.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 330.f))
-			this->objects.push_back(new Object("Fence2", this->player, 0.f, 776.f))
-			this->objects.push_back(new Object("Fence2", this->player, 56.f, 776.f))
-			this->objects.push_back(new Object("Fence2", this->player, 112.f, 776.f))
-			this->objects.push_back(new Object("Fence2", this->player, 168.f, 776.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1776.f, 776.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1832.f, 776.f))
+			this->objects.push_back(new Object("Rock", this->player, 191.f, 69.f));
+			this->objects.push_back(new Object("Rock", this->player, 1428.f, 90.f));
+			this->objects.push_back(new Object("Rock", this->player, 1821.f, 280.f));
+			this->objects.push_back(new Object("Rock", this->player, 6322.f, 868.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1272.f, 868.f));
+			this->objects.push_back(new Object("Rock2", this->player, 75.f, 688.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1714.f, 852.f));
+			this->objects.push_back(new Object("Rock2", this->player, 1116.f, 652.f));
+			this->objects.push_back(new Object("Tree1", this->player, 296.f, -90.f));
+			this->objects.push_back(new Object("Tree1", this->player, 16.f, -90.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1514.f, -126.f));
+			this->objects.push_back(new Object("Tree2", this->player, 595.f, -69.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1192.f, -84.f));
+			this->objects.push_back(new Object("House1", this->player, 18.f, 117.f));
+			this->objects.push_back(new Object("House1", this->player, 409.f, 117.f));
+			this->objects.push_back(new Object("House2", this->player, 246.f, 540.f));
+			this->objects.push_back(new Object("House2", this->player, 744.f, 540.f));
+			this->objects.push_back(new Object("House3", this->player, 1229.f, 567.f));
+			this->objects.push_back(new Object("House3", this->player, 1229.f, 144.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 0.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 55.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 110.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 165.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 220.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 275.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 330.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 0.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 55.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 110.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 165.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 220.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 275.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 330.f));
+			this->objects.push_back(new Object("Fence2", this->player, 0.f, 776.f));
+			this->objects.push_back(new Object("Fence2", this->player, 56.f, 776.f));
+			this->objects.push_back(new Object("Fence2", this->player, 112.f, 776.f));
+			this->objects.push_back(new Object("Fence2", this->player, 168.f, 776.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1776.f, 776.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1832.f, 776.f));
 		}
 		else if (this->gameStage == 32)
 		{
@@ -2446,17 +2438,15 @@ public:
 			this->collisions.push_back(new CollisionBox(*this->player, 130.f, 1000.f, 50.f, 50.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 190.f, 1025.f, 15.f, 50.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 215.f, 1035.f, 1705.f, 1.f));
-
 		}
 		else if (this->gameStage == 33)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map3/map3_3.png");
 		}
 
+		sortObject(objects);
 
 		this->background.setTexture(&this->backgroundTexture);
-		/*this->environment.setTexture(environmentTexture);*/
-		sortObject(objects);
 		this->background.setSize(Vector2f(this->window->getView().getSize()));
 	}
 
@@ -2494,7 +2484,6 @@ public:
 		{
 			this->states->insert_or_assign("Battle", new BattleState(this->window, this->states, this->player, 1));
 			currentState = "Battle";
-			this->player->setMode(true);
 		}
 
 		if (Keyboard::isKeyPressed(Keyboard::Escape))
@@ -2514,7 +2503,6 @@ public:
 					this->chat.pop_front();
 			}
 		}
-
 	}
 
 	void update(const float& dt)
@@ -2537,6 +2525,7 @@ public:
 		if (!this->chat.empty())
 			this->chat.front()->update(this->mousePosView);
 
+		// Map details
 		if (this->gameStage == 11)
 		{
 			//RIGHT
@@ -2576,13 +2565,15 @@ public:
 			{
 				this->player->setPosition(this->player->getPosition().x, 0.f);
 			}
-			if (player->getHitboxGlobalBounds().contains(186.f, 196.f) && dialog == 0)
+
+			//Chatdialog
+			if (this->player->intersects(FloatRect(200.f, 200.f, 100.f, 100.f)) && this->dialog == 0)
 			{
-				this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน","Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน", "Images/character/gurad.png"));
 				this->chat.push_back(new ChatDialog(L" ", "พูดความจริง", "โกหกว่ามาตามหาคน", &dialogchat, &this->chat));
-				dialog = 1;
+				this->dialog = 1;
 			}
-			if (dialogchat == 2 && dialog == 1) {
+			if (this->dialogchat == 2 && this->dialog == 1) {
 				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาวิธีแก้คำสาปให้คนรัก", "Images/character/MC.png"));
 				this->chat.push_back(new ChatDialog(L"คำสาปงั้นเหรอ? ข้าไม่รู้หรอกว่าในป่าแห่งนี้มันจะมีวิธีถอนคำสาปที่เจ้าต้องการรึเปล่าแต่ข้าขอแนะนำเจ้าอย่าง เจ้าอย่าได้เข้าไปเลย เอาชีวิตมาเสี่ยงเสียเปล่าๆ", "Images/character/gurad.png"));
 				this->chat.push_back(new ChatDialog(L"ทำไมละ?", "Images/character/MC.png"));
@@ -2592,10 +2583,10 @@ public:
 				this->chat.push_back(new ChatDialog(L"เพราะถ้าข้าไม่รีบจัดการเกี่ยวกับคำสาปละก็ นางคง....", "Images/character/MC.png"));
 				this->chat.push_back(new ChatDialog(L"เฮ้อ...ก็ได้ข้าจะปล่อยให้เจ้าเข้าไปแต่ขอบอกเอาไว้ก่อนนะ ถ้าเจ้าตายหรือเป็นอะไรจะไม่มีใครเข้าไปช่วยเจ้าเด็ดขาดเข้าใจมั้ย?", "Images/character/gurad.png"));
 
-				dialog = 2;
+				this->dialog = 2;
 			}
 
-			if (dialogchat == 1 && dialog == 1) {
+			if (this->dialogchat == 1 && this->dialog == 1) {
 				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาคนรู้จักที่อยู่ในหมู่บ้านข้างหน้านี้", "Images/character/MC.png"));
 				this->chat.push_back(new ChatDialog(L"อะไรนะเจ้ามาตามหาคนงั้นเหรอ? งั้นก็ขอบอกเลยว่าโชคร้ายหน่อย", "Images/character/gurad.png"));
 				this->chat.push_back(new ChatDialog(L"เกิดเรื่องอะไรขึ้น", "Images/character/MC.png"));
@@ -2605,7 +2596,7 @@ public:
 				this->chat.push_back(new ChatDialog(L"ยังงั้นเหรอ? อะมีโยไคอยู่ข้างหลังเจ้าน่ะ", "Images/character/MC.png"));
 				this->chat.push_back(new ChatDialog(L"ฮะ! อยู่ไหนๆ....เฮ้อ ไม่เห็นมีเลยโล่งอกไปที....ทำไมเจ้า เอะ หายไปไหนแล้ว", "Images/character/gurad.png"));
 
-				dialog = 2;
+				this->dialog = 2;
 			}
 		}
 		else if (this->gameStage == 12)
@@ -2644,12 +2635,6 @@ public:
 		else if (this->gameStage == 13)
 		{
 			//RIGHT
-			/*if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
-			{
-				this->player->setPosition(0.f, this->player->getPosition().y);
-				openWorldState = "Map2_1";
-				currentState = "Map2_1";
-			}*/
 			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x &&
 				!(this->player->getHitboxGlobalBounds().top > 500.f && this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 650.f))
 			{
@@ -2690,12 +2675,6 @@ public:
 		else if (this->gameStage == 21)
 		{
 			//RIGHT
-		/*	if (this->player->getHitboxGlobalBounds().left > this->window->getView().getSize().x)
-			{
-				this->player->setPosition(0.f, this->player->getPosition().y + 265.f);
-				openWorldState = "Map2_2";
-				currentState = "Map2_2";
-			}*/
 			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x &&
 				!(this->player->getHitboxGlobalBounds().top > 30.f && this->player->getHitboxGlobalBounds().top + this->player->getHitboxGlobalBounds().height < 1080.f))
 			{
@@ -2829,18 +2808,18 @@ public:
 				openWorldState = "Map3_3";
 				currentState = "Map3_3";
 			}
-			
-			cout << player->getHitboxGlobalBounds().intersects(FloatRect(150.f, 547.f, 100, 300)) << endl;
-			if (player->getHitboxGlobalBounds().intersects(FloatRect(150.f,547.f,100,300)) && dialog == 0)
+
+			//Chatdialog
+			if (this->player->intersects(FloatRect(150.f, 500.f, 100.f, 100.f)) && this->dialog == 0)
 			{
-				if (dialogchat == 2) {
+				if (this->dialogchat == 2) {
 					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้มันอะไรกัน ราวกับเคยพบเจอมาก่อนเลย", "Images/character/MC.png"));
-					dialog = 3;
+					this->dialog = 3;
 				}
-				if (dialogchat == 1) {
+				if (this->dialogchat == 1) {
 					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้ไม่ผิดแน่ต้องเป็นมันแน่นอน", "Images/character/MC.png"));
 
-					dialog = 3;
+					this->dialog = 3;
 				}
 			}
 		}
@@ -2939,12 +2918,12 @@ public:
 class MainMenuState : public State
 {
 	//Variables
-	Player* player;
 	Texture backgroundTexture;
 	RectangleShape background;
-	int dialog;
-
 	map<string, Button*> buttons;
+	Player* player;
+
+	int dialog;
 
 public:
 	//Initializer functions
@@ -3081,18 +3060,17 @@ public:
 int main()
 {
 	font.loadFromFile("Fonts/2005_iannnnnJPG.ttf");
-	enemyTextures["battleKarakasa"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
+	/*enemyTextures["battleKarakasa"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
 	enemyTextures["battleHitosume"].loadFromFile("Images/on_battle_stage/monmap1_boss_oni.png");
 	enemyTextures["battleBossOni"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
 	enemyTextures["battleKappa"].loadFromFile("Images/on_battle_stage/monmap2_kappa.png");
 	enemyTextures["battleAmikiri"].loadFromFile("Images/on_battle_stage/monmap2_amikiri.png");
 	enemyTextures["battleBossUmibozu"].loadFromFile("Images/on_battle_stage/monmap2_boss_umibozu.png");
 	enemyTextures["battleSkeleton"].loadFromFile("Images/on_battle_stage/monmap3_skeleton.png");
-	enemyTextures["battleWanyudo"].loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");
+	enemyTextures["battleWanyudo"].loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");*/
 
 	bool fullscreen = true;
-	unsigned antialiasing_level = 0;
-	float speed = 10;
+	unsigned antialiasing_level = 5;
 	float dt = 0;
 
 	Event event;
