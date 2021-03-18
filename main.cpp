@@ -245,7 +245,7 @@ public:
 
 	void update(const Vector2f& mousePos)
 	{
-		if (choice1 != NULL) {
+		if (this->choice1 != NULL) {
 			if (this->choice1->isPressed())
 			{
 				*this->dialoglog = 2;
@@ -253,7 +253,7 @@ public:
 			}
 			this->choice1->update(mousePos);
 		}
-		if (choice2 != NULL) {
+		if (this->choice2 != NULL) {
 			if (this->choice2->isPressed())
 			{
 				*this->dialoglog = 1;
@@ -1795,7 +1795,7 @@ public:
 				return false;
 			}
 		}
-		else if (this->stage == 13)
+		else if (this->battleStage == 13)
 		{
 			if (this->stage == 1)
 			{
@@ -1807,7 +1807,7 @@ public:
 				return false;
 			}
 		}
-		else if (this->stage == 21)
+		else if (this->battleStage == 21)
 		{
 			if (this->stage == 1)
 			{
@@ -1821,9 +1821,9 @@ public:
 				return false;
 			}
 		}
-		else if (this->stage == 22)
+		else if (this->battleStage == 22)
 		{
-			if (this->stage == 2)
+			if (this->stage == 1)
 			{
 				this->enemy.push_back(new Enemy("Amikiri", 400, 200));
 				this->enemy.push_back(new Enemy("Amikiri", 150, 350));
@@ -1834,7 +1834,7 @@ public:
 				return false;
 			}
 		}
-		else if (this->stage == 23)
+		else if (this->battleStage == 23)
 		{
 			if (this->stage == 1)
 			{
@@ -1846,7 +1846,7 @@ public:
 				return false;
 			}
 		}
-		else if (this->stage == 31)
+		else if (this->battleStage == 31)
 		{
 			if (this->stage == 1)
 			{
@@ -1857,7 +1857,7 @@ public:
 				return false;
 			}
 		}
-		else if (this->stage == 32)
+		else if (this->battleStage == 32)
 		{
 			if (this->stage == 1)
 			{
@@ -2869,13 +2869,90 @@ public:
 		{
 			if (event.mouseButton.button == Mouse::Left) {
 				if (!this->chat.empty() && !this->chat.front()->haveButton())
+				{
+					delete this->chat.front();
 					this->chat.pop_front();
+				}
 			}
 		}
 	}
 
 	void update(const float& dt)
 	{
+		//ChatDialog
+		if (this->gameStage == 11)
+		{
+			if (this->dialogchat == 2 && this->dialog == 1)
+			{
+				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาวิธีแก้คำสาปให้คนรัก", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"คำสาปงั้นเหรอ? ข้าไม่รู้หรอกว่าในป่าแห่งนี้มันจะมีวิธีถอนคำสาปที่เจ้าต้องการรึเปล่าแต่ข้าขอแนะนำเจ้าอย่าง เจ้าอย่าได้เข้าไปเลย เอาชีวิตมาเสี่ยงเสียเปล่าๆ", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"ทำไมละ?", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"เมื่อไม่กี่วันก่อนจู่ๆก็มีพวกโยไคปรากฏตัวที่หมู่บ้านที่อยู่ในป่าแห่งนี้และไล่ฆ่าทุกคนในหมู่บ้าน จนตอนนี้ก็ลามมาถึงป่าแห่งนี้แล้วแต่โชคยังดีที่ทางเข้าป่าแห่งนี้มีอาคมที่ช่วยไล่พวกโยไคเอาไว้อยู่", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"แต่ถึงอย่างนั้นข้าก็จะเข้าไป", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"ทำไมเจ้าถึงได้ดื้อดึงที่จะเข้าไปถึงขนาดนั้นกัน?", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"เพราะถ้าข้าไม่รีบจัดการเกี่ยวกับคำสาปละก็ นางคง....", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"เฮ้อ...ก็ได้ข้าจะปล่อยให้เจ้าเข้าไปแต่ขอบอกเอาไว้ก่อนนะ ถ้าเจ้าตายหรือเป็นอะไรจะไม่มีใครเข้าไปช่วยเจ้าเด็ดขาดเข้าใจมั้ย?", "Images/character/gurad.png"));
+
+				this->dialog = 2;
+			}
+
+			if (this->dialogchat == 1 && this->dialog == 1)
+			{
+				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาคนรู้จักที่อยู่ในหมู่บ้านข้างหน้านี้", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"อะไรนะเจ้ามาตามหาคนงั้นเหรอ? งั้นก็ขอบอกเลยว่าโชคร้ายหน่อย", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"เกิดเรื่องอะไรขึ้น", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"เมื่อไม่กี่วันก่อนจู่ๆก็มีพวกโยไคปรากฏตัวที่หมู่บ้านที่อยู่ในป่าแห่งนี้และไล่ฆ่าทุกคนในหมู่บ้าน จนตอนนี้ก็ลามมาถึงป่าแห่งนี้แล้วแต่โชคยังดีที่ทางเข้าป่าแห่งนี้มีอาคมที่ช่วยไล่พวกโยไคเอาไว้อยู่", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"ถ้าอย่างนั้นขอข้าเข้าไปดูเพื่อความแน่ใจจะได้มั้ย", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"ไม่ได้ถึงเจ้าจะเข้าไปแต่ก็ทำอะไรไม่ได้หรอก", "Images/character/gurad.png"));
+				this->chat.push_back(new ChatDialog(L"ยังงั้นเหรอ? อะมีโยไคอยู่ข้างหลังเจ้าน่ะ", "Images/character/MC.png"));
+				this->chat.push_back(new ChatDialog(L"ฮะ! อยู่ไหนๆ....เฮ้อ ไม่เห็นมีเลยโล่งอกไปที....ทำไมเจ้า เอะ หายไปไหนแล้ว", "Images/character/gurad.png"));
+
+				this->dialog = 2;
+			}
+		}
+		if (this->gameStage == 31)
+		{
+			if (this->player->intersects(FloatRect(150.f, 500.f, 100.f, 100.f)) && this->dialog == 0)
+			{
+				if (this->dialogchat == 2) {
+					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้มันอะไรกัน ราวกับเคยพบเจอมาก่อนเลย", "Images/character/MC.png"));
+					this->dialog = 3;
+				}
+				if (this->dialogchat == 1) {
+					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้ไม่ผิดแน่ต้องเป็นมันแน่นอน", "Images/character/MC.png"));
+
+					this->dialog = 3;
+				}
+			}
+		}
+		if (this->gameStage == 33)
+		{
+			if (this->player->intersects(FloatRect(849.f, 480.f, 250.f, 250.f)) && this->dialog == 0)
+			{
+				if (this->dialogchat == 2)
+				{
+					this->chat.push_back(new ChatDialog(L"หัวกะโหลกขนาดใหญ่นั้นมัน หรือว่า?", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ดูเหมือนเจ้าจะรู้ตัวแล้วสินะ ไม่คิดเลยว่าเจ้าจะลืมกลิ่นอายของข้าไป", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"ไม่คิดเลยว่าจะเป็นเจ้า กิวคิ เจ้าเองสินะที่ร่ายคำสาปใส่นาง", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ถูกต้อง ข้าเองแหละ ที่เป็นผู้ร่ายคำสาป แต่ก็เพื่อล่อให้เจ้าออกมายังไงละ ข้าจะได้ล้างแค้นในสิ่งที่เจ้าทำกับข้าเอาไว้", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"งั้นเหรอถ้าอย่างนั้น เรามาจบเรื่องกัน!", "Images/character/MC.png"));
+
+					this->dialog = 3;
+				}
+				if (this->dialogchat == 1)
+				{
+					this->chat.push_back(new ChatDialog(L"หัวกะโหลกขนาดใหญ่นี่ กาชาโดคุโระ สินะ กิวคิ", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ไม่คิดเลยว่าเจ้าจะรู้ว่าเป็นข้า ตั้งแต่เมื่อไหร่กัน", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"ตั้งแต่ตอนแรกที่เข้ามาในป่าแล้ว เขตแดนแบบนี้ไม่มีใครอื่นนอกจากเจ้าที่ทำได้หรอก กิวคิ", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ฮึ งั้นก็ดีไหนๆเจ้าก็รู้ตั้งแต่แรกแล้ว เรามาจบเรื่องของเราตั้งแต่เมื่อร้อยปีก่อนเลยดีกว่า", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"ครั้งนั้นข้ายังอ่อนประสบการณ์จนไม่สามารถจัดการเจ้าได้ แต่ครั้งนี้แหละ ", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ถ้าอย่างนั้นก็เข้ามาเลย อาเบะโนะ เซย์เมย์!", "Images/character/gyuki.png"));
+
+					this->dialog = 3;
+				}
+			}
+		}
+
 		this->updateMousePositions();
 		this->updateInput(dt);
 
@@ -2940,7 +3017,7 @@ public:
 		if (!this->chat.empty())
 			this->chat.front()->update(this->mousePosView);
 
-		// Map details
+		// Map connects
 		if (this->gameStage == 11)
 		{
 			//RIGHT
@@ -2979,34 +3056,6 @@ public:
 			if (this->player->getHitboxGlobalBounds().top < 0.f)
 			{
 				this->player->setPosition(this->player->getPosition().x, 0.f);
-			}
-
-			//Chatdialog
-
-			if (this->dialogchat == 2 && this->dialog == 1) {
-				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาวิธีแก้คำสาปให้คนรัก", "Images/character/MC.png"));
-				this->chat.push_back(new ChatDialog(L"คำสาปงั้นเหรอ? ข้าไม่รู้หรอกว่าในป่าแห่งนี้มันจะมีวิธีถอนคำสาปที่เจ้าต้องการรึเปล่าแต่ข้าขอแนะนำเจ้าอย่าง เจ้าอย่าได้เข้าไปเลย เอาชีวิตมาเสี่ยงเสียเปล่าๆ", "Images/character/gurad.png"));
-				this->chat.push_back(new ChatDialog(L"ทำไมละ?", "Images/character/MC.png"));
-				this->chat.push_back(new ChatDialog(L"เมื่อไม่กี่วันก่อนจู่ๆก็มีพวกโยไคปรากฏตัวที่หมู่บ้านที่อยู่ในป่าแห่งนี้และไล่ฆ่าทุกคนในหมู่บ้าน จนตอนนี้ก็ลามมาถึงป่าแห่งนี้แล้วแต่โชคยังดีที่ทางเข้าป่าแห่งนี้มีอาคมที่ช่วยไล่พวกโยไคเอาไว้อยู่", "Images/character/gurad.png"));
-				this->chat.push_back(new ChatDialog(L"แต่ถึงอย่างนั้นข้าก็จะเข้าไป", "Images/character/MC.png"));
-				this->chat.push_back(new ChatDialog(L"ทำไมเจ้าถึงได้ดื้อดึงที่จะเข้าไปถึงขนาดนั้นกัน?", "Images/character/gurad.png"));
-				this->chat.push_back(new ChatDialog(L"เพราะถ้าข้าไม่รีบจัดการเกี่ยวกับคำสาปละก็ นางคง....", "Images/character/MC.png"));
-				this->chat.push_back(new ChatDialog(L"เฮ้อ...ก็ได้ข้าจะปล่อยให้เจ้าเข้าไปแต่ขอบอกเอาไว้ก่อนนะ ถ้าเจ้าตายหรือเป็นอะไรจะไม่มีใครเข้าไปช่วยเจ้าเด็ดขาดเข้าใจมั้ย?", "Images/character/gurad.png"));
-
-				this->dialog = 2;
-			}
-
-			if (this->dialogchat == 1 && this->dialog == 1) {
-				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาคนรู้จักที่อยู่ในหมู่บ้านข้างหน้านี้", "Images/character/MC.png"));
-				this->chat.push_back(new ChatDialog(L"อะไรนะเจ้ามาตามหาคนงั้นเหรอ? งั้นก็ขอบอกเลยว่าโชคร้ายหน่อย", "Images/character/gurad.png"));
-				this->chat.push_back(new ChatDialog(L"เกิดเรื่องอะไรขึ้น", "Images/character/MC.png"));
-				this->chat.push_back(new ChatDialog(L"เมื่อไม่กี่วันก่อนจู่ๆก็มีพวกโยไคปรากฏตัวที่หมู่บ้านที่อยู่ในป่าแห่งนี้และไล่ฆ่าทุกคนในหมู่บ้าน จนตอนนี้ก็ลามมาถึงป่าแห่งนี้แล้วแต่โชคยังดีที่ทางเข้าป่าแห่งนี้มีอาคมที่ช่วยไล่พวกโยไคเอาไว้อยู่", "Images/character/gurad.png"));
-				this->chat.push_back(new ChatDialog(L"ถ้าอย่างนั้นขอข้าเข้าไปดูเพื่อความแน่ใจจะได้มั้ย", "Images/character/MC.png"));
-				this->chat.push_back(new ChatDialog(L"ไม่ได้ถึงเจ้าจะเข้าไปแต่ก็ทำอะไรไม่ได้หรอก", "Images/character/gurad.png"));
-				this->chat.push_back(new ChatDialog(L"ยังงั้นเหรอ? อะมีโยไคอยู่ข้างหลังเจ้าน่ะ", "Images/character/MC.png"));
-				this->chat.push_back(new ChatDialog(L"ฮะ! อยู่ไหนๆ....เฮ้อ ไม่เห็นมีเลยโล่งอกไปที....ทำไมเจ้า เอะ หายไปไหนแล้ว", "Images/character/gurad.png"));
-
-				this->dialog = 2;
 			}
 		}
 		else if (this->gameStage == 12)
@@ -3218,20 +3267,6 @@ public:
 				openWorldState = "Map3_3";
 				currentState = "Map3_3";
 			}
-
-			//Chatdialog
-			if (this->player->intersects(FloatRect(150.f, 500.f, 100.f, 100.f)) && this->dialog == 0)
-			{
-				if (this->dialogchat == 2) {
-					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้มันอะไรกัน ราวกับเคยพบเจอมาก่อนเลย", "Images/character/MC.png"));
-					this->dialog = 3;
-				}
-				if (this->dialogchat == 1) {
-					this->chat.push_back(new ChatDialog(L"ความรู้สึกแบบนี้ไม่ผิดแน่ต้องเป็นมันแน่นอน", "Images/character/MC.png"));
-
-					this->dialog = 3;
-				}
-			}
 		}
 		else if (this->gameStage == 32)
 		{
@@ -3261,7 +3296,8 @@ public:
 				this->player->setPosition(this->player->getPosition().x, 0.f);
 			}
 		}
-		else if (this->gameStage == 33)
+
+		if (this->gameStage == 33)
 		{
 			//RIGHT
 			if (this->player->getHitboxGlobalBounds().left + this->player->getHitboxGlobalBounds().width > this->window->getView().getSize().x)
@@ -3288,27 +3324,19 @@ public:
 			{
 				this->player->setPosition(this->player->getPosition().x, 0.f);
 			}
+		}
 
-			if (this->player->intersects(FloatRect(750.f, 423.f, 100.f, 100.f)) && this->dialog == 0)
+		//End Game
+		if (this->gameStage == 33)
+		{
+			if (this->dialog == 3 && this->chat.empty())
 			{
-				if (this->dialogchat == 2) {
-					this->chat.push_back(new ChatDialog(L"หัวกะโหลกขนาดใหญ่นั้นมัน หรือว่า?", "Images/character/MC.png"));
-					this->chat.push_back(new ChatDialog(L"ดูเหมือนเจ้าจะรู้ตัวแล้วสินะ ไม่คิดเลยว่าเจ้าจะลืมกลิ่นอายของข้าไป", "Images/character/gyuki.png"));
-					this->chat.push_back(new ChatDialog(L"ไม่คิดเลยว่าจะเป็นเจ้า กิวคิ เจ้าเองสินะที่ร่ายคำสาปใส่นาง", "Images/character/MC.png"));
-					this->chat.push_back(new ChatDialog(L"ถูกต้อง ข้าเองแหละ ที่เป็นผู้ร่ายคำสาป แต่ก็เพื่อล่อให้เจ้าออกมายังไงละ ข้าจะได้ล้างแค้นในสิ่งที่เจ้าทำกับข้าเอาไว้", "Images/character/gyuki.png"));
-					this->chat.push_back(new ChatDialog(L"งั้นเหรอถ้าอย่างนั้น เรามาจบเรื่องกัน!", "Images/character/MC.png"));
-					this->dialog = 3;
-				}
-				if (this->dialogchat == 1) {
-					this->chat.push_back(new ChatDialog(L"หัวกะโหลกขนาดใหญ่นี่ กาชาโดคุโระ สินะ กิวคิ", "Images/character/MC.png"));
-					this->chat.push_back(new ChatDialog(L"ไม่คิดเลยว่าเจ้าจะรู้ว่าเป็นข้า ตั้งแต่เมื่อไหร่กัน", "Images/character/gyuki.png"));
-					this->chat.push_back(new ChatDialog(L"ตั้งแต่ตอนแรกที่เข้ามาในป่าแล้ว เขตแดนแบบนี้ไม่มีใครอื่นนอกจากเจ้าที่ทำได้หรอก กิวคิ", "Images/character/MC.png"));
-					this->chat.push_back(new ChatDialog(L"ฮึ งั้นก็ดีไหนๆเจ้าก็รู้ตั้งแต่แรกแล้ว เรามาจบเรื่องของเราตั้งแต่เมื่อร้อยปีก่อนเลยดีกว่า", "Images/character/gyuki.png"));
-					this->chat.push_back(new ChatDialog(L"ครั้งนั้นข้ายังอ่อนประสบการณ์จนไม่สามารถจัดการเจ้าได้ แต่ครั้งนี้แหละ ", "Images/character/MC.png"));
-					this->chat.push_back(new ChatDialog(L"ถ้าอย่างนั้นก็เข้ามาเลย อาเบะโนะ เซย์เมย์!", "Images/character/gyuki.png"));
-
-					this->dialog = 3;
-				}
+				currentState = "MainMenu";
+				for (auto i = this->states->find("Map1_1"); i != this->states->end(); i++)
+					delete i->second;
+				this->states->erase(this->states->find("Map1_1"), this->states->end());
+				delete this->player;
+				this->player = NULL;
 			}
 		}
 	}
@@ -3408,7 +3436,7 @@ public:
 	void updateButtons()
 	{
 		//New game
-		if (this->player != NULL && !this->player->isdead())
+		if (this->player != NULL && !this->player->isdead() && this->states->size() > 1)
 			if (this->buttons["CONTINUE_STATE"]->isPressed())
 			{
 				currentState = openWorldState;
