@@ -149,7 +149,7 @@ class ChatDialog
 	Button* choice1;
 	Button* choice2;
 	list<ChatDialog*>* chat;
-	int* dialoglog; 
+	int* dialoglog;
 
 public:
 	const bool& haveButton() const
@@ -1947,7 +1947,9 @@ class Object
 protected:
 	string name;
 	Texture texture;
+	Texture shadowTexture;
 	Sprite sprite;
+	Sprite shadowSprite;
 	CollisionBox* collisionBox;
 	Player* player;
 
@@ -1972,6 +1974,8 @@ public:
 			this->texture.loadFromFile("Images/map/tree_type_1.png");
 			this->sprite.setTexture(this->texture);
 			this->collisionBox = new CollisionBox(*this->player, positionX + 70.f, positionY + 255.f, 55.f, 40.f);
+			this->shadowTexture.loadFromFile("Images/map/tree_type_1_shadow.png");
+			this->shadowSprite.setTexture(this->shadowTexture);
 		}
 		else if (this->name == "Tree2")
 		{
@@ -2001,7 +2005,7 @@ public:
 		{
 			this->texture.loadFromFile("Images/map/house1.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX + 15.f, positionY + 190.f , 350.f, 130.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX + 15.f, positionY + 190.f, 350.f, 130.f);
 		}
 		else if (this->name == "House2")
 		{
@@ -2027,6 +2031,60 @@ public:
 			this->sprite.setTexture(this->texture);
 			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
 		}
+		else if (this->name == "BossOni")
+		{
+			this->texture.loadFromFile("Images/map/fence2.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+		}
+		else if (this->name == "Hitotsume")
+		{
+			this->texture.loadFromFile("Images/map/fence2.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+		}
+		else if (this->name == "Karakasa")
+		{
+			this->texture.loadFromFile("Images/map/fence2.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+		}
+		else if (this->name == "Amikiri")
+		{
+			this->texture.loadFromFile("Images/map/fence2.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+		}
+		else if (this->name == "BossUmibozu")
+		{
+			this->texture.loadFromFile("Images/map/fence2.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+		}
+		else if (this->name == "Kappa")
+		{
+			this->texture.loadFromFile("Images/map/fence2.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+		}
+		else if (this->name == "BossGashadokuro")
+		{
+			this->texture.loadFromFile("Images/map/fence2.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+		}
+		else if (this->name == "Skeleton")
+		{
+			this->texture.loadFromFile("Images/map/fence2.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+		}
+		else if (this->name == "Wanyudo")
+		{
+			this->texture.loadFromFile("Images/map/fence2.png");
+			this->sprite.setTexture(this->texture);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+		}
 		else
 		{
 			this->texture.loadFromFile("Images/map/tree_type_1.png");
@@ -2034,6 +2092,7 @@ public:
 			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 220.f, 45.f, 40.f);
 		}
 		this->sprite.setPosition(positionX, positionY);
+		this->shadowSprite.setPosition(positionX, positionY);
 	}
 
 	~Object()
@@ -2043,6 +2102,7 @@ public:
 
 	virtual bool update(const float& dt)
 	{
+
 		if (!this->collisionBox->update(dt)) return false;
 	}
 
@@ -2052,6 +2112,7 @@ public:
 		if (this->player->getHitboxGlobalBounds().top < this->collisionBox->getShape().getGlobalBounds().top && !this->player->isRendered())
 			this->player->render(target);
 		target.draw(this->sprite);
+		target.draw(this->shadowSprite);
 	}
 };
 
