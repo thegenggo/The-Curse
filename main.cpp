@@ -2336,7 +2336,7 @@ public:
 			this->objects.push_back(new Object("Tree1", this->player, 1689.f, 749.f));
 			this->objects.push_back(new Object("Tree2", this->player, -18.f, -88.f));
 			this->objects.push_back(new Object("Tree2", this->player, -18.f, 355.f));
-			this->objects.push_back(new Object("Tree2", this->player, 979.f, 355.f));
+			this->objects.push_back(new Object("Tree2", this->player, 979.f, 226.f));
 			this->objects.push_back(new Object("Tree2", this->player, 547.f, 540.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1609.f, -112.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1798.f, 471.f));
@@ -2670,6 +2670,7 @@ public:
 			this->objects.push_back(new Object("Tree1", this->player, 1732.f, 789.f));
 			this->objects.push_back(new Object("Tree1", this->player, 476.f, 743.f));
 			this->objects.push_back(new Object("Tree2", this->player, -62.f, 665.f));
+			
 			this->objects.push_back(new Object("Tree2", this->player, 258.f, 807.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1421.f, 819.f));
 			this->objects.push_back(new Object("Rock", this->player, 655.f, 937.f));
