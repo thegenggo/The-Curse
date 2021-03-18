@@ -2149,6 +2149,9 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
 
 			this->chat.push_back(new ChatDialog(L"ชายหนุ่มได้ออกเดินทางตามหาต้นตอของคำสาปที่ทำให้หญิงผู้ที่เป็นที่รักต้องทนทุกข์ทรมาร จนมาถึงป่าแห่งหนึ่งที่เต็มไปด้วยกลิ่นอายอันชั่วร้าย"));
+			this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน", "Images/character/gurad.png"));
+			this->chat.push_back(new ChatDialog(L" ", "พูดความจริง", "โกหกว่ามาตามหาคน", &dialogchat, &this->chat));
+			this->dialog = 1;
 		}
 		else if (this->gameStage == 12)
 		{
@@ -2439,98 +2442,98 @@ public:
 			this->collisions.push_back(new CollisionBox(*this->player, 190.f, 1025.f, 15.f, 50.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 215.f, 1035.f, 1705.f, 1.f));
 
-			this->objects.push_back(new Object("House1", this->player, 28.f, 99.f))
-			this->objects.push_back(new Object("House1", this->player, 436.f, 99.f))
-			this->objects.push_back(new Object("House1", this->player, 724.f, -168.f))
-			this->objects.push_back(new Object("House2", this->player, 28.f, 578.f))
-			this->objects.push_back(new Object("House2", this->player, 436.f, 578.f))
-			this->objects.push_back(new Object("House3", this->player, 1017.f, 178.f))
-			this->objects.push_back(new Object("House3", this->player, 1597.f, 357.f))
-			this->objects.push_back(new Object("House3", this->player, 1017.f, 604.f))
-			this->objects.push_back(new Object("Fence2", this->player, 295.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 351.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 407.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 463.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 239.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 183.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 519.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 575.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 631.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 687.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1041.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1097.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1153.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1209.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1265.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1321.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1377.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1433.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1489.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1545.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1601.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1657.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1713.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1769.f, 920.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1825.f, 920.f))
-			this->objects.push_back(new Object("Tree1", this->player, 1657.f, -46.f))
-			this->objects.push_back(new Object("Tree1", this->player, 277.f, -145.f))
-			this->objects.push_back(new Object("Tree1", this->player, 1694.f, 578.f))
-			this->objects.push_back(new Object("Tree1", this->player, 1195.f, -168.f))
-			this->objects.push_back(new Object("Tree2", this->player, -51.f, -81.f))
-			this->objects.push_back(new Object("Tree2", this->player, 1461.f, -81.f))
-			this->objects.push_back(new Object("Tree2", this->player, 1503.f, 661.f))
-			this->objects.push_back(new Object("Tree2", this->player, 482.f, -145.f))
-			this->objects.push_back(new Object("Rock", this->player, 787.f, 992.f))
-			this->objects.push_back(new Object("Rock", this->player, 1590.f, 316.f))
-			this->objects.push_back(new Object("Rock", this->player, 154.f, 49.f))
-			this->objects.push_back(new Object("Rock", this->player, 1814.f, 244.f))
-			this->objects.push_back(new Object("Rock", this->player, 1105.f, 18.f))
+			this->objects.push_back(new Object("House1", this->player, 28.f, 99.f));
+			this->objects.push_back(new Object("House1", this->player, 436.f, 99.f));
+			this->objects.push_back(new Object("House1", this->player, 724.f, -168.f));
+			this->objects.push_back(new Object("House2", this->player, 28.f, 578.f));
+			this->objects.push_back(new Object("House2", this->player, 436.f, 578.f));
+			this->objects.push_back(new Object("House3", this->player, 1017.f, 178.f));
+			this->objects.push_back(new Object("House3", this->player, 1597.f, 357.f));
+			this->objects.push_back(new Object("House3", this->player, 1017.f, 604.f));
+			this->objects.push_back(new Object("Fence2", this->player, 295.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 351.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 407.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 463.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 239.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 183.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 519.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 575.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 631.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 687.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1041.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1097.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1153.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1209.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1265.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1321.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1377.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1433.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1489.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1545.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1601.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1657.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1713.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1769.f, 920.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1825.f, 920.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1657.f, -46.f));
+			this->objects.push_back(new Object("Tree1", this->player, 277.f, -145.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1694.f, 578.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1195.f, -168.f));
+			this->objects.push_back(new Object("Tree2", this->player, -51.f, -81.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1461.f, -81.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1503.f, 661.f));
+			this->objects.push_back(new Object("Tree2", this->player, 482.f, -145.f));
+			this->objects.push_back(new Object("Rock", this->player, 787.f, 992.f));
+			this->objects.push_back(new Object("Rock", this->player, 1590.f, 316.f));
+			this->objects.push_back(new Object("Rock", this->player, 154.f, 49.f));
+			this->objects.push_back(new Object("Rock", this->player, 1814.f, 244.f));
+			this->objects.push_back(new Object("Rock", this->player, 1105.f, 18.f));
 		}
 		else if (this->gameStage == 33)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map3/map3_3.png");
 
-			this->objects.push_back(new Object("House3", this->player, 1559.f, 24.f))
-			this->objects.push_back(new Object("House3", this->player, 1559.f, 382.f))
-			this->objects.push_back(new Object("House3", this->player, -213.f, 24.f))
-			this->objects.push_back(new Object("House3", this->player, -213.f, 382.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 747.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 803.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 859.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 914.f))
-			this->objects.push_back(new Object("Fence1", this->player, 800.f, 970.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 747.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 803.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 859.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 914.f))
-			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 970.f))
-			this->objects.push_back(new Object("Fence2", this->player, 741.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 684.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 627.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 570.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 513.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 456.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 399.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 342.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1155.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1212.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1269.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1326.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1440.f, 747.f))
-			this->objects.push_back(new Object("Fence2", this->player, 1497.f, 747.f))
-			this->objects.push_back(new Object("Tree1", this->player, 97.f, 698.f))
-			this->objects.push_back(new Object("Tree1", this->player, 1252.f, 698.f))
-			this->objects.push_back(new Object("Tree1", this->player, 1572.f, 658.f))
-			this->objects.push_back(new Object("Tree1", this->player, 1732.f, 789.f))
-			this->objects.push_back(new Object("Tree1", this->player, 476.f, 743.f))
-			this->objects.push_back(new Object("Tree2", this->player, -62.f, 665.f))
-			this->objects.push_back(new Object("Tree2", this->player, 258.f, 807.f))
-			this->objects.push_back(new Object("Tree2", this->player, 1421.f, 819.f))
-			this->objects.push_back(new Object("Rock", this->player, 655.f, 937.f))
-			this->objects.push_back(new Object("Rock", this->player, 1201.f, 904.f))
-			this->objects.push_back(new Object("Rock", this->player, 11.f, 989.f))
-			this->objects.push_back(new Object("Rock", this->player, 245.f, 698.f))
-			this->objects.push_back(new Object("Rock", this->player, 1782.f, 727.f))
+			this->objects.push_back(new Object("House3", this->player, 1559.f, 24.f));
+			this->objects.push_back(new Object("House3", this->player, 1559.f, 382.f));
+			this->objects.push_back(new Object("House3", this->player, -213.f, 24.f));
+			this->objects.push_back(new Object("House3", this->player, -213.f, 382.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 747.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 803.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 859.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 914.f));
+			this->objects.push_back(new Object("Fence1", this->player, 800.f, 970.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 747.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 803.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 859.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 914.f));
+			this->objects.push_back(new Object("Fence1", this->player, 1157.f, 970.f));
+			this->objects.push_back(new Object("Fence2", this->player, 741.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 684.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 627.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 570.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 513.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 456.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 399.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 342.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1155.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1212.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1269.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1326.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1440.f, 747.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1497.f, 747.f));
+			this->objects.push_back(new Object("Tree1", this->player, 97.f, 698.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1252.f, 698.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1572.f, 658.f));
+			this->objects.push_back(new Object("Tree1", this->player, 1732.f, 789.f));
+			this->objects.push_back(new Object("Tree1", this->player, 476.f, 743.f));
+			this->objects.push_back(new Object("Tree2", this->player, -62.f, 665.f));
+			this->objects.push_back(new Object("Tree2", this->player, 258.f, 807.f));
+			this->objects.push_back(new Object("Tree2", this->player, 1421.f, 819.f));
+			this->objects.push_back(new Object("Rock", this->player, 655.f, 937.f));
+			this->objects.push_back(new Object("Rock", this->player, 1201.f, 904.f));
+			this->objects.push_back(new Object("Rock", this->player, 11.f, 989.f));
+			this->objects.push_back(new Object("Rock", this->player, 245.f, 698.f));
+			this->objects.push_back(new Object("Rock", this->player, 1782.f, 727.f));
 		}
 
 		sortObject(objects);
@@ -2656,12 +2659,7 @@ public:
 			}
 
 			//Chatdialog
-			if (this->player->intersects(FloatRect(200.f, 200.f, 100.f, 100.f)) && this->dialog == 0)
-			{
-				this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน", "Images/character/gurad.png"));
-				this->chat.push_back(new ChatDialog(L" ", "พูดความจริง", "โกหกว่ามาตามหาคน", &dialogchat, &this->chat));
-				this->dialog = 1;
-			}
+
 			if (this->dialogchat == 2 && this->dialog == 1) {
 				this->chat.push_back(new ChatDialog(L"ข้ามาตามหาวิธีแก้คำสาปให้คนรัก", "Images/character/MC.png"));
 				this->chat.push_back(new ChatDialog(L"คำสาปงั้นเหรอ? ข้าไม่รู้หรอกว่าในป่าแห่งนี้มันจะมีวิธีถอนคำสาปที่เจ้าต้องการรึเปล่าแต่ข้าขอแนะนำเจ้าอย่าง เจ้าอย่าได้เข้าไปเลย เอาชีวิตมาเสี่ยงเสียเปล่าๆ", "Images/character/gurad.png"));
