@@ -2295,6 +2295,19 @@ public:
 			this->objects.push_back(new Object("Tree3", this->player, 1225.f, 15.f));
 			this->objects.push_back(new Object("Tree3", this->player, 712.f, 853.f));
 			this->objects.push_back(new Object("Tree3", this->player, 1010.f, 330.f));
+
+			this->shadow.push_back(new Object("Shadow1", this->player, 524.f, 73.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1317.f, -161.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1555.f, -161.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 0.f, -145.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 296.f, -118.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 659.f, 249.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 866.f, 344.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1073.f, 468.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, -43.f, 789.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 509.f, 562.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1799.f, -145.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1685.f, 540.f));
 		}
 		else if (this->gameStage == 13)
 		{
@@ -2342,6 +2355,21 @@ public:
 			this->objects.push_back(new Object("Tree3", this->player, 793.f, 79.f));
 			this->objects.push_back(new Object("Tree3", this->player, 996.f, 769.f));
 			this->objects.push_back(new Object("Tree3", this->player, 58.f, 1023.f));
+
+			this->shadow.push_back(new Object("Shadow1", this->player, 327.f, 767.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 94.f, 148.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1230.f, 210.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1812.f, 666.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 829.f, 783.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 199.f, 439.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 965.f, -65.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1267.f, 524.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 453.f, 0.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1669.f, 194.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 362.f, 492.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1097.f, 783.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 47.f, 508.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1689.f, 749.f));
 		}
 		else if (this->gameStage == 21)
 		{
@@ -2368,6 +2396,13 @@ public:
 			this->objects.push_back(new Object("Tree2", this->player, 0.f, 257.f));
 			this->objects.push_back(new Object("Tree2", this->player, 403.f, 445.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1003.f, -139.f));
+
+			this->shadow.push_back(new Object("Shadow1", this->player, -20.f, 39.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, -29.f, 472.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 720.f, 37.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 335.f, -145.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 335.f, 220.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 562.f, -172.f));
 		}
 		else if (this->gameStage == 22)
 		{
@@ -2409,6 +2444,16 @@ public:
 			this->objects.push_back(new Object("Tree3", this->player, 744.f, 280.f));
 			this->objects.push_back(new Object("Tree3", this->player, 299.f, 859.f));
 			this->objects.push_back(new Object("Tree3", this->player, 17.f, 266.f));
+
+			this->shadow.push_back(new Object("Shadow1", this->player, 20.f, -127.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 368.f, -109.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 114.f, 763.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 536.f, 776.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 845.f, 705.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 650.f, -109.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 524.f, 76.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 208.f, 37.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 335.f, 705.f));
 		}
 		else if (this->gameStage == 23)
 		{
@@ -2457,6 +2502,16 @@ public:
 			this->objects.push_back(new Object("Fence1", this->player, 1699.f, 416.f));
 			this->objects.push_back(new Object("Fence1", this->player, 1755.f, 416.f));
 			this->objects.push_back(new Object("Fence1", this->player, 1811.f, 416.f));
+
+			this->shadow.push_back(new Object("Shadow1", this->player, 113.f, -16.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, -39.f, 276.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, -39.f, 769.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, -11.f, 490.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 343.f, 131.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 646.f, -105.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1010.f, 12.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1336.f, -118.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1699.f, -32.f));
 		}
 		else if (this->gameStage == 31)
 		{
@@ -2510,6 +2565,10 @@ public:
 			this->objects.push_back(new Object("Fence2", this->player, 168.f, 776.f));
 			this->objects.push_back(new Object("Fence2", this->player, 1776.f, 776.f));
 			this->objects.push_back(new Object("Fence2", this->player, 1832.f, 776.f));
+
+			this->shadow.push_back(new Object("Shadow1", this->player, 296.f, -90.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 16.f, -90.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1514.f, -126.f));
 		}
 		else if (this->gameStage == 32)
 		{
@@ -2567,6 +2626,11 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 154.f, 49.f));
 			this->objects.push_back(new Object("Rock", this->player, 1814.f, 244.f));
 			this->objects.push_back(new Object("Rock", this->player, 1105.f, 18.f));
+
+			this->shadow.push_back(new Object("Shadow1", this->player, 1657.f, -46.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 277.f, -145.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1694.f, 578.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1195.f, -168.f));
 		}
 		else if (this->gameStage == 33)
 		{
@@ -2613,6 +2677,12 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 11.f, 989.f));
 			this->objects.push_back(new Object("Rock", this->player, 245.f, 698.f));
 			this->objects.push_back(new Object("Rock", this->player, 1782.f, 727.f));
+
+			this->shadow.push_back(new Object("Shadow1", this->player, 97.f, 698.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1252.f, 698.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1572.f, 658.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1732.f, 789.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 476.f, 743.f));
 		}
 
 		sortObject(objects);
