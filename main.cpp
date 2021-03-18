@@ -1947,9 +1947,7 @@ class Object
 protected:
 	string name;
 	Texture texture;
-	Texture shadowTexture;
 	Sprite sprite;
-	Sprite shadowSprite;
 	CollisionBox* collisionBox;
 	Player* player;
 
@@ -1969,13 +1967,16 @@ public:
 			this->sprite.setTexture(this->texture);
 			this->collisionBox = new CollisionBox(*this->player, positionX + 17.5f, positionY, 60.f, 40.f);
 		}
+		else if (this->name == "Shadow1")
+		{
+			this->texture.loadFromFile("Images/map/tree_type_1_shadow.png");
+			this->sprite.setTexture(this->texture);
+		}
 		else if (this->name == "Tree1")
 		{
 			this->texture.loadFromFile("Images/map/tree_type_1.png");
 			this->sprite.setTexture(this->texture);
 			this->collisionBox = new CollisionBox(*this->player, positionX + 70.f, positionY + 255.f, 55.f, 40.f);
-			this->shadowTexture.loadFromFile("Images/map/tree_type_1_shadow.png");
-			this->shadowSprite.setTexture(this->shadowTexture);
 		}
 		else if (this->name == "Tree2")
 		{
@@ -2092,7 +2093,6 @@ public:
 			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 220.f, 45.f, 40.f);
 		}
 		this->sprite.setPosition(positionX, positionY);
-		this->shadowSprite.setPosition(positionX, positionY);
 	}
 
 	~Object()
@@ -2102,17 +2102,19 @@ public:
 
 	virtual bool update(const float& dt)
 	{
-
 		if (!this->collisionBox->update(dt)) return false;
+		return true;
 	}
 
 	virtual void render(RenderTarget& target)
 	{
-		this->collisionBox->render(target);
-		if (this->player->getHitboxGlobalBounds().top < this->collisionBox->getShape().getGlobalBounds().top && !this->player->isRendered())
-			this->player->render(target);
+		if (this->collisionBox != NULL)
+		{
+			this->collisionBox->render(target);
+			if (this->player->getHitboxGlobalBounds().top < this->collisionBox->getShape().getGlobalBounds().top && !this->player->isRendered())
+				this->player->render(target);
+		}
 		target.draw(this->sprite);
-		target.draw(this->shadowSprite);
 	}
 };
 
@@ -2139,6 +2141,7 @@ class GameState : public State
 	RectangleShape background;
 	Sprite environment;
 	vector<Object*> objects;
+	vector<Object*> shadow;
 	vector<CollisionBox*> collisions;
 	string textline;
 	list<ChatDialog*> chat;
@@ -2209,20 +2212,20 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
 
-			this->objects.push_back(new Object("Shadow1", this->player, 704.f, -172.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 948.f, -5.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 927.f, -163.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 487.f, -179.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 200.f, -164.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 633.f, 760.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 1567.f, 19.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 185.f, 83.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 375.f, 95.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 17.f, 342.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 224.f, 699.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 1221.f, 150.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 1521.f, 694.f));
-			this->objects.push_back(new Object("Shadow1", this->player, 1719.f, 608.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 704.f, -172.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 948.f, -5.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 927.f, -163.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 487.f, -179.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 200.f, -164.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 633.f, 760.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1567.f, 19.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 185.f, 83.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 375.f, 95.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 17.f, 342.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 224.f, 699.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1221.f, 150.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1521.f, 694.f));
+			this->shadow.push_back(new Object("Shadow1", this->player, 1719.f, 608.f));
 
 			this->chat.push_back(new ChatDialog(L"ชายหนุ่มได้ออกเดินทางตามหาต้นตอของคำสาปที่ทำให้หญิงผู้ที่เป็นที่รักต้องทนทุกข์ทรมาร จนมาถึงป่าแห่งหนึ่งที่เต็มไปด้วยกลิ่นอายอันชั่วร้าย"));
 			this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน", "Images/character/gurad.png"));
@@ -3073,17 +3076,22 @@ public:
 
 		target->draw(background);
 		//target->draw(environment);
-		for (auto& i : objects)
+		for (auto& i : this->objects)
 		{
 			i->render(*target);
 		}
-		for (auto& i : collisions)
+		for (auto& i : this->collisions)
 		{
 			i->render(*target);
 		}
 
 
 		if (!this->player->isRendered()) this->player->render(*target);
+
+		for (auto& i : this->shadow)
+		{
+			i->render(*target);
+		}
 
 		if (!this->chat.empty())
 			this->chat.front()->render(target);
