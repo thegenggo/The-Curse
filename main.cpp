@@ -2209,6 +2209,21 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
 
+			this->objects.push_back(new Object("Shadow1", this->player, 704.f, -172.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 948.f, -5.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 927.f, -163.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 487.f, -179.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 200.f, -164.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 633.f, 760.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 1567.f, 19.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 185.f, 83.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 375.f, 95.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 17.f, 342.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 224.f, 699.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 1221.f, 150.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 1521.f, 694.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 1719.f, 608.f));
+
 			this->chat.push_back(new ChatDialog(L"ชายหนุ่มได้ออกเดินทางตามหาต้นตอของคำสาปที่ทำให้หญิงผู้ที่เป็นที่รักต้องทนทุกข์ทรมาร จนมาถึงป่าแห่งหนึ่งที่เต็มไปด้วยกลิ่นอายอันชั่วร้าย"));
 			this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน", "Images/character/gurad.png"));
 			this->chat.push_back(new ChatDialog(L" ", "พูดความจริง", "โกหกว่ามาตามหาคน", &dialogchat, &this->chat));
@@ -3027,6 +3042,27 @@ public:
 				this->player->setPosition(this->player->getPosition().x, 0.f);
 			}
 
+			if (this->player->intersects(FloatRect(750.f, 423.f, 100.f, 100.f)) && this->dialog == 0)
+			{
+				if (this->dialogchat == 2) {
+					this->chat.push_back(new ChatDialog(L"หัวกะโหลกขนาดใหญ่นั้นมัน หรือว่า?", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ดูเหมือนเจ้าจะรู้ตัวแล้วสินะ ไม่คิดเลยว่าเจ้าจะลืมกลิ่นอายของข้าไป", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"ไม่คิดเลยว่าจะเป็นเจ้า กิวคิ เจ้าเองสินะที่ร่ายคำสาปใส่นาง", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ถูกต้อง ข้าเองแหละ ที่เป็นผู้ร่ายคำสาป แต่ก็เพื่อล่อให้เจ้าออกมายังไงละ ข้าจะได้ล้างแค้นในสิ่งที่เจ้าทำกับข้าเอาไว้", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"งั้นเหรอถ้าอย่างนั้น เรามาจบเรื่องกัน!", "Images/character/MC.png"));
+					this->dialog = 3;
+				}
+				if (this->dialogchat == 1) {
+					this->chat.push_back(new ChatDialog(L"หัวกะโหลกขนาดใหญ่นี่ กาชาโดคุโระ สินะ กิวคิ", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ไม่คิดเลยว่าเจ้าจะรู้ว่าเป็นข้า ตั้งแต่เมื่อไหร่กัน", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"ตั้งแต่ตอนแรกที่เข้ามาในป่าแล้ว เขตแดนแบบนี้ไม่มีใครอื่นนอกจากเจ้าที่ทำได้หรอก กิวคิ", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ฮึ งั้นก็ดีไหนๆเจ้าก็รู้ตั้งแต่แรกแล้ว เรามาจบเรื่องของเราตั้งแต่เมื่อร้อยปีก่อนเลยดีกว่า", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"ครั้งนั้นข้ายังอ่อนประสบการณ์จนไม่สามารถจัดการเจ้าได้ แต่ครั้งนี้แหละ ", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ถ้าอย่างนั้นก็เข้ามาเลย อาเบะโนะ เซย์เมย์!", "Images/character/gyuki.png"));
+
+					this->dialog = 3;
+				}
+			}
 		}
 	}
 
