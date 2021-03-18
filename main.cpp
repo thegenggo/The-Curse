@@ -2027,6 +2027,11 @@ public:
 			this->sprite.setTexture(this->texture);
 			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
 		}
+		else if (this->name == "Shadow1")
+		{
+			this->texture.loadFromFile("Images/map/tree_type_1_shadow.png");
+			this->sprite.setTexture(this->texture);
+		}
 		else
 		{
 			this->texture.loadFromFile("Images/map/tree_type_1.png");
@@ -2147,6 +2152,21 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 309.f, 379.f));
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
+
+			this->objects.push_back(new Object("Shadow1", this->player, 704.f, -172.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 948.f, -5.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 927.f, -163.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 487.f, -179.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 200.f, -164.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 633.f, 760.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 1567.f, 19.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 185.f, 83.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 375.f, 95.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 17.f, 342.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 224.f, 699.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 1221.f, 150.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 1521.f, 694.f));
+			this->objects.push_back(new Object("Shadow1", this->player, 1719.f, 608.f));
 
 			this->chat.push_back(new ChatDialog(L"ชายหนุ่มได้ออกเดินทางตามหาต้นตอของคำสาปที่ทำให้หญิงผู้ที่เป็นที่รักต้องทนทุกข์ทรมาร จนมาถึงป่าแห่งหนึ่งที่เต็มไปด้วยกลิ่นอายอันชั่วร้าย"));
 		}
