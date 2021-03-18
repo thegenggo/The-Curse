@@ -2033,57 +2033,57 @@ public:
 		}
 		else if (this->name == "BossOni")
 		{
-			this->texture.loadFromFile("Images/map/fence2.png");
+			this->texture.loadFromFile("Images/monster_on_map/map1/boss_oni.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 250.f, 250.f);
 		}
 		else if (this->name == "Hitotsume")
 		{
-			this->texture.loadFromFile("Images/map/fence2.png");
+			this->texture.loadFromFile("Images/monster_on_map/map1/hitotsume.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 250.f, 250.f);
 		}
 		else if (this->name == "Karakasa")
 		{
-			this->texture.loadFromFile("Images/map/fence2.png");
+			this->texture.loadFromFile("Images/monster_on_map/map1/karakasa.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 125.f, 125.f);
 		}
 		else if (this->name == "Amikiri")
 		{
-			this->texture.loadFromFile("Images/map/fence2.png");
+			this->texture.loadFromFile("Images/monster_on_map/map2/amikiri.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 250.f, 250.f);
 		}
 		else if (this->name == "BossUmibozu")
 		{
-			this->texture.loadFromFile("Images/map/fence2.png");
+			this->texture.loadFromFile("Images/monster_on_map/map2/boss_umibozu.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 250.f, 250.f);
 		}
 		else if (this->name == "Kappa")
 		{
-			this->texture.loadFromFile("Images/map/fence2.png");
+			this->texture.loadFromFile("Images/monster_on_map/map2/kappa.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 250.f, 250.f);
 		}
 		else if (this->name == "BossGashadokuro")
 		{
-			this->texture.loadFromFile("Images/map/fence2.png");
+			this->texture.loadFromFile("Images/monster_on_map/map3/boss_gashadokuro.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 250.f, 250.f);
 		}
 		else if (this->name == "Skeleton")
 		{
-			this->texture.loadFromFile("Images/map/fence2.png");
+			this->texture.loadFromFile("Images/monster_on_map/map3/skeleton.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 250.f, 250.f);
 		}
 		else if (this->name == "Wanyudo")
 		{
-			this->texture.loadFromFile("Images/map/fence2.png");
+			this->texture.loadFromFile("Images/monster_on_map/map3/wanyudo.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 75.f, 74.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX, positionY, 250.f, 250.f);
 		}
 		else
 		{
