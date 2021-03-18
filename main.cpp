@@ -2211,6 +2211,12 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 309.f, 379.f));
 			this->objects.push_back(new Object("Rock", this->player, 147.f, 841.f));
 			this->objects.push_back(new Object("Rock", this->player, 1516.f, 41.f));
+			this->objects.push_back(new Object("Hitotsume", this->player, 904.f, 210.f));
+			this->objects.push_back(new Object("Karakasa", this->player, 342.f, 523.f));
+			this->objects.push_back(new Object("Hitotsume", this->player, 413.f, 690.f));
+			this->objects.push_back(new Object("Karakasa", this->player, 1297.f, 569.f));
+			this->objects.push_back(new Object("Hitotsume", this->player, 900.f, 924.f));
+
 
 			this->shadow.push_back(new Object("Shadow1", this->player, 704.f, -172.f));
 			this->shadow.push_back(new Object("Shadow1", this->player, 948.f, -5.f));
@@ -2226,6 +2232,7 @@ public:
 			this->shadow.push_back(new Object("Shadow1", this->player, 1221.f, 150.f));
 			this->shadow.push_back(new Object("Shadow1", this->player, 1521.f, 694.f));
 			this->shadow.push_back(new Object("Shadow1", this->player, 1719.f, 608.f));
+
 
 			this->chat.push_back(new ChatDialog(L"ชายหนุ่มได้ออกเดินทางตามหาต้นตอของคำสาปที่ทำให้หญิงผู้ที่เป็นที่รักต้องทนทุกข์ทรมาร จนมาถึงป่าแห่งหนึ่งที่เต็มไปด้วยกลิ่นอายอันชั่วร้าย"));
 			this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน", "Images/character/gurad.png"));
@@ -2295,6 +2302,12 @@ public:
 			this->objects.push_back(new Object("Tree3", this->player, 1225.f, 15.f));
 			this->objects.push_back(new Object("Tree3", this->player, 712.f, 853.f));
 			this->objects.push_back(new Object("Tree3", this->player, 1010.f, 330.f));
+			this->objects.push_back(new Object("Hitotsume", this->player, 274.f, 559.f));
+			this->objects.push_back(new Object("Karakasa", this->player, 279.f, 991.f));
+			this->objects.push_back(new Object("Hitotsume", this->player, 945.f, 757.f));
+			this->objects.push_back(new Object("Karakasa", this->player, 1189.f, 127.f));
+			this->objects.push_back(new Object("Hitotsume", this->player, 1513.f, 447.f));
+
 
 			this->shadow.push_back(new Object("Shadow1", this->player, 524.f, 73.f));
 			this->shadow.push_back(new Object("Shadow1", this->player, 1317.f, -161.f));
@@ -2355,6 +2368,12 @@ public:
 			this->objects.push_back(new Object("Tree3", this->player, 793.f, 79.f));
 			this->objects.push_back(new Object("Tree3", this->player, 996.f, 769.f));
 			this->objects.push_back(new Object("Tree3", this->player, 58.f, 1023.f));
+			this->objects.push_back(new Object("Hitotsume", this->player, 375.f, 393.f));
+			this->objects.push_back(new Object("Karakasa", this->player, 896.f, 593.f));
+			this->objects.push_back(new Object("Hitotsume", this->player, 1027.f, 885.f));
+			this->objects.push_back(new Object("Karakasa", this->player, 547.f, 832.f));
+			this->objects.push_back(new Object("BossOni", this->player, 1492.f, 545.f));
+
 
 			this->shadow.push_back(new Object("Shadow1", this->player, 327.f, 767.f));
 			this->shadow.push_back(new Object("Shadow1", this->player, 94.f, 148.f));
@@ -2396,6 +2415,10 @@ public:
 			this->objects.push_back(new Object("Tree2", this->player, 0.f, 257.f));
 			this->objects.push_back(new Object("Tree2", this->player, 403.f, 445.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1003.f, -139.f));
+			this->objects.push_back(new Object("Amikiri", this->player, 606.f, 508.f));
+			this->objects.push_back(new Object("Kappa", this->player, 1453.f, 549.f));
+			this->objects.push_back(new Object("Amikiri", this->player, 1168.f, 640.f));
+
 
 			this->shadow.push_back(new Object("Shadow1", this->player, -20.f, 39.f));
 			this->shadow.push_back(new Object("Shadow1", this->player, -29.f, 472.f));
@@ -2444,6 +2467,10 @@ public:
 			this->objects.push_back(new Object("Tree3", this->player, 744.f, 280.f));
 			this->objects.push_back(new Object("Tree3", this->player, 299.f, 859.f));
 			this->objects.push_back(new Object("Tree3", this->player, 17.f, 266.f));
+			this->objects.push_back(new Object("Amikiri", this->player, 395.f, 499.f));
+			this->objects.push_back(new Object("Kappa", this->player, 1355.f, 544.f));
+			this->objects.push_back(new Object("BossUmibozu", this->player, 954.f, 165.f));
+
 
 			this->shadow.push_back(new Object("Shadow1", this->player, 20.f, -127.f));
 			this->shadow.push_back(new Object("Shadow1", this->player, 368.f, -109.f));
@@ -2565,6 +2592,10 @@ public:
 			this->objects.push_back(new Object("Fence2", this->player, 168.f, 776.f));
 			this->objects.push_back(new Object("Fence2", this->player, 1776.f, 776.f));
 			this->objects.push_back(new Object("Fence2", this->player, 1832.f, 776.f));
+			this->objects.push_back(new Object("Skeleton", this->player, 652.f, 744.f));
+			this->objects.push_back(new Object("Wanyudo", this->player, 983.f, 276.f));
+			this->objects.push_back(new Object("Skeleton", this->player, 1473.f, 437.f));
+
 
 			this->shadow.push_back(new Object("Shadow1", this->player, 296.f, -90.f));
 			this->shadow.push_back(new Object("Shadow1", this->player, 16.f, -90.f));
@@ -2626,6 +2657,10 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 154.f, 49.f));
 			this->objects.push_back(new Object("Rock", this->player, 1814.f, 244.f));
 			this->objects.push_back(new Object("Rock", this->player, 1105.f, 18.f));
+			this->objects.push_back(new Object("Wanyudo", this->player, 863.f, 488.f));
+			this->objects.push_back(new Object("Skeleton", this->player, 873.f, 212.f));
+			this->objects.push_back(new Object("Wanyudo", this->player, 1357.f, 437.f));
+
 
 			this->shadow.push_back(new Object("Shadow1", this->player, 1657.f, -46.f));
 			this->shadow.push_back(new Object("Shadow1", this->player, 277.f, -145.f));
@@ -2678,6 +2713,8 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 11.f, 989.f));
 			this->objects.push_back(new Object("Rock", this->player, 245.f, 698.f));
 			this->objects.push_back(new Object("Rock", this->player, 1782.f, 727.f));
+			this->objects.push_back(new Object("BossGashadokuro", this->player, 756.f, 230.f));
+
 
 			this->shadow.push_back(new Object("Shadow1", this->player, 97.f, 698.f));
 			this->shadow.push_back(new Object("Shadow1", this->player, 1252.f, 698.f));
