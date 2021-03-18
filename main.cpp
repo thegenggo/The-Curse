@@ -2966,6 +2966,27 @@ public:
 				this->player->setPosition(this->player->getPosition().x, 0.f);
 			}
 
+			if (this->player->intersects(FloatRect(750.f, 423.f, 100.f, 100.f)) && this->dialog == 0)
+			{
+				if (this->dialogchat == 2) {
+					this->chat.push_back(new ChatDialog(L"หัวกะโหลกขนาดใหญ่นั้นมัน หรือว่า?", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ดูเหมือนเจ้าจะรู้ตัวแล้วสินะ ไม่คิดเลยว่าเจ้าจะลืมกลิ่นอายของข้าไป", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"ไม่คิดเลยว่าจะเป็นเจ้า กิวคิ เจ้าเองสินะที่ร่ายคำสาปใส่นาง", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ถูกต้อง ข้าเองแหละ ที่เป็นผู้ร่ายคำสาป แต่ก็เพื่อล่อให้เจ้าออกมายังไงละ ข้าจะได้ล้างแค้นในสิ่งที่เจ้าทำกับข้าเอาไว้", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"งั้นเหรอถ้าอย่างนั้น เรามาจบเรื่องกัน!", "Images/character/MC.png"));
+					this->dialog = 3;
+				}
+				if (this->dialogchat == 1) {
+					this->chat.push_back(new ChatDialog(L"หัวกะโหลกขนาดใหญ่นี่ กาชาโดคุโระ สินะ กิวคิ", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ไม่คิดเลยว่าเจ้าจะรู้ว่าเป็นข้า ตั้งแต่เมื่อไหร่กัน", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"ตั้งแต่ตอนแรกที่เข้ามาในป่าแล้ว เขตแดนแบบนี้ไม่มีใครอื่นนอกจากเจ้าที่ทำได้หรอก กิวคิ", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ฮึ งั้นก็ดีไหนๆเจ้าก็รู้ตั้งแต่แรกแล้ว เรามาจบเรื่องของเราตั้งแต่เมื่อร้อยปีก่อนเลยดีกว่า", "Images/character/gyuki.png"));
+					this->chat.push_back(new ChatDialog(L"ครั้งนั้นข้ายังอ่อนประสบการณ์จนไม่สามารถจัดการเจ้าได้ แต่ครั้งนี้แหละ ", "Images/character/MC.png"));
+					this->chat.push_back(new ChatDialog(L"ถ้าอย่างนั้นก็เข้ามาเลย อาเบะโนะ เซย์เมย์!", "Images/character/gyuki.png"));
+
+					this->dialog = 3;
+				}
+			}
 		}
 	}
 
