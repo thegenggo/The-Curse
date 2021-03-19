@@ -1373,7 +1373,6 @@ protected:
 	map<string, State*>* states;
 
 	bool quit;
-
 public:
 	//Accessors
 	const bool& getQuit() const
@@ -1711,7 +1710,7 @@ class BattleState : public State
 	Sprite skillDetail;
 	Sprite itemDetail;
 	vector<Enemy*> enemy;
-	Player* player;
+	Player*& player;
 	Enemy* target;
 	TargetCursor* targetCursor;
 	ShowText* clear;
@@ -1902,7 +1901,7 @@ public:
 	}
 
 	//Constructor / Destructor
-	BattleState(RenderWindow* window, map<string, State*>* states, Player* player, vector<Object*>::iterator monster, vector<Object*>* monsters, int battleStage = 11)
+	BattleState(RenderWindow* window, map<string, State*>* states, Player*& player, vector<Object*>::iterator monster, vector<Object*>* monsters, int battleStage = 11)
 		: State(window, states), player(player), battleStage(battleStage), monster(monster), monsters(monsters)
 	{
 		this->time = 0;
@@ -2242,7 +2241,7 @@ class GameState : public State
 	vector<CollisionBox*> collisions;
 	string textline;
 	list<ChatDialog*> chat;
-	Player* player;
+	Player*& player;
 
 	int& dialogchat;
 	int gameStage;
@@ -2252,7 +2251,7 @@ public:
 	//Initilizer functions
 
 	//Constructor / Destructor
-	GameState(RenderWindow* window, map<string, State*>* states, Player* player, int& dialogchat, int gameStage = 11)
+	GameState(RenderWindow* window, map<string, State*>* states, Player*& player, int& dialogchat, int gameStage = 11)
 		: State(window, states), player(player), gameStage(gameStage), dialogchat(dialogchat)
 	{
 		this->dialog = 0;
@@ -2469,7 +2468,7 @@ public:
 			this->objects.push_back(new Object("Karakasa", this->player, 841.f, 593.f));
 			this->objects.push_back(new Object("Hitotsume", this->player, 1501.f, 830.f));
 			this->objects.push_back(new Object("Karakasa", this->player, 547.f, 832.f));
-			this->objects.push_back(new Object("BossOni", this->player, 1494.f, 465.f));
+			this->objects.push_back(new Object("BossOni", this->player, 1494.f, 400.f));
 
 
 			this->shadow.push_back(new Object("Shadow1", this->player, 327.f, 767.f));
@@ -2951,11 +2950,20 @@ public:
 					this->dialog = 3;
 				}
 			}
+
+			if (this->dialog == 3 && this->chat.empty())
+			{
+				currentState = "MainMenu";
+				for (auto i = this->states->find("Map1_1"); i != this->states->end(); i++)
+					i->second->endState();
+				delete this->player;
+				this->player = NULL;
+				return;
+			}
 		}
 
 		this->updateMousePositions();
 		this->updateInput(dt);
-
 		this->player->update(dt);
 
 		//Check fight with monsters.
@@ -3325,20 +3333,6 @@ public:
 				this->player->setPosition(this->player->getPosition().x, 0.f);
 			}
 		}
-
-		//End Game
-		if (this->gameStage == 33)
-		{
-			if (this->dialog == 3 && this->chat.empty())
-			{
-				currentState = "MainMenu";
-				for (auto i = this->states->find("Map1_1"); i != this->states->end(); i++)
-					delete i->second;
-				this->states->erase(this->states->find("Map1_1"), this->states->end());
-				delete this->player;
-				this->player = NULL;
-			}
-		}
 	}
 
 	void render(RenderTarget* target = NULL)
@@ -3524,14 +3518,6 @@ public:
 int main()
 {
 	font.loadFromFile("Fonts/2005_iannnnnJPG.ttf");
-	/*enemyTextures["battleKarakasa"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
-	enemyTextures["battleHitosume"].loadFromFile("Images/on_battle_stage/monmap1_boss_oni.png");
-	enemyTextures["battleBossOni"].loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
-	enemyTextures["battleKappa"].loadFromFile("Images/on_battle_stage/monmap2_kappa.png");
-	enemyTextures["battleAmikiri"].loadFromFile("Images/on_battle_stage/monmap2_amikiri.png");
-	enemyTextures["battleBossUmibozu"].loadFromFile("Images/on_battle_stage/monmap2_boss_umibozu.png");
-	enemyTextures["battleSkeleton"].loadFromFile("Images/on_battle_stage/monmap3_skeleton.png");
-	enemyTextures["battleWanyudo"].loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");*/
 
 	bool fullscreen = true;
 	unsigned antialiasing_level = 5;
