@@ -817,9 +817,9 @@ public:
 		else if (this->name == "Wanyudo")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");
-			this->hp = 400;
-			this->max_hp = 400;
-			this->att = 100;
+			this->hp = 500;
+			this->max_hp = 500;
+			this->att = 150;
 			this->def = 10;
 			this->lvl = 1;
 			this->exp = 500;
