@@ -728,7 +728,7 @@ public:
 			this->texture.loadFromFile("Images/on_battle_stage/monmap1_karakasa.png");
 			this->hp = 600;
 			this->max_hp = 600;
-			this->att = 80;
+			this->att = 60;
 			this->def = 5;
 			this->lvl = 1;
 			this->exp = 500;
@@ -739,9 +739,9 @@ public:
 		else if (this->name == "Hitotsume")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap1_hitotsume.png");
-			this->hp = 600;
-			this->max_hp = 600;
-			this->att = 80;
+			this->hp = 500;
+			this->max_hp = 500;
+			this->att = 70;
 			this->def = 10;
 			this->lvl = 1;
 			this->exp = 500;
@@ -754,7 +754,7 @@ public:
 			this->texture.loadFromFile("Images/on_battle_stage/monmap1_boss_oni.png");
 			this->hp = 1000;
 			this->max_hp = 1000;
-			this->att = 150;
+			this->att = 100;
 			this->def = 20;
 			this->lvl = 1;
 			this->exp = 500;
@@ -765,9 +765,9 @@ public:
 		else if (this->name == "Amikiri")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap2_amikiri.png");
-			this->hp = 750;
-			this->max_hp = 750;
-			this->att = 100;
+			this->hp = 700;
+			this->max_hp = 700;
+			this->att = 90;
 			this->def = 15;
 			this->lvl = 1;
 			this->exp = 500;
@@ -778,9 +778,9 @@ public:
 		else if (this->name == "Kappa")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap2_kappa.png");
-			this->hp = 700;
-			this->max_hp = 700;
-			this->att = 150;
+			this->hp = 600;
+			this->max_hp = 600;
+			this->att = 100;
 			this->def = 10;
 			this->lvl = 1;
 			this->exp = 500;
@@ -791,10 +791,10 @@ public:
 		else if (this->name == "Boss Umibozu")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap2_boss_umibozu.png");
-			this->hp = 2000;
-			this->max_hp = 2000;
-			this->att = 200;
-			this->def = 30;
+			this->hp = 1300;
+			this->max_hp = 1300;
+			this->att = 150;
+			this->def = 20;
 			this->lvl = 1;
 			this->exp = 500;
 
@@ -806,7 +806,7 @@ public:
 			this->texture.loadFromFile("Images/on_battle_stage/monmap3_skeleton.png");
 			this->hp = 400;
 			this->max_hp = 400;
-			this->att = 300;
+			this->att = 150;
 			this->def = 5;
 			this->lvl = 1;
 			this->exp = 500;
@@ -819,7 +819,7 @@ public:
 			this->texture.loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");
 			this->hp = 400;
 			this->max_hp = 400;
-			this->att = 150;
+			this->att = 100;
 			this->def = 10;
 			this->lvl = 1;
 			this->exp = 500;
