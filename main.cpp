@@ -653,7 +653,7 @@ public:
 		this->showTextPushBack(dmg);
 	}
 
-	virtual void showTextUpdate(const float& dt)
+	void showTextUpdate(const float& dt)
 	{
 		for (auto i = this->showText.begin(); i < this->showText.end(); i++)
 		{
@@ -817,9 +817,9 @@ public:
 		else if (this->name == "Wanyudo")
 		{
 			this->texture.loadFromFile("Images/on_battle_stage/monmap3_wanyudo.png");
-			this->hp = 400;
-			this->max_hp = 400;
-			this->att = 100;
+			this->hp = 500;
+			this->max_hp = 500;
+			this->att = 150;
 			this->def = 10;
 			this->lvl = 1;
 			this->exp = 500;
@@ -908,8 +908,6 @@ class Player : public Entity
 	//Variables
 	Sprite openWorldSprite;
 	Sprite battleSprite;
-	Sprite light;
-	Texture lightTexture;
 	Texture openWorldTexture;
 	Texture battleTexture;
 
@@ -1017,12 +1015,7 @@ public:
 		this->hitboxComponent = new HitboxComponent(this->openWorldSprite, 0.f, 0.f, 45.f, 30.f);
 		this->openWorldanimationComponent = new AnimationComponent(this->openWorldSprite, this->openWorldTexture);
 		this->battleAnimationComponent = new AnimationComponent(this->battleSprite, this->battleTexture);
-		this->movementComponent = new MovementComponent(this->openWorldSprite, 1000.f);
-
-		this->lightTexture.loadFromFile("Images/light.png");
-		this->light.setTexture(lightTexture);
-		this->light.setOrigin(this->light.getGlobalBounds().width / 2, this->light.getGlobalBounds().height / 2);
-		this->light.setColor(Color::Transparent);
+		this->movementComponent = new MovementComponent(this->openWorldSprite, 300.f);
 
 		this->openWorldanimationComponent->addAnimation("IDLE", 0.5f, 0, 0, 0, 0, 125, 125);
 		this->openWorldanimationComponent->addAnimation("IDLE_UP", 0.5f, 1, 1, 1, 1, 125, 125);
@@ -1102,14 +1095,6 @@ public:
 	void setMode(bool x)
 	{
 		this->mode = x;
-	}
-
-	void setLight(bool x)
-	{
-		if (x)
-			this->light.setColor(Color::Black);
-		else
-			this->light.setColor(Color::Transparent);
 	}
 
 	//Functions
@@ -1196,7 +1181,7 @@ public:
 			if (this->elixirs > 0)
 			{
 				this->elixirs--;
-				int heal = floor(this->max_hp * 1.f / 4.f);
+				int heal = this->max_hp * 1 / 4;
 				if (heal + this->hp > this->max_hp) heal = this->max_hp - this->hp;
 				this->hp += heal;
 				this->showTextPushBack(heal, Color::Green);
@@ -1207,7 +1192,7 @@ public:
 			if (this->sacredWater > 0)
 			{
 				this->sacredWater--;
-				int heal = floor(this->max_stamina * 1.f / 4.f);
+				int heal = this->max_stamina * 1 / 4;
 				if (heal + this->stamina > this->max_stamina) heal = this->max_stamina - this->stamina;
 				this->stamina += heal;
 				this->showTextPushBack(heal, Color::Blue);
@@ -1255,7 +1240,6 @@ public:
 		}
 
 		this->hitboxComponent->update();
-		this->light.setPosition(this->openWorldSprite.getPosition().x + this->getGlobalBounds().width / 2, this->openWorldSprite.getPosition().y + this->getGlobalBounds().height / 2);
 
 		this->rendered = false;
 	}
@@ -1290,7 +1274,6 @@ public:
 	{
 		this->hitboxComponent->render(target);
 		target.draw(this->openWorldSprite);
-		target.draw(this->light);
 		this->rendered = true;
 	}
 
@@ -1369,7 +1352,7 @@ public:
 
 	void render(RenderTarget& target)
 	{
-		target.draw(this->shape);
+		/*target.draw(this->shape);*/
 	}
 };
 
@@ -2243,15 +2226,15 @@ public:
 		target->draw(this->amountItem2);
 
 		//show mouse position zone
-		Text mouseText;
+		/*Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
 		mouseText.setFont(font);
 		mouseText.setCharacterSize(20);
 		std::stringstream ss;
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
-		mouseText.setString(ss.str());
+		mouseText.setString(ss.str());*/
 
-		target->draw(mouseText);
+		/*target->draw(mouseText);*/
 	}
 };
 
@@ -2284,6 +2267,8 @@ class GameState : public State
 	string textline;
 	list<ChatDialog*> chat;
 	Player*& player;
+	Sprite light;
+	Texture lightTexture;
 
 	int& dialogchat;
 	int gameStage;
@@ -2296,6 +2281,10 @@ public:
 	GameState(RenderWindow* window, map<string, State*>* states, Player*& player, int& dialogchat, int gameStage = 11)
 		: State(window, states), player(player), gameStage(gameStage), dialogchat(dialogchat)
 	{
+		this->lightTexture.loadFromFile("Images/light.png");
+		this->light.setTexture(this->lightTexture);
+		this->light.setColor(Color::Transparent);
+		this->light.setOrigin(this->light.getGlobalBounds().width / 2.f, this->light.getGlobalBounds().height / 2.f);
 		this->dialog = 0;
 		this->dialogchat = 0;
 		if (this->gameStage == 11)
@@ -2572,10 +2561,13 @@ public:
 		}
 		else if (this->gameStage == 23)
 		{
+			this->light.setColor(Color::Black);
 			this->backgroundTexture.loadFromFile("Images/map/map2/map2_3.png");
 
 			this->shadowTexture.loadFromFile("Images/map/shadow/map2_3_shadow.png");
 			this->shadow.setTexture(this->shadowTexture);
+
+			this->light.setColor(Color::Black);
 
 			this->collisions.push_back(new CollisionBox(*this->player, 1310.f, 870.f, 1.f, 210.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 1310.f, 870.f, 610.f, 1.f));
@@ -2627,6 +2619,8 @@ public:
 
 			this->shadowTexture.loadFromFile("Images/map/shadow/map3_1_shadow.png");
 			this->shadow.setTexture(this->shadowTexture);
+
+			this->light.setColor(Color::Black);
 
 			this->collisions.push_back(new CollisionBox(*this->player, 10.f, 870.f, 50.f, 50.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 70.f, 885.f, 50.f, 50.f));
@@ -2686,6 +2680,8 @@ public:
 
 			this->shadowTexture.loadFromFile("Images/map/shadow/map3_2_shadow.png");
 			this->shadow.setTexture(this->shadowTexture);
+
+			this->light.setColor(Color::Black);
 
 			this->collisions.push_back(new CollisionBox(*this->player, 10.f, 960.f, 50.f, 50.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 70.f, 980.f, 50.f, 50.f));
@@ -2749,6 +2745,8 @@ public:
 
 			this->shadowTexture.loadFromFile("Images/map/shadow/map3_3_shadow.png");
 			this->shadow.setTexture(this->shadowTexture);
+
+			this->light.setColor(Color::Black);
 
 			this->objects.push_back(new Object("House3", this->player, 1559.f, 24.f));
 			this->objects.push_back(new Object("House3", this->player, 1559.f, 382.f));
@@ -2855,6 +2853,9 @@ public:
 
 	void update(const float& dt)
 	{
+
+		//Light
+		this->light.setPosition(this->player->getHitboxGlobalBounds().left + 20.f, this->player->getHitboxGlobalBounds().top - 20.f);
 		//Story
 		if (this->gameStage == 11)
 		{
@@ -2903,7 +2904,7 @@ public:
 		}
 		if (this->gameStage == 33)
 		{
-			if (this->player->intersects(FloatRect(849.f, 480.f, 250.f, 250.f)) && this->dialog == 0)
+			if (this->player->intersects(FloatRect(849.f, 280.f, 250.f, 250.f)) && this->dialog == 0)
 			{
 				if (this->dialogchat == 2)
 				{
@@ -3332,17 +3333,19 @@ public:
 
 		target->draw(this->shadow);
 
+		target->draw(this->light);
+
 		if (!this->chat.empty())
 			this->chat.front()->render(target);
 
-		Text mouseText;
+	/*	Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
 		mouseText.setFont(font);
 		mouseText.setCharacterSize(20);
 		stringstream ss;
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
 		mouseText.setString(ss.str());
-		target->draw(mouseText);
+		target->draw(mouseText);*/
 	}
 };
 
@@ -3475,14 +3478,14 @@ public:
 
 		target->draw(this->background);
 
-		Text mouseText;
+	/*	Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
 		mouseText.setFont(font);
 		mouseText.setCharacterSize(20);
 		stringstream ss;
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
 		mouseText.setString(ss.str());
-		target->draw(mouseText);
+		target->draw(mouseText);*/
 
 		this->renderButtons(*target);
 	}
