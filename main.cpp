@@ -943,6 +943,18 @@ class Player : public Entity
 
 public:
 	//Accessors
+	const int getAmountItem(int itemNumber) const
+	{
+		if (itemNumber == 1)
+		{
+			return elixirs;
+		}
+		else
+		{
+			return sacredWater;
+		}
+	}
+
 	const Vector2f& getVelocity() const
 	{
 		return this->movementComponent->getVelocity();
@@ -1563,7 +1575,7 @@ public:
 		{
 			this->texture.loadFromFile("Images/monster_on_map/map1/boss_oni.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY, 120.f, 250.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 100.f, 120.f, 150.f);
 		}
 		else if (this->name == "Hitotsume")
 		{
@@ -1709,6 +1721,8 @@ class BattleState : public State
 	//entity player&ene
 	Sprite skillDetail;
 	Sprite itemDetail;
+	Text amountItem1;
+	Text amountItem2;
 	vector<Enemy*> enemy;
 	Player*& player;
 	Enemy* target;
@@ -1916,10 +1930,16 @@ public:
 		this->targetCursor = new TargetCursor();
 		this->skillDetailTexture.loadFromFile("Images/skill window.png");
 		this->itemDetailTexture.loadFromFile("Images/ItemwindowV2.png");
+		this->amountItem1.setFont(font);
+		this->amountItem2.setFont(font);
+		this->amountItem1.setCharacterSize(50);
+		this->amountItem2.setCharacterSize(50);
 		this->skillDetail.setColor(Color::Transparent);
 		this->itemDetail.setColor(Color::Transparent);
 		this->skillDetail.setTexture(this->skillDetailTexture);
 		this->itemDetail.setTexture(this->itemDetailTexture);
+		this->amountItem1.setFillColor(Color::Transparent);
+		this->amountItem2.setFillColor(Color::Transparent);
 	}
 
 	~BattleState()
@@ -2070,18 +2090,38 @@ public:
 
 	void update(const float& dt)
 	{
+		this->amountItem1.setString(to_string(this->player->getAmountItem(1)));
+		this->amountItem2.setString(to_string(this->player->getAmountItem(2)));
 		this->skillDetail.setPosition(this->mousePosView.x - this->skillDetail.getGlobalBounds().width,
 			this->mousePosView.y - this->skillDetail.getGlobalBounds().height);
 		this->itemDetail.setPosition(this->mousePosView.x - this->itemDetail.getGlobalBounds().width,
 			this->mousePosView.y - this->itemDetail.getGlobalBounds().height);
+		this->amountItem1.setPosition(this->mousePosView.x - this->skillDetail.getGlobalBounds().width + 480.f,
+			this->mousePosView.y - this->skillDetail.getGlobalBounds().height + 135.f);
+		this->amountItem2.setPosition(this->mousePosView.x - this->itemDetail.getGlobalBounds().width + 480.f,
+			this->mousePosView.y - this->itemDetail.getGlobalBounds().height + 465.f);
 
 		if (this->detailButtons["SkillDetail"]->isHovered())
+		{
 			this->skillDetail.setColor(Color::White);
-		else this->skillDetail.setColor(Color::Transparent);
+		}
+		else
+		{
+			this->skillDetail.setColor(Color::Transparent);
+		}
 
 		if (this->detailButtons["ItemDetail"]->isHovered())
+		{
+			this->amountItem1.setFillColor(Color::Black);
+			this->amountItem2.setFillColor(Color::Black);
 			this->itemDetail.setColor(Color::White);
-		else this->itemDetail.setColor(Color::Transparent);
+		}
+		else
+		{
+			this->amountItem1.setFillColor(Color::Transparent);
+			this->amountItem2.setFillColor(Color::Transparent);
+			this->itemDetail.setColor(Color::Transparent);
+		}
 
 		//enviornment update zone
 		this->updateButtons();
@@ -2190,8 +2230,6 @@ public:
 		for (auto& i : enemy)
 			i->render(*target);
 
-		//render damage to enemy
-
 		//render button
 		this->renderButtons(target);
 
@@ -2200,6 +2238,9 @@ public:
 
 		target->draw(this->skillDetail);
 		target->draw(this->itemDetail);
+
+		target->draw(this->amountItem1);
+		target->draw(this->amountItem2);
 
 		//show mouse position zone
 		Text mouseText;
@@ -2878,7 +2919,7 @@ public:
 
 	void update(const float& dt)
 	{
-		//ChatDialog
+		//Story
 		if (this->gameStage == 11)
 		{
 			if (this->dialogchat == 2 && this->dialog == 1)
@@ -2950,7 +2991,6 @@ public:
 					this->dialog = 3;
 				}
 			}
-
 			if (this->dialog == 3 && this->chat.empty())
 			{
 				currentState = "MainMenu";
