@@ -943,6 +943,18 @@ class Player : public Entity
 
 public:
 	//Accessors
+	const int getAmountItem(int itemNumber) const
+	{
+		if (itemNumber == 1)
+		{
+			return elixirs;
+		}
+		else
+		{
+			return sacredWater;
+		}
+	}
+
 	const Vector2f& getVelocity() const
 	{
 		return this->movementComponent->getVelocity();
@@ -1563,7 +1575,7 @@ public:
 		{
 			this->texture.loadFromFile("Images/monster_on_map/map1/boss_oni.png");
 			this->sprite.setTexture(this->texture);
-			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY, 120.f, 250.f);
+			this->collisionBox = new CollisionBox(*this->player, positionX + 65.f, positionY + 100.f, 120.f, 150.f);
 		}
 		else if (this->name == "Hitotsume")
 		{
@@ -1709,6 +1721,8 @@ class BattleState : public State
 	//entity player&ene
 	Sprite skillDetail;
 	Sprite itemDetail;
+	Text amountItem1;
+	Text amountItem2;
 	vector<Enemy*> enemy;
 	Player*& player;
 	Enemy* target;
@@ -1916,10 +1930,16 @@ public:
 		this->targetCursor = new TargetCursor();
 		this->skillDetailTexture.loadFromFile("Images/skill window.png");
 		this->itemDetailTexture.loadFromFile("Images/ItemwindowV2.png");
+		this->amountItem1.setFont(font);
+		this->amountItem2.setFont(font);
+		this->amountItem1.setCharacterSize(50);
+		this->amountItem2.setCharacterSize(50);
 		this->skillDetail.setColor(Color::Transparent);
 		this->itemDetail.setColor(Color::Transparent);
 		this->skillDetail.setTexture(this->skillDetailTexture);
 		this->itemDetail.setTexture(this->itemDetailTexture);
+		this->amountItem1.setFillColor(Color::Transparent);
+		this->amountItem2.setFillColor(Color::Transparent);
 	}
 
 	~BattleState()
@@ -2070,18 +2090,38 @@ public:
 
 	void update(const float& dt)
 	{
+		this->amountItem1.setString(to_string(this->player->getAmountItem(1)));
+		this->amountItem2.setString(to_string(this->player->getAmountItem(2)));
 		this->skillDetail.setPosition(this->mousePosView.x - this->skillDetail.getGlobalBounds().width,
 			this->mousePosView.y - this->skillDetail.getGlobalBounds().height);
 		this->itemDetail.setPosition(this->mousePosView.x - this->itemDetail.getGlobalBounds().width,
 			this->mousePosView.y - this->itemDetail.getGlobalBounds().height);
+		this->amountItem1.setPosition(this->mousePosView.x - this->skillDetail.getGlobalBounds().width + 480.f,
+			this->mousePosView.y - this->skillDetail.getGlobalBounds().height + 135.f);
+		this->amountItem2.setPosition(this->mousePosView.x - this->itemDetail.getGlobalBounds().width + 480.f,
+			this->mousePosView.y - this->itemDetail.getGlobalBounds().height + 465.f);
 
 		if (this->detailButtons["SkillDetail"]->isHovered())
+		{
 			this->skillDetail.setColor(Color::White);
-		else this->skillDetail.setColor(Color::Transparent);
+		}
+		else
+		{
+			this->skillDetail.setColor(Color::Transparent);
+		}
 
 		if (this->detailButtons["ItemDetail"]->isHovered())
+		{
+			this->amountItem1.setFillColor(Color::Black);
+			this->amountItem2.setFillColor(Color::Black);
 			this->itemDetail.setColor(Color::White);
-		else this->itemDetail.setColor(Color::Transparent);
+		}
+		else
+		{
+			this->amountItem1.setFillColor(Color::Transparent);
+			this->amountItem2.setFillColor(Color::Transparent);
+			this->itemDetail.setColor(Color::Transparent);
+		}
 
 		//enviornment update zone
 		this->updateButtons();
@@ -2190,8 +2230,6 @@ public:
 		for (auto& i : enemy)
 			i->render(*target);
 
-		//render damage to enemy
-
 		//render button
 		this->renderButtons(target);
 
@@ -2200,6 +2238,9 @@ public:
 
 		target->draw(this->skillDetail);
 		target->draw(this->itemDetail);
+
+		target->draw(this->amountItem1);
+		target->draw(this->amountItem2);
 
 		//show mouse position zone
 		Text mouseText;
@@ -2234,10 +2275,11 @@ class GameState : public State
 {
 	//Variables
 	Texture backgroundTexture;
+	Texture shadowTexture;
+	Sprite shadow;
 	RectangleShape background;
 	Sprite environment;
 	vector<Object*> objects;
-	vector<Object*> shadow;
 	vector<CollisionBox*> collisions;
 	string textline;
 	list<ChatDialog*> chat;
@@ -2259,6 +2301,9 @@ public:
 		if (this->gameStage == 11)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map1/map1_1.png");
+
+			this->shadowTexture.loadFromFile("Images/map/shadow/map1_1_shadow.png");
+			this->shadow.setTexture(this->shadowTexture);
 
 			this->objects.push_back(new Object("Tree1", this->player, 704.f, -172.f));
 			this->objects.push_back(new Object("Tree1", this->player, 948.f, -5.f));
@@ -2313,23 +2358,6 @@ public:
 			this->objects.push_back(new Object("Karakasa", this->player, 1297.f, 474.f));
 			this->objects.push_back(new Object("Hitotsume", this->player, 792.f, 739.f));
 
-
-			this->shadow.push_back(new Object("Shadow1", this->player, 704.f, -172.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 948.f, -5.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 927.f, -163.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 487.f, -179.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 200.f, -164.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 633.f, 760.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1567.f, 19.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 185.f, 83.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 375.f, 95.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 17.f, 342.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 224.f, 699.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1221.f, 150.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1521.f, 694.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1719.f, 608.f));
-
-
 			this->chat.push_back(new ChatDialog(L"ชายหนุ่มได้ออกเดินทางตามหาต้นตอของคำสาปที่ทำให้หญิงผู้ที่เป็นที่รักต้องทนทุกข์ทรมาร จนมาถึงป่าแห่งหนึ่งที่เต็มไปด้วยกลิ่นอายอันชั่วร้าย"));
 			this->chat.push_back(new ChatDialog(L"หยุดก่อนเจ้าหนุ่ม เจ้ามีธุระอะไรในป่าแห่งนี้กัน", "Images/character/gurad.png"));
 			this->chat.push_back(new ChatDialog(L" ", "พูดความจริง", "โกหกว่ามาตามหาคน", &dialogchat, &this->chat));
@@ -2338,6 +2366,9 @@ public:
 		else if (this->gameStage == 12)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map1/map1_2.png");
+
+			this->shadowTexture.loadFromFile("Images/map/shadow/map1_2_shadow.png");
+			this->shadow.setTexture(this->shadowTexture);
 
 			this->collisions.push_back(new CollisionBox(*this->player, 1434.f, 584.f, 1.f, 358.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 1634.f, 589.f, 1.f, 353.f));
@@ -2403,24 +2434,13 @@ public:
 			this->objects.push_back(new Object("Hitotsume", this->player, 945.f, 757.f));
 			this->objects.push_back(new Object("Karakasa", this->player, 1189.f, 127.f));
 			this->objects.push_back(new Object("Hitotsume", this->player, 1385.f, 447.f));
-
-
-			this->shadow.push_back(new Object("Shadow1", this->player, 524.f, 73.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1317.f, -161.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1555.f, -161.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 0.f, -145.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 296.f, -118.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 659.f, 249.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 866.f, 344.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1073.f, 468.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, -43.f, 789.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 509.f, 562.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1799.f, -145.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1685.f, 540.f));
 		}
 		else if (this->gameStage == 13)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map1/map1_3.png");
+
+			this->shadowTexture.loadFromFile("Images/map/shadow/map1_3_shadow.png");
+			this->shadow.setTexture(this->shadowTexture);
 
 			this->objects.push_back(new Object("Rock", this->player, 738.f, 730.f));
 			this->objects.push_back(new Object("Rock", this->player, 1165.f, 210.f));
@@ -2470,25 +2490,13 @@ public:
 			this->objects.push_back(new Object("Karakasa", this->player, 547.f, 832.f));
 			this->objects.push_back(new Object("BossOni", this->player, 1494.f, 400.f));
 
-
-			this->shadow.push_back(new Object("Shadow1", this->player, 327.f, 767.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 94.f, 148.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1230.f, 210.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1812.f, 666.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 829.f, 783.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 199.f, 439.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 965.f, -65.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1267.f, 524.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 453.f, 0.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1669.f, 194.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 362.f, 492.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1097.f, 783.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 47.f, 508.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1689.f, 749.f));
 		}
 		else if (this->gameStage == 21)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map2/map2_1.png");
+
+			this->shadowTexture.loadFromFile("Images/map/shadow/map2_1_shadow.png");
+			this->shadow.setTexture(this->shadowTexture);
 
 			this->collisions.push_back(new CollisionBox(*this->player, 490.f, 815.f, 1430.f, 1.f));
 
@@ -2513,18 +2521,13 @@ public:
 			this->objects.push_back(new Object("Tree2", this->player, 1003.f, -139.f));
 			this->objects.push_back(new Object("Amikiri", this->player, 528.f, 508.f));
 			this->objects.push_back(new Object("Kappa", this->player, 1453.f, 349.f));
-
-
-			this->shadow.push_back(new Object("Shadow1", this->player, -20.f, 39.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, -29.f, 472.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 720.f, 37.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 335.f, -145.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 335.f, 220.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 562.f, -172.f));
 		}
 		else if (this->gameStage == 22)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map2/map2_2.png");
+
+			this->shadowTexture.loadFromFile("Images/map/shadow/map2_2_shadow.png");
+			this->shadow.setTexture(this->shadowTexture);
 
 			this->collisions.push_back(new CollisionBox(*this->player, 1700.f, 320.f, 1.f, 500.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 1660.f, 840.f, 50.f, 50.f));
@@ -2566,20 +2569,13 @@ public:
 			this->objects.push_back(new Object("Kappa", this->player, 1355.f, 454.f));
 			this->objects.push_back(new Object("BossUmibozu", this->player, 878.f, 165.f));
 
-
-			this->shadow.push_back(new Object("Shadow1", this->player, 20.f, -127.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 368.f, -109.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 114.f, 763.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 536.f, 776.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 845.f, 705.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 650.f, -109.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 524.f, 76.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 208.f, 37.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 335.f, 705.f));
 		}
 		else if (this->gameStage == 23)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map2/map2_3.png");
+
+			this->shadowTexture.loadFromFile("Images/map/shadow/map2_3_shadow.png");
+			this->shadow.setTexture(this->shadowTexture);
 
 			this->collisions.push_back(new CollisionBox(*this->player, 1310.f, 870.f, 1.f, 210.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 1310.f, 870.f, 610.f, 1.f));
@@ -2624,20 +2620,13 @@ public:
 			this->objects.push_back(new Object("Fence1", this->player, 1699.f, 416.f));
 			this->objects.push_back(new Object("Fence1", this->player, 1755.f, 416.f));
 			this->objects.push_back(new Object("Fence1", this->player, 1811.f, 416.f));
-
-			this->shadow.push_back(new Object("Shadow1", this->player, 113.f, -16.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, -39.f, 276.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, -39.f, 769.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, -11.f, 490.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 343.f, 131.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 646.f, -105.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1010.f, 12.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1336.f, -118.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1699.f, -32.f));
 		}
 		else if (this->gameStage == 31)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map3/map3_1.png");
+
+			this->shadowTexture.loadFromFile("Images/map/shadow/map3_1_shadow.png");
+			this->shadow.setTexture(this->shadowTexture);
 
 			this->collisions.push_back(new CollisionBox(*this->player, 10.f, 870.f, 50.f, 50.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 70.f, 885.f, 50.f, 50.f));
@@ -2690,15 +2679,13 @@ public:
 			this->objects.push_back(new Object("Skeleton", this->player, 615.f, 587.f));
 			this->objects.push_back(new Object("Wanyudo", this->player, 843.f, 276.f));
 			this->objects.push_back(new Object("Skeleton", this->player, 1473.f, 437.f));
-
-
-			this->shadow.push_back(new Object("Shadow1", this->player, 296.f, -90.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 16.f, -90.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1514.f, -126.f));
 		}
 		else if (this->gameStage == 32)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map3/map3_2.png");
+
+			this->shadowTexture.loadFromFile("Images/map/shadow/map3_2_shadow.png");
+			this->shadow.setTexture(this->shadowTexture);
 
 			this->collisions.push_back(new CollisionBox(*this->player, 10.f, 960.f, 50.f, 50.f));
 			this->collisions.push_back(new CollisionBox(*this->player, 70.f, 980.f, 50.f, 50.f));
@@ -2755,16 +2742,13 @@ public:
 			this->objects.push_back(new Object("Wanyudo", this->player, 776.f, 488.f));
 			this->objects.push_back(new Object("Skeleton", this->player, 803.f, 212.f));
 			this->objects.push_back(new Object("Wanyudo", this->player, 1277.f, 437.f));
-
-
-			this->shadow.push_back(new Object("Shadow1", this->player, 1657.f, -46.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 277.f, -145.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1694.f, 578.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1195.f, -168.f));
 		}
 		else if (this->gameStage == 33)
 		{
 			this->backgroundTexture.loadFromFile("Images/map/map3/map3_3.png");
+
+			this->shadowTexture.loadFromFile("Images/map/shadow/map3_3_shadow.png");
+			this->shadow.setTexture(this->shadowTexture);
 
 			this->objects.push_back(new Object("House3", this->player, 1559.f, 24.f));
 			this->objects.push_back(new Object("House3", this->player, 1559.f, 382.f));
@@ -2809,13 +2793,6 @@ public:
 			this->objects.push_back(new Object("Rock", this->player, 245.f, 698.f));
 			this->objects.push_back(new Object("Rock", this->player, 1782.f, 727.f));
 			this->objects.push_back(new Object("BossGashadokuro", this->player, 849.f, 230.f));
-
-
-			this->shadow.push_back(new Object("Shadow1", this->player, 97.f, 698.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1252.f, 698.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1572.f, 658.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 1732.f, 789.f));
-			this->shadow.push_back(new Object("Shadow1", this->player, 476.f, 743.f));
 		}
 
 		sortObject(objects);
@@ -2878,7 +2855,7 @@ public:
 
 	void update(const float& dt)
 	{
-		//ChatDialog
+		//Story
 		if (this->gameStage == 11)
 		{
 			if (this->dialogchat == 2 && this->dialog == 1)
@@ -2950,7 +2927,6 @@ public:
 					this->dialog = 3;
 				}
 			}
-
 			if (this->dialog == 3 && this->chat.empty())
 			{
 				currentState = "MainMenu";
@@ -3354,10 +3330,7 @@ public:
 
 		if (!this->player->isRendered()) this->player->render(*target);
 
-		for (auto& i : this->shadow)
-		{
-			i->render(*target);
-		}
+		target->draw(this->shadow);
 
 		if (!this->chat.empty())
 			this->chat.front()->render(target);
