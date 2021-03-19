@@ -2606,20 +2606,20 @@ public:
 			this->objects.push_back(new Object("Tree2", this->player, 1177.f, -102.f));
 			this->objects.push_back(new Object("Tree2", this->player, -104.f, 421.f));
 			this->objects.push_back(new Object("Tree2", this->player, 1498.f, -129.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1475.f, 608.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1531.f, 608.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1587.f, 608.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1643.f, 608.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1699.f, 608.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1755.f, 608.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1811.f, 608.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1475.f, 416.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1531.f, 416.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1587.f, 416.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1643.f, 416.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1699.f, 416.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1755.f, 416.f));
-			this->objects.push_back(new Object("Fence1", this->player, 1811.f, 416.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1475.f, 608.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1531.f, 608.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1587.f, 608.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1643.f, 608.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1699.f, 608.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1755.f, 608.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1811.f, 608.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1475.f, 416.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1531.f, 416.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1587.f, 416.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1643.f, 416.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1699.f, 416.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1755.f, 416.f));
+			this->objects.push_back(new Object("Fence2", this->player, 1811.f, 416.f));
 		}
 		else if (this->gameStage == 31)
 		{
