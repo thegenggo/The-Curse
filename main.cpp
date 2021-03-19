@@ -653,7 +653,7 @@ public:
 		this->showTextPushBack(dmg);
 	}
 
-	virtual void showTextUpdate(const float& dt)
+	void showTextUpdate(const float& dt)
 	{
 		for (auto i = this->showText.begin(); i < this->showText.end(); i++)
 		{
@@ -2226,15 +2226,15 @@ public:
 		target->draw(this->amountItem2);
 
 		//show mouse position zone
-		Text mouseText;
+		/*Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
 		mouseText.setFont(font);
 		mouseText.setCharacterSize(20);
 		std::stringstream ss;
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
-		mouseText.setString(ss.str());
+		mouseText.setString(ss.str());*/
 
-		target->draw(mouseText);
+		/*target->draw(mouseText);*/
 	}
 };
 
@@ -3338,14 +3338,14 @@ public:
 		if (!this->chat.empty())
 			this->chat.front()->render(target);
 
-		Text mouseText;
+	/*	Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
 		mouseText.setFont(font);
 		mouseText.setCharacterSize(20);
 		stringstream ss;
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
 		mouseText.setString(ss.str());
-		target->draw(mouseText);
+		target->draw(mouseText);*/
 	}
 };
 
@@ -3478,14 +3478,14 @@ public:
 
 		target->draw(this->background);
 
-		Text mouseText;
+	/*	Text mouseText;
 		mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 20);
 		mouseText.setFont(font);
 		mouseText.setCharacterSize(20);
 		stringstream ss;
 		ss << this->mousePosView.x << " " << this->mousePosView.y;
 		mouseText.setString(ss.str());
-		target->draw(mouseText);
+		target->draw(mouseText);*/
 
 		this->renderButtons(*target);
 	}
