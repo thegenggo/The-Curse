@@ -1073,8 +1073,8 @@ public:
 
 		this->rendered = false;
 
-		this->elixirs = 3;
-		this->sacredWater = 3;
+		this->elixirs = 10;
+		this->sacredWater = 10;
 	}
 
 	virtual ~Player()
@@ -1196,7 +1196,7 @@ public:
 			if (this->elixirs > 0)
 			{
 				this->elixirs--;
-				int heal = this->max_hp * 3 / 4;
+				int heal = floor(this->max_hp * 1.f / 4.f);
 				if (heal + this->hp > this->max_hp) heal = this->max_hp - this->hp;
 				this->hp += heal;
 				this->showTextPushBack(heal, Color::Green);
@@ -1207,7 +1207,7 @@ public:
 			if (this->sacredWater > 0)
 			{
 				this->sacredWater--;
-				int heal = this->max_stamina * 3 / 4;
+				int heal = floor(this->max_stamina * 1.f / 4.f);
 				if (heal + this->stamina > this->max_stamina) heal = this->max_stamina - this->stamina;
 				this->stamina += heal;
 				this->showTextPushBack(heal, Color::Blue);
