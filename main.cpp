@@ -2284,7 +2284,7 @@ public:
 		this->lightTexture.loadFromFile("Images/light.png");
 		this->light.setTexture(this->lightTexture);
 		this->light.setColor(Color::Transparent);
-		this->light.setOrigin(this->light.getGlobalBounds().width / 2.f, this->light.getGlobalBounds().height / 2.f);
+		this->light.setOrigin(2400.f, 1350.f);
 		this->dialog = 0;
 		this->dialogchat = 0;
 		if (this->gameStage == 11)
@@ -2561,7 +2561,6 @@ public:
 		}
 		else if (this->gameStage == 23)
 		{
-			this->light.setColor(Color::Black);
 			this->backgroundTexture.loadFromFile("Images/map/map2/map2_3.png");
 
 			this->shadowTexture.loadFromFile("Images/map/shadow/map2_3_shadow.png");
@@ -2855,7 +2854,7 @@ public:
 	{
 
 		//Light
-		this->light.setPosition(this->player->getHitboxGlobalBounds().left + 20.f, this->player->getHitboxGlobalBounds().top - 20.f);
+		this->light.setPosition(this->player->getSpriteGlobalBounds().left + 70.f, this->player->getSpriteGlobalBounds().top + 20.f);
 		//Story
 		if (this->gameStage == 11)
 		{
