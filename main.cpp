@@ -2904,7 +2904,7 @@ public:
 		}
 		if (this->gameStage == 33)
 		{
-			if (this->player->intersects(FloatRect(849.f, 480.f, 250.f, 250.f)) && this->dialog == 0)
+			if (this->player->intersects(FloatRect(849.f, 280.f, 250.f, 250.f)) && this->dialog == 0)
 			{
 				if (this->dialogchat == 2)
 				{
