@@ -1017,7 +1017,7 @@ public:
 		this->hitboxComponent = new HitboxComponent(this->openWorldSprite, 0.f, 0.f, 45.f, 30.f);
 		this->openWorldanimationComponent = new AnimationComponent(this->openWorldSprite, this->openWorldTexture);
 		this->battleAnimationComponent = new AnimationComponent(this->battleSprite, this->battleTexture);
-		this->movementComponent = new MovementComponent(this->openWorldSprite, 1000.f);
+		this->movementComponent = new MovementComponent(this->openWorldSprite, 300.f);
 
 		this->lightTexture.loadFromFile("Images/light.png");
 		this->light.setTexture(lightTexture);
