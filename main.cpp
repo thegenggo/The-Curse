@@ -22,6 +22,7 @@ map<string, Texture> enemyTextures;
 
 enum class button_states { BTN_IDLE, BTN_HOVER, BTN_ACTIVE };
 
+
 class Button
 {
 	button_states buttonState;
